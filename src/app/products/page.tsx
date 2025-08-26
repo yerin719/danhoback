@@ -37,25 +37,34 @@ export default function ProductsPage() {
       }
 
       // 단백질 함량 필터 (범위)
-      if (product.protein < filters.proteinRange[0] || product.protein > filters.proteinRange[1]) {
+      if (
+        product.nutritionFacts.protein < filters.proteinRange[0] ||
+        product.nutritionFacts.protein > filters.proteinRange[1]
+      ) {
         return false;
       }
 
       // 칼로리 필터 (범위)
       if (
-        product.calories < filters.caloriesRange[0] ||
-        product.calories > filters.caloriesRange[1]
+        product.nutritionFacts.calories < filters.caloriesRange[0] ||
+        product.nutritionFacts.calories > filters.caloriesRange[1]
       ) {
         return false;
       }
 
       // 탄수화물 필터 (범위)
-      if (product.carbs < filters.carbsRange[0] || product.carbs > filters.carbsRange[1]) {
+      if (
+        product.nutritionFacts.carbs < filters.carbsRange[0] ||
+        product.nutritionFacts.carbs > filters.carbsRange[1]
+      ) {
         return false;
       }
 
       // 당 함량 필터 (범위)
-      if (product.sugar < filters.sugarRange[0] || product.sugar > filters.sugarRange[1]) {
+      if (
+        product.nutritionFacts.sugar < filters.sugarRange[0] ||
+        product.nutritionFacts.sugar > filters.sugarRange[1]
+      ) {
         return false;
       }
 

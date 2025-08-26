@@ -1,8 +1,8 @@
 "use client";
 
+import ProductImage from "@/components/ProductImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import ProductImage from "@/components/ProductImage";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -13,12 +13,16 @@ interface Product {
   brand: string;
   image: string;
   favorites: number;
-  protein: number;
-  calories: number;
-  carbs: number;
-  sugar: number;
   flavor: string;
   proteinType: string;
+  nutritionFacts: {
+    servingSize: number;
+    calories: number;
+    carbs: number;
+    sugar: number;
+    protein: number;
+    fat?: number;
+  };
 }
 
 interface ProductCardProps {
@@ -45,7 +49,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               className="object-cover rounded-lg"
             />
-            <Button variant="ghost" size="sm" onClick={handleFavoriteClick} className="absolute bottom-2 right-2 h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFavoriteClick}
+              className="absolute bottom-2 right-2 h-8 w-8 p-0"
+            >
               <Heart
                 className={`h-4 w-4 ${
                   isFavorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
@@ -64,19 +73,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
             <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
               <span className="text-muted-foreground">단백질</span>
-              <p className="font-semibold">{product.protein}g</p>
+              <p className="font-semibold">{product.nutritionFacts.protein}g</p>
             </div>
             <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
               <span className="text-muted-foreground">칼로리</span>
-              <p className="font-semibold">{product.calories}kcal</p>
+              <p className="font-semibold">{product.nutritionFacts.calories}kcal</p>
             </div>
             <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
               <span className="text-muted-foreground">탄수화물</span>
-              <p className="font-semibold">{product.carbs}g</p>
+              <p className="font-semibold">{product.nutritionFacts.carbs}g</p>
             </div>
             <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
               <span className="text-muted-foreground">당</span>
-              <p className="font-semibold">{product.sugar}g</p>
+              <p className="font-semibold">{product.nutritionFacts.sugar}g</p>
             </div>
           </div>
 

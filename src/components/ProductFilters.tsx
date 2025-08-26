@@ -80,23 +80,6 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     });
   };
 
-  const toggleAllFlavors = (selectAll: boolean) => {
-    const newFlavors = selectAll ? flavorOptions.filter((f) => f !== "전체") : [];
-    onFiltersChange({
-      ...filters,
-      flavors: newFlavors,
-    });
-  };
-
-  const toggleAllProteinTypes = (selectAll: boolean) => {
-    const allTypes = [...mainProteinTypes, ...additionalProteinTypes];
-    const newProteinTypes = selectAll ? allTypes : [];
-    onFiltersChange({
-      ...filters,
-      proteinTypes: newProteinTypes,
-    });
-  };
-
   const resetFilters = () => {
     onFiltersChange({
       flavors: [],
@@ -221,9 +204,7 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
                     <Checkbox
                       id={`flavor-${flavor}`}
                       checked={filters.flavors.includes(flavor)}
-                      onCheckedChange={(checked) =>
-                        handleFlavorChange(flavor, checked as boolean)
-                      }
+                      onCheckedChange={(checked) => handleFlavorChange(flavor, checked as boolean)}
                     />
                     <label htmlFor={`flavor-${flavor}`} className="text-sm cursor-pointer">
                       {flavor}
