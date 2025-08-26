@@ -6,6 +6,7 @@ import ArticleCard from "@/components/articles/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { articles, getFeaturedArticle, articleCategories, type ArticleCategory } from "@/lib/articles";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function ArticlesPage() {
   const [selectedCategory, setSelectedCategory] = useState<ArticleCategory | "전체">("전체");
@@ -30,24 +31,31 @@ export default function ArticlesPage() {
       
       {/* 카테고리 필터 */}
       <section id="articles-list" className="mb-8">
-        <div className="flex flex-wrap gap-3 mb-8">
-          <Button 
-            variant={selectedCategory === "전체" ? "default" : "outline"}
-            onClick={() => setSelectedCategory("전체")}
-            size="sm"
-          >
-            전체
-          </Button>
-          {articleCategories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category)}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              variant={selectedCategory === "전체" ? "default" : "outline"}
+              onClick={() => setSelectedCategory("전체")}
               size="sm"
             >
-              {category}
+              전체
             </Button>
-          ))}
+            {articleCategories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                onClick={() => setSelectedCategory(category)}
+                size="sm"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+          <Button asChild variant="default" size="sm">
+            <Link href="/articles/new">
+              글 작성
+            </Link>
+          </Button>
         </div>
       </section>
       

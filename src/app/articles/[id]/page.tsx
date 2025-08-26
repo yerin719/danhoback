@@ -5,7 +5,7 @@ import CategoryBadge from "@/components/articles/CategoryBadge";
 import RelatedArticles from "@/components/articles/RelatedArticles";
 import { Button } from "@/components/ui/button";
 import { articles, getRelatedArticles } from "@/lib/articles";
-import { ArrowLeft, Clock, Eye, User, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -45,30 +45,8 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             {article.summary}
           </p>
           
-          {/* 메타 정보 */}
-          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground pb-8 border-b">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span>{article.author}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <time dateTime={article.publishedAt}>
-                {new Date(article.publishedAt).toLocaleDateString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </time>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              <span>{article.readTime}분 읽기</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              <span>{article.views.toLocaleString()} 보기</span>
-            </div>
+          {/* 단순 공백 */}
+          <div className="pb-8 border-b">
           </div>
           
           {/* 태그 */}

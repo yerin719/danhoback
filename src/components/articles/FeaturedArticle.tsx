@@ -5,7 +5,6 @@ import ProductImage from "@/components/ProductImage";
 import CategoryBadge from "./CategoryBadge";
 import type { Article } from "@/lib/articles";
 import Link from "next/link";
-import { Clock, Eye, User } from "lucide-react";
 
 interface FeaturedArticleProps {
   article: Article;
@@ -17,7 +16,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
       <Card className="cursor-pointer border-none shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
           {/* 왼쪽: 이미지 */}
-          <div className="aspect-video lg:aspect-square relative">
+          <div className="aspect-video relative">
             <ProductImage
               src={article.featuredImage}
               alt={article.title}
@@ -44,29 +43,8 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
                 {article.summary}
               </p>
               
-              {/* 메타 정보 */}
-              <div className="flex items-center gap-6 text-sm text-muted-foreground pt-4">
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
-                  <span>{article.author}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{article.readTime}분</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Eye className="h-4 w-4" />
-                  <span>{article.views.toLocaleString()}</span>
-                </div>
-              </div>
-              
-              {/* 날짜 */}
-              <div className="text-sm text-muted-foreground">
-                {new Date(article.publishedAt).toLocaleDateString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+              {/* 단지 여백 */}
+              <div className="pt-4">
               </div>
             </div>
           </div>
