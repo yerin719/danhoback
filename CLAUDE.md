@@ -129,3 +129,13 @@ yarn lint
 - **ESLint**: Next.js recommended + TypeScript rules
 - **Path Aliases**: All imports use `@/` prefix for src directory
 - **Korean Content**: Application is Korean-language focused
+
+## Git Commit Rules
+
+- **Do NOT include Claude Code attribution in commits**:
+  ```
+  🤖 Generated with [Claude Code](https://claude.ai/code)
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
+- Keep commit messages focused on the actual changes made
+- Use Korean for commit messages when appropriate
