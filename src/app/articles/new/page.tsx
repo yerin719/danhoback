@@ -1,247 +1,237 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { ImageUpload } from "@/components/common/image-upload";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import CategoryBadge from "@/components/articles/CategoryBadge";
-import ArticleContent from "@/components/articles/ArticleContent";
 import { articleCategories, type ArticleCategory } from "@/lib/articles";
-import { ArrowLeft, Eye, Save } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-// 마크다운 에디터를 dynamic import로 로드 (SSR 이슈 방지)
-const MDEditor = dynamic(
-  () => import("@uiw/react-md-editor").then((mod) => mod.default),
-  { ssr: false }
-);
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function NewArticlePage() {
   const router = useRouter();
-  const [isPreview, setIsPreview] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    summary: "",
     content: "",
-    category: "" as ArticleCategory | "",
-    featuredImage: "",
-    tags: ""
+    tags: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // 실제로는 API 호출로 저장
-    console.log("새 글 저장:", {
-      ...formData,
-      tags: formData.tags ? formData.tags.split(",").map(tag => tag.trim()) : []
-    });
-    
-    // 저장 후 목록 페이지로 이동
-    router.push("/articles");
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publishData, setPublishData] = useState({
+    featuredImage: "",
+    summary: "",
+    category: "" as ArticleCategory | "",
+    isPublic: true,
+  });
+
+  const handlePublish = () => {
+    // 출간 모달 오픈 시 제목 미리 채우기
+    setPublishData((prev) => ({ ...prev, summary: formData.title }));
+    setShowPublishModal(true);
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePublishDataChange = (field: string, value: string | boolean) => {
+    setPublishData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFinalPublish = async () => {
+    // 최종 출간 로직
+    const articleData = {
+      ...formData,
+      ...publishData,
+      tags: formData.tags ? formData.tags.split(",").map((tag) => tag.trim()) : [],
+    };
+
+    console.log("출간할 데이터:", articleData);
+
+    // TODO: API 호출
+    // await publishArticle(articleData);
+
+    // 성공 시 상세 페이지로 이동
+    router.push("/articles");
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* 뒤로 가기 버튼 */}
-      <div className="mb-8">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/articles" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            글 목록으로
-          </Link>
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 왼쪽: 폼 */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                새 글 작성
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={isPreview ? "outline" : "default"}
-                    size="sm"
-                    onClick={() => setIsPreview(false)}
-                  >
-                    편집
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={isPreview ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsPreview(true)}
-                    disabled={!formData.content}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    미리보기
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* 제목 */}
-                <div>
-                  <Label htmlFor="title">제목 *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    placeholder="글 제목을 입력하세요"
-                    required
-                  />
-                </div>
-
-                {/* 요약 */}
-                <div>
-                  <Label htmlFor="summary">요약 *</Label>
-                  <Textarea
-                    id="summary"
-                    value={formData.summary}
-                    onChange={(e) => handleInputChange("summary", e.target.value)}
-                    placeholder="글의 간단한 요약을 입력하세요"
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                {/* 카테고리 */}
-                <div>
-                  <Label>카테고리 *</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value: ArticleCategory) => handleInputChange("category", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="카테고리를 선택하세요" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {articleCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {formData.category && (
-                    <div className="mt-2">
-                      <CategoryBadge category={formData.category} />
-                    </div>
-                  )}
-                </div>
-
-                {/* 대표 이미지 URL */}
-                <div>
-                  <Label htmlFor="featuredImage">대표 이미지 URL</Label>
-                  <Input
-                    id="featuredImage"
-                    type="url"
-                    value={formData.featuredImage}
-                    onChange={(e) => handleInputChange("featuredImage", e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-
-                {/* 태그 */}
-                <div>
-                  <Label htmlFor="tags">태그</Label>
-                  <Input
-                    id="tags"
-                    value={formData.tags}
-                    onChange={(e) => handleInputChange("tags", e.target.value)}
-                    placeholder="태그를 쉼표로 구분해서 입력하세요 (예: 단백질, 운동, 다이어트)"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    쉼표(,)로 구분하여 여러 태그를 입력할 수 있습니다
-                  </p>
-                </div>
-
-                {/* 마크다운 에디터 */}
-                {!isPreview && (
-                  <div>
-                    <Label>내용 *</Label>
-                    <div className="mt-2">
-                      <MDEditor
-                        value={formData.content}
-                        onChange={(value) => handleInputChange("content", value || "")}
-                        preview="edit"
-                        height={400}
-                        data-color-mode="light"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* 저장 버튼 */}
-                <div className="flex gap-3 pt-4">
-                  <Button type="submit" className="flex-1">
-                    <Save className="h-4 w-4 mr-2" />
-                    글 저장
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => router.back()}>
-                    취소
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+    <div className="bg-background">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* 뒤로 가기 버튼 */}
+        <div className="mb-8">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/articles" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />글 목록으로
+            </Link>
+          </Button>
         </div>
 
-        {/* 오른쪽: 미리보기 */}
-        <div>
-          <Card className="sticky top-8">
-            <CardHeader>
-              <CardTitle>미리보기</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isPreview && formData.content ? (
-                <div className="space-y-4">
-                  {/* 미리보기 헤더 */}
-                  <div>
-                    {formData.category && (
-                      <div className="mb-2">
-                        <CategoryBadge category={formData.category} />
-                      </div>
-                    )}
-                    {formData.title && (
-                      <h1 className="text-2xl font-bold mb-3">{formData.title}</h1>
-                    )}
-                    {formData.summary && (
-                      <p className="text-muted-foreground mb-4">{formData.summary}</p>
-                    )}
-                    <div className="border-b pb-4 mb-4">
-                      <p className="text-sm text-muted-foreground">
-                        작성자: 현재 사용자 • 방금 전
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* 미리보기 콘텐츠 */}
-                  <ArticleContent content={formData.content} />
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>미리보기를 보려면 내용을 입력하고</p>
-                  <p>미리보기 버튼을 클릭하세요</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* 메인 폼 */}
+        <div className="space-y-6">
+          {/* 제목 */}
+          <Input
+            value={formData.title}
+            onChange={(e) => handleInputChange("title", e.target.value)}
+            placeholder="글 제목을 입력하세요..."
+            className="!text-3xl md:!text-3xl font-bold border-0 border-b-2 border-border rounded-none px-0 py-8 focus-visible:ring-0 focus-visible:border-primary"
+            style={{ fontSize: "1.875rem" }}
+          />
+
+          {/* 태그 */}
+          <Input
+            value={formData.tags}
+            onChange={(e) => handleInputChange("tags", e.target.value)}
+            placeholder="태그를 입력하세요... (예: 단백질, 운동, 다이어트)"
+            className="border-0 rounded-none px-0 py-3 focus-visible:ring-0 shadow-none"
+          />
+
+          {/* 내용 */}
+          <Textarea
+            value={formData.content}
+            onChange={(e) => handleInputChange("content", e.target.value)}
+            placeholder="내용을 작성하세요..."
+            className="min-h-[calc(100vh-500px)] font-mono resize-none border-0 rounded-none px-0 py-4 focus-visible:ring-0 text-base leading-relaxed shadow-none"
+          />
+
+          {/* 출간 버튼 */}
+          <div className="flex justify-center pt-8">
+            <Button
+              onClick={handlePublish}
+              size="lg"
+              className="px-8 py-3 text-lg"
+              disabled={!formData.title.trim() || !formData.content.trim()}
+            >
+              출간하기
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* 출간 설정 모달 */}
+      <Dialog open={showPublishModal} onOpenChange={setShowPublishModal}>
+        <DialogContent className="max-w-[90vw] w-[90vw] sm:max-w-[90vw] lg:max-w-[80vw] max-h-[90vh] overflow-y-auto min-w-[800px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">글 출간 설정</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+            {/* 좌측: 썸네일 및 콘텐츠 */}
+            <div className="space-y-6">
+              {/* 썸네일 업로드 */}
+              <div>
+                <Label>썸네일 이미지</Label>
+                <div className="mt-2">
+                  <ImageUpload
+                    value={publishData.featuredImage}
+                    onChange={(value) => handlePublishDataChange("featuredImage", value)}
+                    aspectRatio="video"
+                  />
+                </div>
+              </div>
+
+              {/* 제목 확인 */}
+              <div>
+                <Label>제목</Label>
+                <Input value={formData.title} className="mt-2 text-lg font-semibold" disabled />
+              </div>
+
+              {/* 요약 */}
+              <div>
+                <Label>글 요약</Label>
+                <Textarea
+                  value={publishData.summary}
+                  onChange={(e) => handlePublishDataChange("summary", e.target.value)}
+                  placeholder="독자가 볼 수 있는 글 요약을 작성하세요..."
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            {/* 우측: 설정 */}
+            <div className="space-y-6">
+              {/* 공개 설정 */}
+              <div>
+                <Label>공개 설정</Label>
+                <div className="mt-3 space-y-3">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={publishData.isPublic === true}
+                      onChange={() => handlePublishDataChange("isPublic", true)}
+                      className="w-4 h-4"
+                    />
+                    <span>전체 공개</span>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={publishData.isPublic === false}
+                      onChange={() => handlePublishDataChange("isPublic", false)}
+                      className="w-4 h-4"
+                    />
+                    <span>비공개</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* 카테고리 설정 */}
+              <div>
+                <Label>카테고리</Label>
+                <Select
+                  value={publishData.category}
+                  onValueChange={(value: ArticleCategory) =>
+                    handlePublishDataChange("category", value)
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="카테고리를 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {articleCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 버튼들 */}
+              <div className="flex flex-col gap-3 pt-6">
+                <Button
+                  onClick={handleFinalPublish}
+                  size="lg"
+                  disabled={!publishData.summary.trim() || !publishData.category}
+                  className="w-full"
+                >
+                  출간하기
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPublishModal(false)}
+                  size="lg"
+                  className="w-full"
+                >
+                  취소
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

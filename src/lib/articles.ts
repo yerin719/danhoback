@@ -114,7 +114,7 @@ export const articles: Article[] = [
 ## 결론
 초보자에게는 옵티멈이, 고칼로리를 원하는 분에게는 머슬팜을 추천합니다.`,
     category: "제품 브랜드",
-    featuredImage: "/api/placeholder/600/400", 
+    featuredImage: "", 
     author: "리뷰어 박비교",
     publishedAt: "2025-01-12T14:30:00Z",
     updatedAt: "2025-01-12T14:30:00Z",
@@ -156,7 +156,7 @@ export const articles: Article[] = [
 ## 주의사항
 개인의 체질과 소화능력을 고려하여 조절해야 합니다.`,
     category: "운동",
-    featuredImage: "/api/placeholder/600/400",
+    featuredImage: "",
     author: "트레이너 최운동",
     publishedAt: "2025-01-10T11:15:00Z",
     updatedAt: "2025-01-10T11:15:00Z", 
@@ -210,7 +210,7 @@ export const articles: Article[] = [
 ## 5. 프로틴 에너지볼
 운동 전후 간식으로 최적의 선택입니다.`,
     category: "식단",
-    featuredImage: "/api/placeholder/600/400",
+    featuredImage: "",
     author: "영양사 이식단", 
     publishedAt: "2025-01-08T16:45:00Z",
     updatedAt: "2025-01-08T16:45:00Z",
@@ -347,4 +347,10 @@ export function searchArticles(query: string): Article[] {
     article.summary.toLowerCase().includes(lowercaseQuery) ||
     article.tags?.some(tag => tag.toLowerCase().includes(lowercaseQuery))
   );
+}
+
+export function getLatestArticles(limit: number = 5): Article[] {
+  return articles
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, limit);
 }
