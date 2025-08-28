@@ -16,6 +16,20 @@ export interface CommunityPost {
   updatedAt: string;
 }
 
+export interface Comment {
+  id: string;
+  postId: string;
+  content: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  likes: number;
+  createdAt: string;
+  parentId?: string; // 답글을 위한 부모 댓글 ID
+}
+
 export type CommunityCategory = "자유" | "리뷰" | "운동" | "식단" | "다이어트";
 
 export const communityCategories: CommunityCategory[] = [
@@ -199,6 +213,87 @@ export function searchPosts(query: string): CommunityPost[] {
 
 export function getLatestPosts(limit: number = 8): CommunityPost[] {
   return communityPosts
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, limit);
+}
+
+// Mock 댓글 데이터
+export const comments: Comment[] = [
+  {
+    id: "c1",
+    postId: "1",
+    content: "와 데드리프트 100kg 대단하네요! 저도 목표로 하고 있는 무게인데 어떤 점을 주의해야 할까요?",
+    author: {
+      id: "user9",
+      name: "초보리프터",
+      avatar: "/api/placeholder/40/48",
+    },
+    likes: 3,
+    createdAt: "2025-01-20T19:00:00Z",
+  },
+  {
+    id: "c2",
+    postId: "1",
+    content: "폼이 정말 중요해요! 처음엔 무게보다는 정확한 자세를 익히는 게 좋습니다.",
+    author: {
+      id: "user1",
+      name: "근육맨김철수",
+      avatar: "/api/placeholder/40/40",
+    },
+    likes: 5,
+    createdAt: "2025-01-20T19:30:00Z",
+    parentId: "c1",
+  },
+  {
+    id: "c3",
+    postId: "2",
+    content: "저도 이 제품 쓰고 있는데 정말 맛있어요! 바닐라맛도 추천드려요.",
+    author: {
+      id: "user10",
+      name: "프로틴러버",
+      avatar: "/api/placeholder/40/49",
+    },
+    likes: 7,
+    createdAt: "2025-01-20T17:00:00Z",
+  },
+  {
+    id: "c4",
+    postId: "2",
+    content: "가격이 좀 부담되긴 하지만 품질은 확실히 좋은 것 같아요.",
+    author: {
+      id: "user11",
+      name: "알뜰구매자",
+      avatar: "/api/placeholder/40/50",
+    },
+    likes: 2,
+    createdAt: "2025-01-20T18:00:00Z",
+  },
+  {
+    id: "c5",
+    postId: "3",
+    content: "레시피 정말 간단하네요! 내일 아침에 따라해봐야겠어요 👍",
+    author: {
+      id: "user12",
+      name: "요리초보",
+      avatar: "/api/placeholder/40/51",
+    },
+    likes: 4,
+    createdAt: "2025-01-20T10:30:00Z",
+  },
+];
+
+// 댓글 관련 유틸리티 함수들
+export function getCommentsByPostId(postId: string): Comment[] {
+  return comments.filter(comment => comment.postId === postId);
+}
+
+export function getPostById(id: string): CommunityPost | undefined {
+  return communityPosts.find(post => post.id === id);
+}
+
+export function getRelatedPosts(currentPostId: string, category: CommunityCategory, limit: number = 4): CommunityPost[] {
+  return communityPosts
+    .filter(post => post.id !== currentPostId && post.category === category)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, limit);
 }

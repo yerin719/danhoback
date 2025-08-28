@@ -8,19 +8,22 @@ import Link from "next/link";
 
 interface CommunityPostListItemProps {
   post: CommunityPost;
+  hideCategories?: boolean;
 }
 
-export default function CommunityPostListItem({ post }: CommunityPostListItemProps) {
+export default function CommunityPostListItem({ post, hideCategories = false }: CommunityPostListItemProps) {
 
   return (
     <div className="py-3 border-b border-border/40 last:border-b-0">
       <div className="flex items-center gap-4 text-sm">
         {/* 카테고리 */}
-        <div className="w-16 flex-shrink-0">
-          <Badge variant="outline" className="text-xs h-5">
-            {post.category}
-          </Badge>
-        </div>
+        {!hideCategories && (
+          <div className="w-16 flex-shrink-0">
+            <Badge variant="outline" className="text-xs h-5">
+              {post.category}
+            </Badge>
+          </div>
+        )}
 
         {/* 제목 */}
         <div className="flex-1 min-w-0">
