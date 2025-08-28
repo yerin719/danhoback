@@ -5,6 +5,7 @@ import CommunityPostItem from "@/components/community/CommunityPostItem";
 import CommunityPostListItem from "@/components/community/CommunityPostListItem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import {
   Sheet,
   SheetContent,
@@ -80,10 +81,12 @@ export default function CommunityPage() {
           <h1 className="text-3xl font-bold">커뮤니티</h1>
           <p className="text-muted-foreground mt-1">단백질 생활의 모든 이야기를 나누어보세요</p>
         </div>
-        <Button className="w-fit">
-          <Plus className="h-4 w-4 mr-2" />
-          글쓰기
-        </Button>
+        <Link href="/community/write">
+          <Button className="w-fit">
+            <Plus className="h-4 w-4 mr-2" />
+            글쓰기
+          </Button>
+        </Link>
       </div>
 
       <div className="flex gap-8">
