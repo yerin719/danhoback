@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatRelativeTime, getNotificationIcon, getUnreadNotificationCount, notifications } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
-import { Bell, Heart, LogOut, MessageCircle, Settings, Tag, User, UserPlus } from "lucide-react";
+import { Bell, Heart, LogOut, MessageCircle, Tag, User, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -146,12 +146,6 @@ export default function Navigation() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    <Settings className="mr-2 h-4 w-4" />
-                    프로필 설정
-                  </Link>
-                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/users">
                     <User className="mr-2 h-4 w-4" />

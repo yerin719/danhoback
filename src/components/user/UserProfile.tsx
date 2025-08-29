@@ -1,8 +1,11 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User } from "@/lib/user";
 import { Settings } from "lucide-react";
-import Link from "next/link";
+import { useState } from "react";
+import ProfileEditModal from "@/components/ProfileEditModal";
 
 interface UserProfileProps {
   user: User;
@@ -10,6 +13,8 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ user, isOwner }: UserProfileProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="pb-8 mb-8 border-b">
       <div className="flex items-start gap-6">
@@ -29,16 +34,24 @@ export default function UserProfile({ user, isOwner }: UserProfileProps) {
 
             {/* 설정 버튼 (본인인 경우만) */}
             {isOwner && (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/profile" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  설정
-                </Link>
+              <Button 
+                onClick={() => setIsModalOpen(true)}
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                설정
               </Button>
             )}
           </div>
         </div>
       </div>
+      
+      <ProfileEditModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }
