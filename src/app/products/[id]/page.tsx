@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { products } from "@/lib/products";
 import { ExternalLink, Heart } from "lucide-react";
 import { notFound } from "next/navigation";
-import { useState } from "react";
+import { useState, use } from "react";
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = products.find((p) => p.id === params.id);
+export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const product = products.find((p) => p.id === id);
 
   if (!product) {
     notFound();

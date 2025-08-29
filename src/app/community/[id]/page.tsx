@@ -11,10 +11,11 @@ import { ArrowLeft, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { useState } from "react";
+import { useState, use } from "react";
 
-export default function CommunityPostPage({ params }: { params: { id: string } }) {
-  const postId = params.id;
+export default function CommunityPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const postId = id;
   const post = getPostById(postId);
   const comments = getCommentsByPostId(postId);
   const relatedPosts = post ? getRelatedPosts(postId, post.category) : [];

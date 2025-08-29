@@ -8,9 +8,11 @@ import { articles, getRelatedArticles } from "@/lib/articles";
 import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { use } from "react";
 
-export default function ArticleDetailPage({ params }: { params: { id: string } }) {
-  const article = articles.find((a) => a.id === params.id);
+export default function ArticleDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const article = articles.find((a) => a.id === id);
 
   if (!article) {
     notFound();
