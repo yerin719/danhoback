@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           <Navigation />
-          <main className="pb-16 md:pb-0">{children}</main>
+          <main className="pt-16 pb-16 md:pb-0">{children}</main>
           <MobileBottomNav />
           <Toaster />
         </Providers>
