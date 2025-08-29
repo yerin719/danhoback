@@ -1,3 +1,4 @@
+import MobileBottomNav from "@/components/MobileBottomNav";
 import Navigation from "@/components/Navigation";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
@@ -15,7 +16,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           <Navigation />
-          <main>{children}</main>
+          <main className="pb-16 md:pb-0">{children}</main>
+          <MobileBottomNav />
           <Toaster />
         </Providers>
       </body>
