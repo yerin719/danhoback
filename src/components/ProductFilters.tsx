@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
+import { PACKAGE_TYPES, PRODUCT_FORMS } from "@/features/products/constants";
 import { flavorOptions } from "@/lib/products";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -15,6 +16,8 @@ interface FilterState {
   caloriesRange: [number, number];
   carbsRange: [number, number];
   sugarRange: [number, number];
+  forms: string[];
+  packageTypes: string[];
 }
 
 interface ProductFiltersProps {
@@ -80,6 +83,34 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     });
   };
 
+  const handleFormChange = (form: string, checked: boolean) => {
+    const newForms = checked
+      ? [...filters.forms, form]
+      : filters.forms.filter((f) => f !== form);
+
+    // 파우더가 선택 해제되면 packageTypes 초기화
+    const newPackageTypes = newForms.includes("powder")
+      ? filters.packageTypes
+      : [];
+
+    onFiltersChange({
+      ...filters,
+      forms: newForms,
+      packageTypes: newPackageTypes,
+    });
+  };
+
+  const handlePackageTypeChange = (packageType: string, checked: boolean) => {
+    const newPackageTypes = checked
+      ? [...filters.packageTypes, packageType]
+      : filters.packageTypes.filter((p) => p !== packageType);
+
+    onFiltersChange({
+      ...filters,
+      packageTypes: newPackageTypes,
+    });
+  };
+
   const resetFilters = () => {
     onFiltersChange({
       flavors: [],
@@ -88,6 +119,8 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
       caloriesRange: [80, 200],
       carbsRange: [0, 15],
       sugarRange: [0, 10],
+      forms: [],
+      packageTypes: [],
     });
   };
 
@@ -190,7 +223,7 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
         </div>
 
         {/* Checkbox 필터 행 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 맛 필터 */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
@@ -267,6 +300,52 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
                 ))}
               </CollapsibleContent>
             </Collapsible>
+          </div>
+
+          {/* 제품 형태 & 포장 타입 필터 */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-medium">제품 형태</label>
+            </div>
+
+            {/* 제품 형태 */}
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(PRODUCT_FORMS).map(([key, label]) => (
+                <div key={key} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`form-${key}`}
+                    checked={filters.forms.includes(key)}
+                    onCheckedChange={(checked) => handleFormChange(key, checked as boolean)}
+                  />
+                  <label htmlFor={`form-${key}`} className="text-sm cursor-pointer">
+                    {label}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            {/* 포장 타입 (파우더 선택 시만 표시) */}
+            {filters.forms.includes("powder") && (
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-muted-foreground">포장 타입</label>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {Object.entries(PACKAGE_TYPES).map(([key, label]) => (
+                    <div key={key} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`package-${key}`}
+                        checked={filters.packageTypes.includes(key)}
+                        onCheckedChange={(checked) => handlePackageTypeChange(key, checked as boolean)}
+                      />
+                      <label htmlFor={`package-${key}`} className="text-sm cursor-pointer">
+                        {label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

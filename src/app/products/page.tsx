@@ -12,6 +12,8 @@ interface FilterState {
   caloriesRange: [number, number];
   carbsRange: [number, number];
   sugarRange: [number, number];
+  forms: string[];
+  packageTypes: string[];
 }
 
 export default function ProductsPage() {
@@ -22,6 +24,8 @@ export default function ProductsPage() {
     caloriesRange: [80, 200],
     carbsRange: [0, 15],
     sugarRange: [0, 10],
+    forms: [],
+    packageTypes: [],
   });
 
   const filteredProducts = useMemo(() => {
@@ -66,6 +70,18 @@ export default function ProductsPage() {
         product.nutritionFacts.sugar > filters.sugarRange[1]
       ) {
         return false;
+      }
+
+      // 제품 형태 필터 (다중 선택)
+      if (filters.forms.length > 0 && !filters.forms.includes(product.form || "powder")) {
+        return false;
+      }
+
+      // 포장 타입 필터 (파우더 제품에만 적용)
+      if (filters.packageTypes.length > 0 && (product.form === "powder" || !product.form)) {
+        if (!filters.packageTypes.includes(product.packageType || "")) {
+          return false;
+        }
       }
 
       return true;
