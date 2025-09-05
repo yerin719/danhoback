@@ -45,17 +45,27 @@ export const PROTEIN_TYPES = {
 export type ProteinType = keyof typeof PROTEIN_TYPES;
 
 // ============================================
-// FORM TYPES
+// PRODUCT FORMS MAPPING
 // ============================================
 
-export const FORM_TYPES = {
+export const PRODUCT_FORMS = {
   powder: "파우더",
-  bar: "바",
   rtd: "드링크",
-  capsule: "캡슐",
 } as const;
 
-export type FormType = keyof typeof FORM_TYPES;
+export type ProductForm = keyof typeof PRODUCT_FORMS;
+
+// ============================================
+// PACKAGE TYPES MAPPING
+// ============================================
+
+export const PACKAGE_TYPES = {
+  bulk: "대용량",
+  pouch: "파우치",
+  stick: "스틱",
+} as const;
+
+export type PackageType = keyof typeof PACKAGE_TYPES;
 
 // ============================================
 // HELPER FUNCTIONS
@@ -71,9 +81,14 @@ export function getProteinTypeDisplayName(type: ProteinType | null | undefined):
   return PROTEIN_TYPES[type] || type;
 }
 
-export function getFormDisplayName(form: FormType | string | null | undefined): string {
+export function getFormDisplayName(form: ProductForm | string | null | undefined): string {
   if (!form) return "파우더";
-  return FORM_TYPES[form as FormType] || form;
+  return PRODUCT_FORMS[form as ProductForm] || form;
+}
+
+export function getPackageTypeDisplayName(packageType: PackageType | string | null | undefined): string {
+  if (!packageType) return "";
+  return PACKAGE_TYPES[packageType as PackageType] || packageType;
 }
 
 // ============================================

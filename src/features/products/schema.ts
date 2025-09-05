@@ -51,6 +51,17 @@ export const proteinTypeEnum = pgEnum("protein_type", [
   "mixed", // 혼합
 ]);
 
+export const productFormEnum = pgEnum("product_form", [
+  "powder",    // 파우더
+  "rtd",       // 드링크 (RTD)
+]);
+
+export const packageTypeEnum = pgEnum("package_type", [
+  "bulk",      // 대용량
+  "pouch",     // 파우치
+  "stick",     // 스틱
+]);
+
 // ============================================
 // TABLES
 // ============================================
@@ -77,7 +88,7 @@ export const products = pgTable(
       .notNull(),
     name: varchar("name", { length: 200 }).notNull(),
     proteinType: proteinTypeEnum("protein_type").notNull(),
-    form: varchar("form", { length: 30 }).default("powder"),
+    form: productFormEnum("form").default("powder"),
     isActive: boolean("is_active").default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -102,6 +113,7 @@ export const productVariants = pgTable(
     name: varchar("name", { length: 200 }).notNull(),
     flavorCategory: flavorCategoryEnum("flavor_category"),
     flavorName: varchar("flavor_name", { length: 100 }),
+    packageType: packageTypeEnum("package_type"),
     size: varchar("size", { length: 50 }),
     totalAmount: decimal("total_amount", { precision: 8, scale: 2 }),
     servingsPerContainer: integer("servings_per_container"),
