@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   decimal,
@@ -180,37 +180,3 @@ export const variantNutritionRelations = relations(variantNutrition, ({ one }) =
     references: [productVariants.id],
   }),
 }));
-
-// ============================================
-// TRIGGER FUNCTION FOR updated_at
-// ============================================
-
-export const updateUpdatedAtTrigger = sql`
-  CREATE OR REPLACE FUNCTION update_updated_at_column()
-  RETURNS TRIGGER AS $$
-  BEGIN
-      NEW.updated_at = CURRENT_TIMESTAMP;
-      RETURN NEW;
-  END;
-  $$ language 'plpgsql';
-`;
-
-export const createBrandsUpdateTrigger = sql`
-  CREATE TRIGGER update_brands_updated_at BEFORE UPDATE ON brands
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-`;
-
-export const createProductsUpdateTrigger = sql`
-  CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-`;
-
-export const createProductVariantsUpdateTrigger = sql`
-  CREATE TRIGGER update_product_variants_updated_at BEFORE UPDATE ON product_variants
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-`;
-
-export const createVariantNutritionUpdateTrigger = sql`
-  CREATE TRIGGER update_variant_nutrition_updated_at BEFORE UPDATE ON variant_nutrition
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-`;
