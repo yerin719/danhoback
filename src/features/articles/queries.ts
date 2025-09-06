@@ -10,9 +10,15 @@ export type Article = Database["public"]["Tables"]["articles"]["Row"];
 
 // Article with tags 타입 (태그 관계 포함)
 export type ArticleWithTags = Article & {
-  tags?: Array<{
+  tags: Array<{
     id: string;
     name: string;
+  }>;
+  tagRelations?: Array<{
+    tag: {
+      id: string;
+      name: string;
+    };
   }>;
 };
 
@@ -101,13 +107,21 @@ export async function getArticlesByCategory(
 }
 
 /**
- * 단일 Article 상세 조회 (ID 또는 Slug 기준)
+ * 단일 Article 상세 조회 (ID 또는 Slug 기준, 태그 포함)
  */
-export async function getArticleById(id: string): Promise<Article | null> {
+export async function getArticleById(id: string): Promise<ArticleWithTags | null> {
   try {
     const { data, error } = await client
       .from("articles")
-      .select("*")
+      .select(`
+        *,
+        tagRelations:article_tag_relations(
+          tag:article_tags(
+            id,
+            name
+          )
+        )
+      `)
       .or(`id.eq.${id},slug.eq.${id}`)
       .eq("status", "published")
       .single();
@@ -121,7 +135,11 @@ export async function getArticleById(id: string): Promise<Article | null> {
       return null;
     }
 
-    return data;
+    // 태그 데이터 변환
+    return {
+      ...data,
+      tags: data.tagRelations?.map(rel => rel.tag).filter(Boolean) || []
+    };
   } catch (error) {
     console.error("Error in getArticleById:", error);
     return null;
