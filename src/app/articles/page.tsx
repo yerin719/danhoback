@@ -1,28 +1,33 @@
-"use client";
-
 import ArticleBanner from "@/components/articles/ArticleBanner";
 import ArticleCard from "@/components/articles/ArticleCard";
+import CategoryFilter from "@/components/articles/CategoryFilter";
 import FeaturedArticle from "@/components/articles/FeaturedArticle";
 import { Button } from "@/components/ui/button";
-import {
-  articleCategories,
-  articles,
-  getFeaturedArticle,
-  type ArticleCategory,
-} from "@/lib/articles";
+import { getCategoryDisplayName } from "@/features/articles/constants";
+import { getArticles, getFeaturedArticle } from "@/features/articles/queries";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense } from "react";
 
-export default function ArticlesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<ArticleCategory | "전체">("전체");
-  const featuredArticle = getFeaturedArticle();
+interface ArticlesPageProps {
+  searchParams: Promise<{ category?: string }>;
+}
 
-  const filteredArticles =
-    selectedCategory === "전체"
-      ? articles.filter((article) => article.id !== featuredArticle.id)
-      : articles.filter(
-          (article) => article.category === selectedCategory && article.id !== featuredArticle.id,
-        );
+export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
+  const params = await searchParams;
+  const category = params.category as "guide" | "brand" | "exercise" | "diet" | "trend" | undefined;
+
+  // 데이터 가져오기
+  const [featuredArticle, articles] = await Promise.all([
+    getFeaturedArticle(),
+    category
+      ? getArticles("publishedAt", "desc", 100, 0, { category })
+      : getArticles("publishedAt", "desc", 100, 0),
+  ]);
+
+  // Featured 글을 제외한 나머지 글들
+  const filteredArticles = articles.filter(
+    (article) => featuredArticle && article.id !== featuredArticle.id,
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -32,32 +37,18 @@ export default function ArticlesPage() {
       </div>
 
       {/* 최신글 하이라이트 */}
-      <section className="mb-12">
-        <FeaturedArticle article={featuredArticle} />
-      </section>
+      {featuredArticle && (
+        <section className="mb-12">
+          <FeaturedArticle article={featuredArticle} />
+        </section>
+      )}
 
       {/* 카테고리 필터 */}
       <section id="articles-list" className="mb-8">
         <div className="flex justify-between items-center mb-8">
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant={selectedCategory === "전체" ? "default" : "outline"}
-              onClick={() => setSelectedCategory("전체")}
-              size="sm"
-            >
-              전체
-            </Button>
-            {articleCategories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                size="sm"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+          <Suspense fallback={<div className="flex gap-3">로딩 중...</div>}>
+            <CategoryFilter />
+          </Suspense>
           <Button asChild variant="default" size="sm">
             <Link href="/articles/new">글 작성</Link>
           </Button>
@@ -66,15 +57,19 @@ export default function ArticlesPage() {
 
       {/* 게시글 리스트 */}
       <section>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredArticles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </div>
-
-        {filteredArticles.length === 0 && (
+        {filteredArticles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredArticles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">해당 카테고리의 글이 없습니다.</p>
+            <p className="text-muted-foreground">
+              {category
+                ? `${getCategoryDisplayName(category)} 카테고리의 글이 없습니다.`
+                : "아직 작성된 글이 없습니다."}
+            </p>
           </div>
         )}
       </section>

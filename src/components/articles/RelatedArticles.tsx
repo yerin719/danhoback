@@ -1,18 +1,28 @@
 "use client";
 
-import type { Article } from "@/lib/articles";
-import { getLatestArticles } from "@/lib/articles";
+import { getCategoryDisplayName } from "@/features/articles/constants";
 import Link from "next/link";
 import ArticleCard from "./ArticleCard";
 import ArticleImage from "./ArticleImage";
 
 interface RelatedArticlesProps {
-  articles: Article[];
+  articles: Array<{
+    id: string;
+    title: string;
+    summary: string | null;
+    category: string;
+    featured_image: string | null;
+  }>;
+  latestArticles: Array<{
+    id: string;
+    title: string;
+    summary: string | null;
+    category: string;
+    featured_image: string | null;
+  }>;
 }
 
-export default function RelatedArticles({ articles }: RelatedArticlesProps) {
-  const latestArticles = getLatestArticles(5);
-
+export default function RelatedArticles({ articles, latestArticles }: RelatedArticlesProps) {
   return (
     <section>
       {/* 관련 글 섹션 */}
@@ -59,18 +69,28 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
 }
 
 // 데스크탑용 가로형 카드 컴포넌트
-function RelatedArticleHorizontalCard({ article }: { article: Article }) {
+function RelatedArticleHorizontalCard({ 
+  article 
+}: { 
+  article: {
+    id: string;
+    title: string;
+    summary: string | null;
+    category: string;
+    featured_image: string | null;
+  }
+}) {
   return (
     <Link href={`/articles/${article.id}`}>
       <div className="flex gap-4 rounded-lg cursor-pointer mb-6">
         {/* 이미지 */}
         <div className="flex-shrink-0 w-20 h-16 relative overflow-hidden rounded-lg">
           <ArticleImage
-            src={article.featuredImage}
+            src={article.featured_image || ""}
             alt={article.title}
-            category={article.category}
+            category={getCategoryDisplayName(article.category as any)}
             iconSize="sm"
-            className="object-cover transition-transform duration-200 hover:scale-105"
+            className="object-cover"
           />
         </div>
 
@@ -79,7 +99,9 @@ function RelatedArticleHorizontalCard({ article }: { article: Article }) {
           <h3 className="font-semibold text-lg leading-tight line-clamp-2 hover:text-primary transition-colors">
             {article.title}
           </h3>
-          <div className="text-xs text-muted-foreground">{article.category}</div>
+          <div className="text-xs text-muted-foreground">
+            {getCategoryDisplayName(article.category as any)}
+          </div>
         </div>
       </div>
     </Link>

@@ -1,12 +1,18 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import type { Article } from "@/lib/articles";
+import { getCategoryDisplayName } from "@/features/articles/constants";
 import Link from "next/link";
 import ArticleImage from "./ArticleImage";
 
 interface ArticleCardProps {
-  article: Article;
+  article: {
+    id: string;
+    title: string;
+    summary: string | null;
+    category: string;
+    featured_image: string | null;
+  };
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
@@ -15,11 +21,11 @@ export default function ArticleCard({ article }: ArticleCardProps) {
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
         <div className="aspect-video relative mb-4 overflow-hidden rounded-lg">
           <ArticleImage
-            src={article.featuredImage}
+            src={article.featured_image || ""}
             alt={article.title}
-            category={article.category}
+            category={getCategoryDisplayName(article.category as any)}
             iconSize="lg"
-            className="object-cover transition-transform duration-200 hover:scale-105"
+            className="object-cover"
           />
         </div>
 
@@ -31,10 +37,14 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             </h3>
 
             {/* 요약 */}
-            <p className="text-muted-foreground text-sm line-clamp-3 mb-2">{article.summary}</p>
+            <p className="text-muted-foreground text-sm line-clamp-3 mb-2">
+              {article.summary || ""}
+            </p>
 
             {/* 카테고리 */}
-            <div className="text-xs text-muted-foreground">{article.category}</div>
+            <div className="text-xs text-muted-foreground">
+              {getCategoryDisplayName(article.category as any)}
+            </div>
           </div>
         </CardContent>
       </Card>

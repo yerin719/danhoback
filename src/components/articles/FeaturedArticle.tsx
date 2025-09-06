@@ -1,12 +1,18 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import type { Article } from "@/lib/articles";
+import { ArticleCategory, getCategoryDisplayName } from "@/features/articles/constants";
 import Link from "next/link";
 import ArticleImage from "./ArticleImage";
 
 interface FeaturedArticleProps {
-  article: Article;
+  article: {
+    id: string;
+    title: string;
+    summary: string | null;
+    category: ArticleCategory;
+    featured_image: string | null;
+  };
 }
 
 export default function FeaturedArticle({ article }: FeaturedArticleProps) {
@@ -17,11 +23,11 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
           {/* 왼쪽: 이미지 */}
           <div className="aspect-video relative">
             <ArticleImage
-              src={article.featuredImage}
+              src={article.featured_image || ""}
               alt={article.title}
-              category={article.category}
+              category={getCategoryDisplayName(article.category)}
               iconSize="xl"
-              className="object-cover transition-transform duration-300 hover:scale-105"
+              className="object-cover"
             />
           </div>
 
@@ -34,11 +40,13 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
               </h2>
 
               {/* 요약 */}
-              <p className="text-muted-foreground leading-relaxed">{article.summary}</p>
+              <p className="text-muted-foreground leading-relaxed">{article.summary || ""}</p>
 
               {/* 카테고리 */}
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{article.category}</span>
+                <span className="text-sm text-muted-foreground">
+                  {getCategoryDisplayName(article.category)}
+                </span>
               </div>
 
               {/* 단지 여백 */}
