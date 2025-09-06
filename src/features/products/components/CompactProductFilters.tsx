@@ -1,0 +1,294 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  FLAVOR_CATEGORIES,
+  PACKAGE_TYPES,
+  PRODUCT_FORMS,
+  PROTEIN_TYPES,
+} from "@/features/products/constants";
+import { useAllFilterOptions } from "@/features/products/hooks/useFilterOptions";
+import { FilterState } from "@/features/products/queries";
+import { RotateCcw } from "lucide-react";
+import { useMemo } from "react";
+import FilterButton from "./filters/FilterButton";
+import MultiSelectFilterPopover from "./filters/MultiSelectFilterPopover";
+import RangeFilterPopover from "./filters/RangeFilterPopover";
+import {
+  formatMultiSelectValue,
+  formatRangeValue,
+  getFilterActiveState,
+  isDefaultFilters,
+} from "./filters/filterUtils";
+
+interface CompactProductFiltersProps {
+  filters: FilterState;
+  onFiltersChange: (filters: FilterState) => void;
+}
+
+export default function CompactProductFilters({
+  filters,
+  onFiltersChange,
+}: CompactProductFiltersProps) {
+  // DB에서 실제 필터 옵션 가져오기
+  const { flavors, proteinTypes, forms, packageTypes, isLoading } = useAllFilterOptions();
+
+  // DB에서 받은 코드를 한글 레이블과 매핑
+  const flavorOptions = useMemo(() => {
+    if (!flavors.data) return [];
+    return flavors.data
+      .map((code) => ({
+        code,
+        label: FLAVOR_CATEGORIES[code as keyof typeof FLAVOR_CATEGORIES] || code,
+      }))
+      .filter((item) => item.label !== item.code);
+  }, [flavors.data]);
+
+  const proteinTypeOptions = useMemo(() => {
+    if (!proteinTypes.data) return [];
+    return proteinTypes.data.map((code) => ({
+      code,
+      label: PROTEIN_TYPES[code as keyof typeof PROTEIN_TYPES] || code,
+    }));
+  }, [proteinTypes.data]);
+
+  const formOptions = useMemo(() => {
+    if (!forms.data) return [];
+    return forms.data.map((code) => ({
+      code,
+      label: PRODUCT_FORMS[code as keyof typeof PRODUCT_FORMS] || code,
+    }));
+  }, [forms.data]);
+
+  const packageTypeOptions = useMemo(() => {
+    if (!packageTypes.data) return [];
+    return packageTypes.data.map((code) => ({
+      code,
+      label: PACKAGE_TYPES[code as keyof typeof PACKAGE_TYPES] || code,
+    }));
+  }, [packageTypes.data]);
+
+  // 필터 활성화 상태 확인
+  const activeStates = getFilterActiveState(filters);
+
+  // 필터 값 포맷팅
+  const proteinValue = formatRangeValue(filters.proteinRange, [0, 100], "g");
+  const caloriesValue = formatRangeValue(filters.caloriesRange, [0, 1000], "kcal");
+  const carbsValue = formatRangeValue(filters.carbsRange, [0, 100], "g");
+  const sugarValue = formatRangeValue(filters.sugarRange, [0, 50], "g");
+  const flavorsValue = formatMultiSelectValue(filters.flavors, flavorOptions.length);
+  const proteinTypesValue = formatMultiSelectValue(filters.proteinTypes, proteinTypeOptions.length);
+  const formsValue = formatMultiSelectValue(filters.forms, formOptions.length);
+  const packageTypesValue = formatMultiSelectValue(filters.packageTypes, packageTypeOptions.length);
+
+  // 필터 변경 핸들러들
+  const handleRangeChange = (
+    key: "proteinRange" | "caloriesRange" | "carbsRange" | "sugarRange",
+    value: [number, number],
+  ) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value,
+    });
+  };
+
+  const handleMultiSelectChange = (
+    key: "flavors" | "proteinTypes" | "forms" | "packageTypes",
+    values: string[],
+  ) => {
+    if (key === "forms") {
+      // 파우더가 선택 해제되면 packageTypes 초기화
+      const newPackageTypes = values.includes("powder") ? filters.packageTypes : [];
+      onFiltersChange({
+        ...filters,
+        [key]: values,
+        packageTypes: newPackageTypes,
+      });
+    } else {
+      onFiltersChange({
+        ...filters,
+        [key]: values,
+      });
+    }
+  };
+
+  const resetFilters = () => {
+    onFiltersChange({
+      flavors: [],
+      proteinTypes: [],
+      proteinRange: [0, 100],
+      caloriesRange: [0, 1000],
+      carbsRange: [0, 100],
+      sugarRange: [0, 50],
+      forms: [],
+      packageTypes: [],
+      searchQuery: "",
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <span className="text-sm text-muted-foreground">필터 옵션을 불러오는 중...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-b pb-4 mb-6">
+      <div
+        className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
+        style={{
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
+        <div className="flex gap-2 min-w-max">
+          {/* 단백질 필터 */}
+          <FilterButton label="단백질" value={proteinValue} isActive={activeStates.protein}>
+            {({ onClose }) => (
+              <RangeFilterPopover
+                label="단백질 함량"
+                value={filters.proteinRange}
+                min={0}
+                max={100}
+                step={1}
+                unit="g"
+                onApply={(value) => handleRangeChange("proteinRange", value)}
+                onClose={onClose}
+              />
+            )}
+          </FilterButton>
+
+          {/* 칼로리 필터 */}
+          <FilterButton label="칼로리" value={caloriesValue} isActive={activeStates.calories}>
+            {({ onClose }) => (
+              <RangeFilterPopover
+                label="칼로리"
+                value={filters.caloriesRange}
+                min={0}
+                max={1000}
+                step={10}
+                unit="kcal"
+                onApply={(value) => handleRangeChange("caloriesRange", value)}
+                onClose={onClose}
+              />
+            )}
+          </FilterButton>
+
+          {/* 탄수화물 필터 */}
+          <FilterButton label="탄수화물" value={carbsValue} isActive={activeStates.carbs}>
+            {({ onClose }) => (
+              <RangeFilterPopover
+                label="탄수화물 함량"
+                value={filters.carbsRange}
+                min={0}
+                max={100}
+                step={1}
+                unit="g"
+                onApply={(value) => handleRangeChange("carbsRange", value)}
+                onClose={onClose}
+              />
+            )}
+          </FilterButton>
+
+          {/* 당 필터 */}
+          <FilterButton label="당" value={sugarValue} isActive={activeStates.sugar}>
+            {({ onClose }) => (
+              <RangeFilterPopover
+                label="당 함량"
+                value={filters.sugarRange}
+                min={0}
+                max={50}
+                step={0.5}
+                unit="g"
+                onApply={(value) => handleRangeChange("sugarRange", value)}
+                onClose={onClose}
+              />
+            )}
+          </FilterButton>
+
+          {/* 맛 필터 */}
+          {flavorOptions.length > 0 && (
+            <FilterButton label="맛" value={flavorsValue} isActive={activeStates.flavors}>
+              {({ onClose }) => (
+                <MultiSelectFilterPopover
+                  label="맛"
+                  options={flavorOptions}
+                  selectedValues={filters.flavors}
+                  onApply={(values) => handleMultiSelectChange("flavors", values)}
+                  onClose={onClose}
+                />
+              )}
+            </FilterButton>
+          )}
+
+          {/* 단백질 종류 필터 */}
+          {proteinTypeOptions.length > 0 && (
+            <FilterButton
+              label="단백질 종류"
+              value={proteinTypesValue}
+              isActive={activeStates.proteinTypes}
+            >
+              {({ onClose }) => (
+                <MultiSelectFilterPopover
+                  label="단백질 종류"
+                  options={proteinTypeOptions}
+                  selectedValues={filters.proteinTypes}
+                  onApply={(values) => handleMultiSelectChange("proteinTypes", values)}
+                  onClose={onClose}
+                />
+              )}
+            </FilterButton>
+          )}
+
+          {/* 제품 형태 필터 */}
+          {formOptions.length > 0 && (
+            <FilterButton label="제품 형태" value={formsValue} isActive={activeStates.forms}>
+              {({ onClose }) => (
+                <MultiSelectFilterPopover
+                  label="제품 형태"
+                  options={formOptions}
+                  selectedValues={filters.forms}
+                  onApply={(values) => handleMultiSelectChange("forms", values)}
+                  onClose={onClose}
+                />
+              )}
+            </FilterButton>
+          )}
+
+          {/* 포장 타입 필터 (파우더 선택 시만 표시) */}
+          {filters.forms.includes("powder") && packageTypeOptions.length > 0 && (
+            <FilterButton
+              label="포장 타입"
+              value={packageTypesValue}
+              isActive={activeStates.packageTypes}
+            >
+              {({ onClose }) => (
+                <MultiSelectFilterPopover
+                  label="포장 타입"
+                  options={packageTypeOptions}
+                  selectedValues={filters.packageTypes}
+                  onApply={(values) => handleMultiSelectChange("packageTypes", values)}
+                  onClose={onClose}
+                />
+              )}
+            </FilterButton>
+          )}
+        </div>
+
+        {/* 초기화 버튼 */}
+        {!isDefaultFilters(filters) && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={resetFilters}
+            className="ml-2 h-9 px-3 flex-shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}

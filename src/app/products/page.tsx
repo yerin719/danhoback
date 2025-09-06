@@ -1,9 +1,7 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
-import ProductFilters from "@/components/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -11,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import CompactProductFilters from "@/features/products/components/CompactProductFilters";
 import { useProductSearch } from "@/features/products/hooks/useProductSearch";
 import { getDefaultFilters, type FilterState } from "@/features/products/queries";
 import { ArrowUpDown } from "lucide-react";
@@ -49,7 +49,7 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 필터 컴포넌트 - 실제 DB 필터 옵션 전달 */}
-      <ProductFilters filters={filters} onFiltersChange={handleFilterChange} />
+      <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       {/* 정렬 옵션 */}
       <div className="mb-6 flex items-center justify-between">
