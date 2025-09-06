@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState } from "react";
 
 interface Option {
@@ -50,32 +51,56 @@ export default function MultiSelectFilterPopover({
     onClose();
   };
 
-  return (
-    <div className="p-4 space-y-4">
-      <ScrollArea className="rounded border h-48 scrollbar-hide">
-        <div className="p-3 space-y-2">
-          {options.map((option) => (
-            <div key={option.code} className="flex items-center space-x-2">
-              <Checkbox
-                id={`${label}-${option.code}`}
-                checked={tempValues.includes(option.code)}
-                onCheckedChange={(checked) => handleToggle(option.code, checked as boolean)}
-              />
-              <Label htmlFor={`${label}-${option.code}`} className="text-sm cursor-pointer flex-1">
-                {option.label}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={handleClearAll} className="flex-1">
-          초기화
-        </Button>
-        <Button size="sm" onClick={handleApply} className="flex-1">
-          적용
-        </Button>
+  return (
+    <div className={isMobile ? "flex flex-col h-full" : "p-4 space-y-4"}>
+      {/* 스크롤 영역 */}
+      <div className={isMobile ? "flex-1 px-6 pt-2" : ""}>
+        <ScrollArea className={`rounded border scrollbar-hide ${isMobile ? "h-64" : "h-48"} mb-2`}>
+          <div className={isMobile ? "p-4 space-y-4" : "p-3 space-y-2"}>
+            {options.map((option) => (
+              <div
+                key={option.code}
+                className={`flex items-center space-x-3 ${isMobile ? "py-2" : ""}`}
+              >
+                <Checkbox
+                  id={`${label}-${option.code}`}
+                  checked={tempValues.includes(option.code)}
+                  onCheckedChange={(checked) => handleToggle(option.code, checked as boolean)}
+                  className={isMobile ? "h-5 w-5" : ""}
+                />
+                <Label
+                  htmlFor={`${label}-${option.code}`}
+                  className={`cursor-pointer flex-1 ${isMobile ? "text-base" : "text-sm"}`}
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* 버튼 영역 */}
+      <div className={isMobile ? "p-6 pt-4 border-t bg-background flex-shrink-0" : ""}>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            size={isMobile ? "default" : "sm"}
+            onClick={handleClearAll}
+            className={isMobile ? "h-12 flex-1" : "flex-1"}
+          >
+            초기화
+          </Button>
+          <Button
+            size={isMobile ? "default" : "sm"}
+            onClick={handleApply}
+            className={isMobile ? "h-12 flex-[2]" : "flex-1"}
+          >
+            적용
+          </Button>
+        </div>
       </div>
     </div>
   );

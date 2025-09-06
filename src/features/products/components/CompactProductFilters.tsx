@@ -145,7 +145,7 @@ export default function CompactProductFilters({
       >
         <div className="flex gap-2 min-w-max">
           {/* 단백질 필터 */}
-          <FilterButton label="단백질" value={proteinValue} isActive={activeStates.protein}>
+          <FilterButton label="단백질" value={proteinValue} isActive={activeStates.protein} type="range">
             {({ onClose }) => (
               <RangeFilterPopover
                 label="단백질 함량"
@@ -161,7 +161,7 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 칼로리 필터 */}
-          <FilterButton label="칼로리" value={caloriesValue} isActive={activeStates.calories}>
+          <FilterButton label="칼로리" value={caloriesValue} isActive={activeStates.calories} type="range">
             {({ onClose }) => (
               <RangeFilterPopover
                 label="칼로리"
@@ -177,7 +177,7 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 탄수화물 필터 */}
-          <FilterButton label="탄수화물" value={carbsValue} isActive={activeStates.carbs}>
+          <FilterButton label="탄수화물" value={carbsValue} isActive={activeStates.carbs} type="range">
             {({ onClose }) => (
               <RangeFilterPopover
                 label="탄수화물 함량"
@@ -193,7 +193,7 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 당 필터 */}
-          <FilterButton label="당" value={sugarValue} isActive={activeStates.sugar}>
+          <FilterButton label="당" value={sugarValue} isActive={activeStates.sugar} type="range">
             {({ onClose }) => (
               <RangeFilterPopover
                 label="당 함량"
