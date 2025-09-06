@@ -1,23 +1,11 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-
-interface NutritionFacts {
-  servingSize: number;
-  calories: number;
-  sodium?: number;
-  carbs: number;
-  sugar: number;
-  protein: number;
-  fat?: number;
-  saturatedFat?: number;
-  transFat?: number;
-  cholesterol?: number;
-  calcium?: number;
-}
+import { ProductNutrition } from "@/features/products/hooks/useProductDetail";
 
 interface NutritionTableProps {
-  nutritionFacts: NutritionFacts;
+  nutrition: ProductNutrition;
+  servingSize?: number;
 }
 
 // 영양성분 기준치 대비 퍼센트 계산 (일일 권장량 기준)
@@ -39,87 +27,80 @@ const calculatePercentage = (value: number, nutrient: string): string => {
   return `${percentage}%`;
 };
 
-export default function NutritionTable({ nutritionFacts }: NutritionTableProps) {
+export default function NutritionTable({ nutrition, servingSize = 30 }: NutritionTableProps) {
   const nutritionRows = [
     {
       name: "열량",
-      value: nutritionFacts.calories,
+      value: nutrition.calories,
       unit: "kcal",
       percentage: "-",
       indent: false,
     },
     {
       name: "나트륨",
-      value: nutritionFacts.sodium,
+      value: nutrition.sodium,
       unit: "mg",
-      percentage: nutritionFacts.sodium
-        ? calculatePercentage(nutritionFacts.sodium, "sodium")
+      percentage: nutrition.sodium
+        ? calculatePercentage(nutrition.sodium, "sodium")
         : "-",
       indent: false,
     },
     {
       name: "탄수화물",
-      value: nutritionFacts.carbs,
+      value: nutrition.carbs,
       unit: "g",
-      percentage: calculatePercentage(nutritionFacts.carbs, "carbs"),
+      percentage: nutrition.carbs ? calculatePercentage(nutrition.carbs, "carbs") : "-",
       indent: false,
     },
     {
       name: "당류",
-      value: nutritionFacts.sugar,
+      value: nutrition.sugar,
       unit: "g",
-      percentage: calculatePercentage(nutritionFacts.sugar, "sugar"),
+      percentage: nutrition.sugar ? calculatePercentage(nutrition.sugar, "sugar") : "-",
       indent: true,
     },
     {
       name: "단백질",
-      value: nutritionFacts.protein,
+      value: nutrition.protein,
       unit: "g",
-      percentage: calculatePercentage(nutritionFacts.protein, "protein"),
+      percentage: nutrition.protein ? calculatePercentage(nutrition.protein, "protein") : "-",
       indent: false,
     },
     {
       name: "지방",
-      value: nutritionFacts.fat,
+      value: nutrition.fat,
       unit: "g",
-      percentage: nutritionFacts.fat ? calculatePercentage(nutritionFacts.fat, "fat") : "-",
+      percentage: nutrition.fat ? calculatePercentage(nutrition.fat, "fat") : "-",
       indent: false,
     },
     {
       name: "포화지방",
-      value: nutritionFacts.saturatedFat,
+      value: nutrition.saturated_fat,
       unit: "g",
-      percentage: nutritionFacts.saturatedFat
-        ? calculatePercentage(nutritionFacts.saturatedFat, "saturatedFat")
+      percentage: nutrition.saturated_fat
+        ? calculatePercentage(nutrition.saturated_fat, "saturatedFat")
         : "-",
       indent: true,
     },
     {
-      name: "트랜스지방",
-      value: nutritionFacts.transFat,
-      unit: "g",
-      percentage: "-",
-      indent: true,
-    },
-    {
       name: "콜레스테롤",
-      value: nutritionFacts.cholesterol,
+      value: nutrition.cholesterol,
       unit: "mg",
-      percentage: nutritionFacts.cholesterol
-        ? calculatePercentage(nutritionFacts.cholesterol, "cholesterol")
+      percentage: nutrition.cholesterol
+        ? calculatePercentage(nutrition.cholesterol, "cholesterol")
         : "-",
       indent: false,
     },
     {
       name: "칼슘",
-      value: nutritionFacts.calcium,
+      value: nutrition.calcium,
       unit: "mg",
-      percentage: nutritionFacts.calcium
-        ? calculatePercentage(nutritionFacts.calcium, "calcium")
+      percentage: nutrition.calcium
+        ? calculatePercentage(nutrition.calcium, "calcium")
         : "-",
       indent: false,
     },
-  ].filter((row) => row.value !== undefined);
+  ].filter((row) => row.value !== undefined && row.value !== null);
 
   return (
     <div>
@@ -131,7 +112,7 @@ export default function NutritionTable({ nutritionFacts }: NutritionTableProps) 
               <TableRow>
                 <TableHead className="w-[140px] px-6">영양성분</TableHead>
                 <TableHead className="text-center w-[120px] px-6">
-                  1회 제공량 ({nutritionFacts.servingSize}g)
+                  1회 제공량 ({servingSize}g)
                 </TableHead>
                 <TableHead className="text-center w-[100px] px-6">%영양성분 기준치</TableHead>
               </TableRow>

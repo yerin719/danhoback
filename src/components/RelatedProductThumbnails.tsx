@@ -1,62 +1,66 @@
 "use client";
 
+import { getFlavorDisplayName, getPackageTypeDisplayName } from "@/features/products/constants";
+import { ProductVariant } from "@/features/products/hooks/useProductDetail";
 import Link from "next/link";
 import ProductImage from "./ProductImage";
 
-interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  image: string;
-  flavor: string;
-  nutritionFacts: {
-    servingSize: number;
-    calories: number;
-    carbs: number;
-    sugar: number;
-    protein: number;
-    fat?: number;
-  };
-}
-
 interface RelatedProductThumbnailsProps {
-  relatedProducts: Product[];
-  currentProductId: string;
+  variants: ProductVariant[];
+  currentVariantId: string;
 }
 
 export default function RelatedProductThumbnails({
-  relatedProducts,
-  currentProductId,
+  variants,
+  currentVariantId,
 }: RelatedProductThumbnailsProps) {
-  // 현재 제품 제외
-  const filteredProducts = relatedProducts.filter((product) => product.id !== currentProductId);
+  // 현재 variant 제외
+  const filteredVariants = variants.filter((variant) => variant.id !== currentVariantId);
 
-  if (filteredProducts.length === 0) {
+  if (filteredVariants.length === 0) {
     return null;
   }
 
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 md:grid-cols-6 lg:grid-cols-8">
-        {filteredProducts.map((product) => (
-          <Link key={product.id} href={`/products/${product.id}`} className="group block">
-            <div className="space-y-1">
-              {/* 썸네일 이미지 */}
-              <div className="aspect-square relative rounded-md overflow-hidden border border-muted transition-colors group-hover:border-muted-foreground">
-                <ProductImage
-                  src={product.image}
-                  alt={`${product.name} 썸네일`}
-                  className="object-cover"
-                />
-              </div>
+        {filteredVariants.map((variant) => {
+          const imageUrl = (() => {
+            // primary_image가 있으면 우선 사용
+            if (variant.primary_image) {
+              return variant.primary_image;
+            }
+            
+            // images가 배열이면 첫 번째 이미지 사용
+            if (Array.isArray(variant.images) && variant.images.length > 0) {
+              const firstImage = variant.images[0];
+              return typeof firstImage === 'string' ? firstImage : "/placeholder.svg";
+            }
+            
+            return "/placeholder.svg";
+          })();
 
-              {/* 맛 라벨 */}
-              <p className="text-[10px] text-center text-muted-foreground group-hover:text-foreground transition-colors truncate">
-                {product.flavor}
-              </p>
-            </div>
-          </Link>
-        ))}
+          return (
+            <Link key={variant.id} href={`/products/${variant.id}`} className="group block">
+              <div className="space-y-1">
+                {/* 썸네일 이미지 */}
+                <div className="aspect-square relative rounded-md overflow-hidden border border-muted transition-colors group-hover:border-muted-foreground">
+                  <ProductImage
+                    src={imageUrl}
+                    alt={variant.name || "제품 이미지"}
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* 맛 라벨 */}
+                <p className="text-[10px] text-center text-muted-foreground group-hover:text-foreground transition-colors truncate">
+                  {variant.flavor_category && getFlavorDisplayName(variant.flavor_category)}
+                  {variant.package_type && ` ${getPackageTypeDisplayName(variant.package_type)}`}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

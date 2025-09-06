@@ -6,19 +6,22 @@ import ProductImage from "./ProductImage";
 import { Button } from "./ui/button";
 
 interface ProductImageGalleryProps {
-  images: string[];
+  images: (string | { url: string })[];
   alt: string;
 }
 
 export default function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // 이미지 배열을 문자열 배열로 정규화
+  const imageUrls = images.map(img => typeof img === 'string' ? img : img?.url || '/placeholder.svg');
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
   };
 
   const goToImage = (index: number) => {
@@ -26,12 +29,12 @@ export default function ProductImageGallery({ images, alt }: ProductImageGallery
   };
 
   // 단일 이미지인 경우 간단히 표시
-  if (images.length === 1) {
+  if (imageUrls.length === 1) {
     return (
       <div className="space-y-4">
         <div className="aspect-square relative">
           <ProductImage
-            src={images[0]}
+            src={imageUrls[0]}
             alt={alt}
             className="object-cover rounded-lg"
           />
@@ -45,13 +48,13 @@ export default function ProductImageGallery({ images, alt }: ProductImageGallery
       {/* 메인 이미지 */}
       <div className="aspect-square relative group">
         <ProductImage
-          src={images[currentIndex]}
+          src={imageUrls[currentIndex]}
           alt={`${alt} - ${currentIndex + 1}`}
           className="object-cover rounded-lg"
         />
         
         {/* 네비게이션 버튼 */}
-        {images.length > 1 && (
+        {imageUrls.length > 1 && (
           <>
             <Button
               variant="ghost"
@@ -74,9 +77,9 @@ export default function ProductImageGallery({ images, alt }: ProductImageGallery
       </div>
 
       {/* 썸네일 */}
-      {images.length > 1 && (
+      {imageUrls.length > 1 && (
         <div className="flex gap-2 overflow-x-auto">
-          {images.map((image, index) => (
+          {imageUrls.map((image, index) => (
             <button
               key={index}
               onClick={() => goToImage(index)}

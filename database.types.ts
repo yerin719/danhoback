@@ -132,7 +132,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          is_active: boolean | null
+          is_active: boolean
           logo_url: string | null
           name: string
           name_en: string | null
@@ -142,7 +142,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
           logo_url?: string | null
           name: string
           name_en?: string | null
@@ -152,7 +152,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
           logo_url?: string | null
           name?: string
           name_en?: string | null
@@ -253,9 +253,9 @@ export type Database = {
         Row: {
           brand_id: string
           created_at: string
-          form: Database["public"]["Enums"]["product_form"] | null
+          form: Database["public"]["Enums"]["product_form"]
           id: string
-          is_active: boolean | null
+          is_active: boolean
           name: string
           protein_type: Database["public"]["Enums"]["protein_type"]
           updated_at: string
@@ -263,9 +263,9 @@ export type Database = {
         Insert: {
           brand_id: string
           created_at?: string
-          form?: Database["public"]["Enums"]["product_form"] | null
+          form?: Database["public"]["Enums"]["product_form"]
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
           name: string
           protein_type: Database["public"]["Enums"]["protein_type"]
           updated_at?: string
@@ -273,9 +273,9 @@ export type Database = {
         Update: {
           brand_id?: string
           created_at?: string
-          form?: Database["public"]["Enums"]["product_form"] | null
+          form?: Database["public"]["Enums"]["product_form"]
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
           name?: string
           protein_type?: Database["public"]["Enums"]["protein_type"]
           updated_at?: string
@@ -461,14 +461,12 @@ export type Database = {
         }[]
       }
       get_product_detail: {
-        Args: { product_id_param: string }
+        Args: { variant_id_param: string }
         Returns: {
-          brand: Json
-          form: string
-          product_id: string
-          product_name: string
-          protein_type: string
-          variants: Json
+          brand_info: Json
+          product_info: Json
+          related_variants: Json
+          selected_variant: Json
         }[]
       }
       search_products: {
@@ -530,8 +528,6 @@ export type Database = {
         | "milktea"
         | "greentea"
         | "coffee"
-        | "mint"
-        | "cookies"
         | "other"
       package_type: "bulk" | "pouch" | "stick"
       product_form: "powder" | "rtd"
@@ -691,8 +687,6 @@ export const Constants = {
         "milktea",
         "greentea",
         "coffee",
-        "mint",
-        "cookies",
         "other",
       ],
       package_type: ["bulk", "pouch", "stick"],

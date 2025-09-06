@@ -1,8 +1,31 @@
 import client from "@/supabase";
+import { Database } from "../../../database.types";
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
+
+// Database 기반으로 Json을 구체적인 타입으로 변환
+type ProductDetailRow = {
+  selected_variant: Database["public"]["Tables"]["product_variants"]["Row"] & {
+    nutrition?: Database["public"]["Tables"]["variant_nutrition"]["Row"];
+  };
+  product_info: Database["public"]["Tables"]["products"]["Row"];
+  brand_info: Database["public"]["Tables"]["brands"]["Row"];
+  related_variants: Array<
+    Pick<
+      Database["public"]["Tables"]["product_variants"]["Row"],
+      | "id"
+      | "name"
+      | "flavor_category"
+      | "flavor_name"
+      | "primary_image"
+      | "package_type"
+      | "size"
+      | "images"
+    >
+  >;
+};
 
 // 필터 옵션 인터페이스
 export interface FilterOption {
@@ -69,11 +92,12 @@ export async function searchProducts(
 }
 
 /**
- * 단일 제품 상세 정보 조회
+ * 단일 제품 상세 정보 조회 (variant_id 기준)
+ * 선택된 variant의 상세 정보와 같은 라인의 다른 variants 반환
  */
-export async function getProductDetail(productId: string) {
+export async function getProductDetail(variantId: string): Promise<ProductDetailRow | null> {
   const { data, error } = await client.rpc("get_product_detail", {
-    product_id_param: productId,
+    variant_id_param: variantId,
   });
 
   if (error) {
@@ -85,7 +109,7 @@ export async function getProductDetail(productId: string) {
     return null;
   }
 
-  return data[0];
+  return data[0] as ProductDetailRow;
 }
 
 /**

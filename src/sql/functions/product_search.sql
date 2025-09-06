@@ -205,85 +205,115 @@ END;
 $$;
 
 -- ============================================
--- 단일 제품 상세 조회 함수
+-- 단일 제품 상세 조회 함수 (variant_id 기준)
 -- ============================================
 CREATE OR REPLACE FUNCTION get_product_detail(
-  product_id_param uuid
+  variant_id_param uuid
 )
 RETURNS TABLE (
-  product_id uuid,
-  product_name text,
-  protein_type text,
-  form text,
-  brand jsonb,
-  variants jsonb
+  -- 선택된 variant 상세 정보
+  selected_variant jsonb,
+  -- 제품 기본 정보
+  product_info jsonb,
+  -- 브랜드 정보
+  brand_info jsonb,
+  -- 같은 라인의 다른 variants (간소한 정보)
+  related_variants jsonb
 )
 LANGUAGE plpgsql
 STABLE
 AS $$
 BEGIN
   RETURN QUERY
+  WITH selected_variant_data AS (
+    -- 선택된 variant의 상세 정보
+    SELECT 
+      pv.id,
+      pv.product_id,
+      jsonb_build_object(
+        'id', pv.id,
+        'name', pv.name,
+        'slug', pv.slug,
+        'flavor_category', pv.flavor_category::text,
+        'flavor_name', pv.flavor_name,
+        'package_type', pv.package_type::text,
+        'size', pv.size,
+        'total_amount', pv.total_amount,
+        'servings_per_container', pv.servings_per_container,
+        'serving_size', pv.serving_size,
+        'barcode', pv.barcode,
+        'primary_image', pv.primary_image,
+        'images', pv.images,
+        'purchase_url', pv.purchase_url,
+        'favorites_count', pv.favorites_count,
+        'is_available', pv.is_available,
+        'nutrition', CASE 
+          WHEN vn.id IS NOT NULL THEN
+            jsonb_build_object(
+              'calories', vn.calories,
+              'protein', vn.protein,
+              'carbs', vn.carbs,
+              'sugar', vn.sugar,
+              'fat', vn.fat,
+              'saturated_fat', vn.saturated_fat,
+              'sodium', vn.sodium,
+              'cholesterol', vn.cholesterol,
+              'calcium', vn.calcium,
+              'bcaa', vn.bcaa,
+              'additional_nutrients', vn.additional_nutrients,
+              'allergen_info', vn.allergen_info
+            )
+          ELSE NULL
+        END
+      ) as variant_data
+    FROM product_variants pv
+    LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
+    WHERE pv.id = variant_id_param AND pv.is_available = true
+  )
   SELECT 
-    p.id as product_id,
-    p.name::text as product_name,
-    p.protein_type::text,
-    p.form::text,
+    svd.variant_data as selected_variant,
+    -- 제품 정보
+    jsonb_build_object(
+      'id', p.id,
+      'name', p.name,
+      'protein_type', p.protein_type::text,
+      'form', p.form::text,
+      'is_active', p.is_active
+    ) as product_info,
+    -- 브랜드 정보
     jsonb_build_object(
       'id', b.id,
       'name', b.name,
       'name_en', b.name_en,
       'logo_url', b.logo_url,
-      'website', b.website
-    ) as brand,
+      'website', b.website,
+      'is_active', b.is_active
+    ) as brand_info,
+    -- 같은 라인의 다른 variants (선택된 것 제외)
     COALESCE(
-      jsonb_agg(
-        jsonb_build_object(
-          'id', pv.id,
-          'name', pv.name,
-          'slug', pv.slug,
-          'flavor_category', pv.flavor_category::text,
-          'flavor_name', pv.flavor_name,
-          'package_type', pv.package_type::text,
-          'size', pv.size,
-          'total_amount', pv.total_amount,
-          'servings_per_container', pv.servings_per_container,
-          'serving_size', pv.serving_size,
-          'barcode', pv.barcode,
-          'primary_image', pv.primary_image,
-          'images', pv.images,
-          'purchase_url', pv.purchase_url,
-          'favorites_count', pv.favorites_count,
-          'nutrition', CASE 
-            WHEN vn.id IS NOT NULL THEN
-              jsonb_build_object(
-                'calories', vn.calories,
-                'protein', vn.protein,
-                'carbs', vn.carbs,
-                'sugar', vn.sugar,
-                'fat', vn.fat,
-                'saturated_fat', vn.saturated_fat,
-                'sodium', vn.sodium,
-                'cholesterol', vn.cholesterol,
-                'calcium', vn.calcium,
-                'bcaa', vn.bcaa,
-                'additional_nutrients', vn.additional_nutrients,
-                'allergen_info', vn.allergen_info
-              )
-            ELSE NULL
-          END
+      (
+        SELECT jsonb_agg(
+          jsonb_build_object(
+            'id', other_pv.id,
+            'name', other_pv.name,
+            'flavor_category', other_pv.flavor_category::text,
+            'flavor_name', other_pv.flavor_name,
+            'primary_image', other_pv.primary_image,
+            'package_type', other_pv.package_type::text,
+            'size', other_pv.size
+          ) ORDER BY other_pv.display_order, other_pv.name
         )
-      ) FILTER (WHERE pv.id IS NOT NULL),
+        FROM product_variants other_pv
+        WHERE other_pv.product_id = svd.product_id 
+          AND other_pv.id != variant_id_param 
+          AND other_pv.is_available = true
+      ),
       '[]'::jsonb
-    ) as variants
-  FROM products p
+    ) as related_variants
+  FROM selected_variant_data svd
+  INNER JOIN products p ON svd.product_id = p.id
   INNER JOIN brands b ON p.brand_id = b.id
-  LEFT JOIN product_variants pv ON p.id = pv.product_id AND pv.is_available = true
-  LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
-  WHERE 
-    p.id = product_id_param
-    AND p.is_active = true
-    AND b.is_active = true
-  GROUP BY p.id, p.name, p.protein_type, p.form, b.id, b.name, b.name_en, b.logo_url, b.website;
+  WHERE p.is_active = true AND b.is_active = true;
 END;
 $$;
 

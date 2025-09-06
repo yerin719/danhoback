@@ -1,0 +1,1 @@
+ALTER TABLE "brands" ALTER COLUMN "is_active" SET NOT NULL;
