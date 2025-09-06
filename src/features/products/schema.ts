@@ -20,15 +20,12 @@ import {
 export const flavorCategoryEnum = pgEnum("flavor_category", [
   "chocolate",
   "strawberry",
-  "vanilla",
   "banana",
   "matcha",
   "grain", // 곡물
   "milktea",
   "greentea",
   "coffee",
-  "mint",
-  "cookies",
   "other",
 ]);
 
@@ -52,14 +49,14 @@ export const proteinTypeEnum = pgEnum("protein_type", [
 ]);
 
 export const productFormEnum = pgEnum("product_form", [
-  "powder",    // 파우더
-  "rtd",       // 드링크 (RTD)
+  "powder", // 파우더
+  "rtd", // 드링크 (RTD)
 ]);
 
 export const packageTypeEnum = pgEnum("package_type", [
-  "bulk",      // 대용량
-  "pouch",     // 파우치
-  "stick",     // 스틱
+  "bulk", // 대용량
+  "pouch", // 파우치
+  "stick", // 스틱
 ]);
 
 // ============================================

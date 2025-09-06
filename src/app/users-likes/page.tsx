@@ -1,7 +1,7 @@
 "use client";
 
 import EmptyFavorites from "@/components/EmptyFavorites";
-import ProductCard from "@/components/ProductCard";
+// import ProductCard from "@/components/ProductCard";
 import UserProfile from "@/components/user/UserProfile";
 import { getFavoriteCount, getFavoriteProducts } from "@/lib/favorites";
 import { currentUser, isCurrentUser } from "@/lib/user";
@@ -35,14 +35,14 @@ export default function MyPage() {
           <EmptyFavorites />
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {favoriteProducts.map((product) => (
+            {/* {favoriteProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
                 showPurchaseButton={true}
                 onFavoriteChange={handleFavoriteChange}
               />
-            ))}
+            ))} */}
           </div>
         )}
       </div>

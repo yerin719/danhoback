@@ -8,22 +8,29 @@ import Link from "next/link";
 import { useState } from "react";
 
 interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  image: string;
-  favorites: number;
-  flavor: string;
-  proteinType: string;
-  purchaseUrl?: string;
-  nutritionFacts: {
-    servingSize: number;
-    calories: number;
-    carbs: number;
-    sugar: number;
-    protein: number;
-    fat?: number;
-  };
+  variant_id: string;
+  product_id: string;
+  product_name: string;
+  variant_name: string;
+  brand_name: string;
+  brand_name_en?: string;
+  brand_logo_url?: string;
+  brand_id: string;
+  primary_image?: string;
+  favorites_count: number;
+  flavor_name?: string;
+  flavor_category?: string;
+  protein_type: string;
+  form: string;
+  package_type?: string;
+  size?: string;
+  purchase_url?: string;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  sugar?: number;
+  fat?: number;
+  sodium?: number;
 }
 
 interface ProductCardProps {
@@ -32,19 +39,19 @@ interface ProductCardProps {
   onFavoriteChange?: () => void;
 }
 
-export default function ProductCard({ 
-  product, 
-  showPurchaseButton = false, 
-  onFavoriteChange 
+export default function ProductCard({
+  product,
+  showPurchaseButton = false,
+  onFavoriteChange,
 }: ProductCardProps) {
   const [isFavorited, setIsFavorited] = useState(false);
-  const [favoriteCount, setFavoriteCount] = useState(product.favorites);
+  const [favoriteCount, setFavoriteCount] = useState(product.favorites_count || 0);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault(); // 카드 클릭과 구분
     setIsFavorited(!isFavorited);
     setFavoriteCount((prev) => (isFavorited ? prev - 1 : prev + 1));
-    
+
     // 찜 해제시 부모 컴포넌트에 알림
     if (isFavorited && onFavoriteChange) {
       onFavoriteChange();
@@ -53,19 +60,19 @@ export default function ProductCard({
 
   const handlePurchaseClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (product.purchaseUrl) {
-      window.open(product.purchaseUrl, "_blank", "noopener,noreferrer");
+    if (product.purchase_url) {
+      window.open(product.purchase_url, "_blank", "noopener,noreferrer");
     }
   };
 
   return (
-    <Link href={`/products/${product.id}`}>
+    <Link href={`/products/${product.product_id}`}>
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
         <CardHeader className="py-4 px-0 pb-2">
           <div className="aspect-square relative mb-4">
             <ProductImage
-              src={product.image}
-              alt={product.name}
+              src={product.primary_image || "/placeholder.png"}
+              alt={product.product_name}
               className="object-cover rounded-lg"
             />
             <Button
@@ -82,40 +89,50 @@ export default function ProductCard({
             </Button>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{product.brand}</p>
-            <h3 className="font-semibold text-sm leading-tight">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">{product.brand_name}</p>
+            <h3 className="font-semibold text-sm leading-tight">{product.product_name}</h3>
           </div>
         </CardHeader>
 
         <CardContent className="px-0 py-0">
           {/* 영양 성분 정보 */}
           <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-            <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-              <span className="text-muted-foreground">단백질</span>
-              <p className="font-semibold">{product.nutritionFacts.protein}g</p>
-            </div>
-            <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-              <span className="text-muted-foreground">칼로리</span>
-              <p className="font-semibold">{product.nutritionFacts.calories}kcal</p>
-            </div>
-            <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-              <span className="text-muted-foreground">탄수화물</span>
-              <p className="font-semibold">{product.nutritionFacts.carbs}g</p>
-            </div>
-            <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-              <span className="text-muted-foreground">당</span>
-              <p className="font-semibold">{product.nutritionFacts.sugar}g</p>
-            </div>
+            {product.protein !== null && product.protein !== undefined && (
+              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <span className="text-muted-foreground">단백질</span>
+                <p className="font-semibold">{product.protein}g</p>
+              </div>
+            )}
+            {product.calories !== null && product.calories !== undefined && (
+              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <span className="text-muted-foreground">칼로리</span>
+                <p className="font-semibold">{product.calories}kcal</p>
+              </div>
+            )}
+            {product.carbs !== null && product.carbs !== undefined && (
+              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <span className="text-muted-foreground">탄수화물</span>
+                <p className="font-semibold">{product.carbs}g</p>
+              </div>
+            )}
+            {product.sugar !== null && product.sugar !== undefined && (
+              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <span className="text-muted-foreground">당</span>
+                <p className="font-semibold">{product.sugar}g</p>
+              </div>
+            )}
           </div>
 
           {/* 찜 카운트 */}
-          <div className={`flex items-center justify-start gap-1 ${showPurchaseButton ? 'mb-4' : ''}`}>
+          <div
+            className={`flex items-center justify-start gap-1 ${showPurchaseButton ? "mb-4" : ""}`}
+          >
             <Heart className="h-4 w-4 fill-red-500 text-red-500" />
             <span className="text-sm text-red-500">{favoriteCount}</span>
           </div>
 
           {/* 구매하기 버튼 */}
-          {showPurchaseButton && product.purchaseUrl && (
+          {showPurchaseButton && product.purchase_url && (
             <Button
               onClick={handlePurchaseClick}
               className="w-full flex items-center gap-2"

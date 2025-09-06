@@ -2,12 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
-import { PACKAGE_TYPES, PRODUCT_FORMS } from "@/features/products/constants";
-import { flavorOptions } from "@/lib/products";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import {
+  FLAVOR_CATEGORIES,
+  PACKAGE_TYPES,
+  PRODUCT_FORMS,
+  PROTEIN_TYPES,
+} from "@/features/products/constants";
+import { useAllFilterOptions } from "@/features/products/hooks/useFilterOptions";
+import { useMemo } from "react";
 
 interface FilterState {
   flavors: string[];
@@ -25,36 +28,49 @@ interface ProductFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
 }
 
-// 대표 단백질 종류 (기본 노출)
-const mainProteinTypes = [
-  "분리유청단백(WPI)",
-  "농축유청단백(WPC)",
-  "완두단백",
-  "카제인",
-  "분리대두단백(ISP)",
-];
-
-// 추가 단백질 종류 (접기/펼치기)
-const additionalProteinTypes = [
-  "가수분해유청단백(WPH)",
-  "가수분해분리유청단백(WPIH)",
-  "농축대두단백(SPC)",
-  "현미단백",
-  "귀리단백",
-  "농축우유단백(MPC)",
-  "분리우유단백(MPI)",
-  "산양유",
-  "초유",
-  "난백",
-];
-
 export default function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps) {
-  const [isProteinExpanded, setIsProteinExpanded] = useState(false);
+  // DB에서 실제 필터 옵션 가져오기
+  const { flavors, proteinTypes, forms, packageTypes, isLoading } = useAllFilterOptions();
 
-  const handleFlavorChange = (flavor: string, checked: boolean) => {
+  // DB에서 받은 코드를 한글 레이블과 매핑
+  const flavorOptions = useMemo(() => {
+    if (!flavors.data) return [];
+    return flavors.data
+      .map((code) => ({
+        code,
+        label: FLAVOR_CATEGORIES[code as keyof typeof FLAVOR_CATEGORIES] || code,
+      }))
+      .filter((item) => item.label !== item.code); // 매핑이 없는 항목 제외
+  }, [flavors.data]);
+
+  const proteinTypeOptions = useMemo(() => {
+    if (!proteinTypes.data) return [];
+    return proteinTypes.data.map((code) => ({
+      code,
+      label: PROTEIN_TYPES[code as keyof typeof PROTEIN_TYPES] || code,
+    }));
+  }, [proteinTypes.data]);
+
+  const formOptions = useMemo(() => {
+    if (!forms.data) return [];
+    return forms.data.map((code) => ({
+      code,
+      label: PRODUCT_FORMS[code as keyof typeof PRODUCT_FORMS] || code,
+    }));
+  }, [forms.data]);
+
+  const packageTypeOptions = useMemo(() => {
+    if (!packageTypes.data) return [];
+    return packageTypes.data.map((code) => ({
+      code,
+      label: PACKAGE_TYPES[code as keyof typeof PACKAGE_TYPES] || code,
+    }));
+  }, [packageTypes.data]);
+
+  const handleFlavorChange = (flavorCode: string, checked: boolean) => {
     const newFlavors = checked
-      ? [...filters.flavors, flavor]
-      : filters.flavors.filter((f) => f !== flavor);
+      ? [...filters.flavors, flavorCode]
+      : filters.flavors.filter((f) => f !== flavorCode);
 
     onFiltersChange({
       ...filters,
@@ -62,10 +78,10 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     });
   };
 
-  const handleProteinTypeChange = (proteinType: string, checked: boolean) => {
+  const handleProteinTypeChange = (proteinCode: string, checked: boolean) => {
     const newProteinTypes = checked
-      ? [...filters.proteinTypes, proteinType]
-      : filters.proteinTypes.filter((p) => p !== proteinType);
+      ? [...filters.proteinTypes, proteinCode]
+      : filters.proteinTypes.filter((p) => p !== proteinCode);
 
     onFiltersChange({
       ...filters,
@@ -83,15 +99,13 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     });
   };
 
-  const handleFormChange = (form: string, checked: boolean) => {
+  const handleFormChange = (formCode: string, checked: boolean) => {
     const newForms = checked
-      ? [...filters.forms, form]
-      : filters.forms.filter((f) => f !== form);
+      ? [...filters.forms, formCode]
+      : filters.forms.filter((f) => f !== formCode);
 
     // 파우더가 선택 해제되면 packageTypes 초기화
-    const newPackageTypes = newForms.includes("powder")
-      ? filters.packageTypes
-      : [];
+    const newPackageTypes = newForms.includes("powder") ? filters.packageTypes : [];
 
     onFiltersChange({
       ...filters,
@@ -100,10 +114,10 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     });
   };
 
-  const handlePackageTypeChange = (packageType: string, checked: boolean) => {
+  const handlePackageTypeChange = (packageCode: string, checked: boolean) => {
     const newPackageTypes = checked
-      ? [...filters.packageTypes, packageType]
-      : filters.packageTypes.filter((p) => p !== packageType);
+      ? [...filters.packageTypes, packageCode]
+      : filters.packageTypes.filter((p) => p !== packageCode);
 
     onFiltersChange({
       ...filters,
@@ -123,6 +137,16 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
       packageTypes: [],
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-background border-b pb-6 mb-8">
+        <div className="flex items-center justify-center py-8">
+          <span className="text-sm text-muted-foreground">필터 옵션을 불러오는 중...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background border-b pb-6 mb-8">
@@ -224,122 +248,106 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
 
         {/* Checkbox 필터 행 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 맛 필터 */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">맛</label>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {flavorOptions
-                .filter((f) => f !== "전체")
-                .map((flavor) => (
-                  <div key={flavor} className="flex items-center space-x-2">
+          {/* 맛 필터 - DB 데이터 사용 */}
+          {flavorOptions.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium">맛</label>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {flavorOptions.map((flavor) => (
+                  <div key={flavor.code} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`flavor-${flavor}`}
-                      checked={filters.flavors.includes(flavor)}
-                      onCheckedChange={(checked) => handleFlavorChange(flavor, checked as boolean)}
-                    />
-                    <label htmlFor={`flavor-${flavor}`} className="text-sm cursor-pointer">
-                      {flavor}
-                    </label>
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          {/* 단백질 종류 필터 */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">단백질 종류</label>
-            </div>
-
-            {/* 대표 단백질 종류 */}
-            <div className="grid grid-cols-2 gap-2">
-              {mainProteinTypes.map((proteinType) => (
-                <div key={proteinType} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`protein-${proteinType}`}
-                    checked={filters.proteinTypes.includes(proteinType)}
-                    onCheckedChange={(checked) =>
-                      handleProteinTypeChange(proteinType, checked as boolean)
-                    }
-                  />
-                  <label htmlFor={`protein-${proteinType}`} className="text-sm cursor-pointer">
-                    {proteinType}
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            {/* 접기/펼치기 추가 단백질 종류 */}
-            <Collapsible open={isProteinExpanded} onOpenChange={setIsProteinExpanded}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <span className="text-xs text-muted-foreground">
-                    {isProteinExpanded ? "접기" : `더보기 (${additionalProteinTypes.length}개)`}
-                  </span>
-                  <ChevronDown
-                    className={`h-3 w-3 transition-transform ${isProteinExpanded ? "rotate-180" : ""}`}
-                  />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="grid grid-cols-2 gap-2 mt-2">
-                {additionalProteinTypes.map((proteinType) => (
-                  <div key={proteinType} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`protein-${proteinType}`}
-                      checked={filters.proteinTypes.includes(proteinType)}
+                      id={`flavor-${flavor.code}`}
+                      checked={filters.flavors.includes(flavor.code)}
                       onCheckedChange={(checked) =>
-                        handleProteinTypeChange(proteinType, checked as boolean)
+                        handleFlavorChange(flavor.code, checked as boolean)
                       }
                     />
-                    <label htmlFor={`protein-${proteinType}`} className="text-sm cursor-pointer">
-                      {proteinType}
+                    <label htmlFor={`flavor-${flavor.code}`} className="text-sm cursor-pointer">
+                      {flavor.label}
                     </label>
                   </div>
                 ))}
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
+              </div>
+            </div>
+          )}
 
-          {/* 제품 형태 & 포장 타입 필터 */}
+          {/* 단백질 종류 필터 - DB 데이터 사용 */}
+          {proteinTypeOptions.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium">단백질 종류</label>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {proteinTypeOptions.map((proteinType) => (
+                  <div key={proteinType.code} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`protein-${proteinType.code}`}
+                      checked={filters.proteinTypes.includes(proteinType.code)}
+                      onCheckedChange={(checked) =>
+                        handleProteinTypeChange(proteinType.code, checked as boolean)
+                      }
+                    />
+                    <label
+                      htmlFor={`protein-${proteinType.code}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {proteinType.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 제품 형태 & 포장 타입 필터 - DB 데이터 사용 */}
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">제품 형태</label>
-            </div>
-
-            {/* 제품 형태 */}
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(PRODUCT_FORMS).map(([key, label]) => (
-                <div key={key} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`form-${key}`}
-                    checked={filters.forms.includes(key)}
-                    onCheckedChange={(checked) => handleFormChange(key, checked as boolean)}
-                  />
-                  <label htmlFor={`form-${key}`} className="text-sm cursor-pointer">
-                    {label}
-                  </label>
+            {formOptions.length > 0 && (
+              <>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">제품 형태</label>
                 </div>
-              ))}
-            </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {formOptions.map((form) => (
+                    <div key={form.code} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`form-${form.code}`}
+                        checked={filters.forms.includes(form.code)}
+                        onCheckedChange={(checked) =>
+                          handleFormChange(form.code, checked as boolean)
+                        }
+                      />
+                      <label htmlFor={`form-${form.code}`} className="text-sm cursor-pointer">
+                        {form.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* 포장 타입 (파우더 선택 시만 표시) */}
-            {filters.forms.includes("powder") && (
+            {filters.forms.includes("powder") && packageTypeOptions.length > 0 && (
               <div className="mt-4">
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-sm font-medium text-muted-foreground">포장 타입</label>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
-                  {Object.entries(PACKAGE_TYPES).map(([key, label]) => (
-                    <div key={key} className="flex items-center space-x-2">
+                  {packageTypeOptions.map((packageType) => (
+                    <div key={packageType.code} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`package-${key}`}
-                        checked={filters.packageTypes.includes(key)}
-                        onCheckedChange={(checked) => handlePackageTypeChange(key, checked as boolean)}
+                        id={`package-${packageType.code}`}
+                        checked={filters.packageTypes.includes(packageType.code)}
+                        onCheckedChange={(checked) =>
+                          handlePackageTypeChange(packageType.code, checked as boolean)
+                        }
                       />
-                      <label htmlFor={`package-${key}`} className="text-sm cursor-pointer">
-                        {label}
+                      <label
+                        htmlFor={`package-${packageType.code}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {packageType.label}
                       </label>
                     </div>
                   ))}

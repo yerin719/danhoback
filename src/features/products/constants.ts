@@ -5,15 +5,12 @@
 export const FLAVOR_CATEGORIES = {
   chocolate: "초코",
   strawberry: "딸기",
-  vanilla: "바닐라",
   banana: "바나나",
   matcha: "말차",
   grain: "곡물",
   milktea: "밀크티",
   greentea: "녹차",
   coffee: "커피",
-  mint: "민트",
-  cookies: "쿠키",
   other: "기타",
 } as const;
 
@@ -86,7 +83,9 @@ export function getFormDisplayName(form: ProductForm | string | null | undefined
   return PRODUCT_FORMS[form as ProductForm] || form;
 }
 
-export function getPackageTypeDisplayName(packageType: PackageType | string | null | undefined): string {
+export function getPackageTypeDisplayName(
+  packageType: PackageType | string | null | undefined,
+): string {
   if (!packageType) return "";
   return PACKAGE_TYPES[packageType as PackageType] || packageType;
 }
@@ -98,7 +97,6 @@ export function getPackageTypeDisplayName(packageType: PackageType | string | nu
 export const FLAVOR_SLUG_MAP = {
   chocolate: "choco",
   strawberry: "strawberry",
-  vanilla: "vanilla",
   banana: "banana",
   matcha: "matcha",
   grain: "grain",
