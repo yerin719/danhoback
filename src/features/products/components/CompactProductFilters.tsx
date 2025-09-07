@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   FLAVOR_CATEGORIES,
   PACKAGE_TYPES,
@@ -126,10 +127,34 @@ export default function CompactProductFilters({
     });
   };
 
+  // 필터 버튼 스켈레톤 컴포넌트
+  const FilterButtonSkeleton = ({ width }: { width: string }) => (
+    <Skeleton className={`h-9 ${width} rounded-md flex-shrink-0`} />
+  );
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-4">
-        <span className="text-sm text-muted-foreground">필터 옵션을 불러오는 중...</span>
+      <div className="border-b pb-4 mb-6">
+        <div
+          className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
+          style={{
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
+          <div className="flex gap-2 min-w-max">
+            {/* Range 필터 스켈레톤 */}
+            <FilterButtonSkeleton width="w-20" />
+            <FilterButtonSkeleton width="w-20" />
+            <FilterButtonSkeleton width="w-24" />
+            <FilterButtonSkeleton width="w-16" />
+
+            {/* MultiSelect 필터 스켈레톤 */}
+            <FilterButtonSkeleton width="w-16" />
+            <FilterButtonSkeleton width="w-24" />
+            <FilterButtonSkeleton width="w-24" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -145,7 +170,12 @@ export default function CompactProductFilters({
       >
         <div className="flex gap-2 min-w-max">
           {/* 단백질 필터 */}
-          <FilterButton label="단백질" value={proteinValue} isActive={activeStates.protein} type="range">
+          <FilterButton
+            label="단백질"
+            value={proteinValue}
+            isActive={activeStates.protein}
+            type="range"
+          >
             {({ onClose }) => (
               <RangeFilterPopover
                 label="단백질 함량"
@@ -161,7 +191,12 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 칼로리 필터 */}
-          <FilterButton label="칼로리" value={caloriesValue} isActive={activeStates.calories} type="range">
+          <FilterButton
+            label="칼로리"
+            value={caloriesValue}
+            isActive={activeStates.calories}
+            type="range"
+          >
             {({ onClose }) => (
               <RangeFilterPopover
                 label="칼로리"
@@ -177,7 +212,12 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 탄수화물 필터 */}
-          <FilterButton label="탄수화물" value={carbsValue} isActive={activeStates.carbs} type="range">
+          <FilterButton
+            label="탄수화물"
+            value={carbsValue}
+            isActive={activeStates.carbs}
+            type="range"
+          >
             {({ onClose }) => (
               <RangeFilterPopover
                 label="탄수화물 함량"
