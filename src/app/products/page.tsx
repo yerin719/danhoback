@@ -1,6 +1,7 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
+import { CarouselAdBanner } from "@/components/advertising";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -48,6 +49,50 @@ export default function ProductsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* 캐러셀 광고 배너 */}
+      <CarouselAdBanner
+        campaigns={[
+          {
+            id: "spring-protein-sale",
+            title: "여름맞이 단백질 특가!",
+            subtitle: "프리미엄 보충제 할인",
+            description: "최대 40% 할인 + 무료배송 혜택",
+            imageUrl: "/images/banners/sale-30-off.png",
+            ctaUrl: "/products?sale=spring",
+            textColor: "#90760B",
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            isActive: true,
+            priority: "high",
+          },
+          {
+            id: "text-only-promo",
+            title: "💪 새로운 단백질 라인업",
+            description: "혁신적인 아이솔레이트 프로틴 출시",
+            ctaText: "신제품 보기",
+            ctaUrl: "/products/new",
+            gradientBackground: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            textColor: "#FFFFFF",
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            isActive: true,
+            priority: "medium",
+          },
+          {
+            id: "minimal-banner",
+            backgroundColor: "#F59E0B",
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            isActive: true,
+            priority: "low",
+          },
+        ]}
+        height={300}
+        autoPlay={true}
+        interval={5000}
+        className="mb-6"
+      />
+
       {/* 필터 컴포넌트 - 실제 DB 필터 옵션 전달 */}
       <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
