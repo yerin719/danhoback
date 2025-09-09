@@ -1,8 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
-import type { MergeDeep, SetNonNullable } from "type-fest";
 import type { Database as SupabaseDatabase, Tables } from "database.types";
+import type { MergeDeep, SetNonNullable } from "type-fest";
 
-type Database = MergeDeep<
+// 커스텀 타입 정의 (공통)
+export type Database = MergeDeep<
   SupabaseDatabase,
   {
     public: {
@@ -17,10 +17,3 @@ type Database = MergeDeep<
     };
   }
 >;
-
-const client = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
-
-export default client;

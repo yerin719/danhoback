@@ -1,4 +1,4 @@
-import client from "@/supabase";
+import client from "@/lib/supabase/client";
 import { Database } from "../../../database.types";
 
 // ============================================

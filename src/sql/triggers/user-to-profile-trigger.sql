@@ -5,10 +5,11 @@ security definer
 set search_path = ''
 as $$
 begin
-    insert into public.profiles (id, username, role)
+    insert into public.profiles (id, username, avatar_url, role)
     values (
         new.id,
-         'user_' || substr(md5(new.id::text), 1, 8),
+        'user_' || substr(md5(new.id::text), 1, 8),
+        (new.raw_user_meta_data->>'avatar_url'),
         'user'
     );
     return new;
