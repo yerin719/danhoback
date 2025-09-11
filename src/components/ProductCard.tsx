@@ -3,9 +3,11 @@
 import ProductImage from "@/components/ProductImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToggleFavorite } from "@/features/favorites/hooks";
 import { ExternalLink, Heart } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   variant_id: string;
@@ -18,6 +20,7 @@ interface Product {
   brand_id: string;
   primary_image?: string;
   favorites_count: number;
+  is_favorited?: boolean; // SQL 함수에서 받아오는 찜 여부
   flavor_name?: string;
   flavor_category?: string;
   protein_type: string;
@@ -44,16 +47,27 @@ export default function ProductCard({
   showPurchaseButton = false,
   onFavoriteChange,
 }: ProductCardProps) {
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [favoriteCount, setFavoriteCount] = useState(product.favorites_count || 0);
+  const { user } = useAuth();
+  const router = useRouter();
+  const toggleFavorite = useToggleFavorite(user?.id || "");
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // 카드 클릭과 구분
-    setIsFavorited(!isFavorited);
-    setFavoriteCount((prev) => (isFavorited ? prev - 1 : prev + 1));
+
+    if (!user) {
+      // 로그인 페이지로 리다이렉트
+      router.push(`/auth/login?redirectedFrom=/products/${product.variant_id}`);
+      return;
+    }
+
+    // 찜 토글 mutation 실행 (현재 상태 전달)
+    toggleFavorite.mutate({
+      productVariantId: product.variant_id,
+      currentStatus: !!product.is_favorited,
+    });
 
     // 찜 해제시 부모 컴포넌트에 알림
-    if (isFavorited && onFavoriteChange) {
+    if (product.is_favorited && onFavoriteChange) {
       onFavoriteChange();
     }
   };
@@ -80,10 +94,11 @@ export default function ProductCard({
               size="sm"
               onClick={handleFavoriteClick}
               className="absolute bottom-2 right-2 h-8 w-8 p-0"
+              disabled={toggleFavorite.isPending}
             >
               <Heart
                 className={`h-4 w-4 ${
-                  isFavorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                  product.is_favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
                 }`}
               />
             </Button>
@@ -128,7 +143,7 @@ export default function ProductCard({
             className={`flex items-center justify-start gap-1 ${showPurchaseButton ? "mb-4" : ""}`}
           >
             <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-            <span className="text-sm text-red-500">{favoriteCount}</span>
+            <span className="text-sm text-red-500">{product.favorites_count}</span>
           </div>
 
           {/* 구매하기 버튼 */}

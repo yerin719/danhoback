@@ -8,20 +8,36 @@ import RelatedProductThumbnails from "@/components/RelatedProductThumbnails";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductDetail } from "@/features/products/hooks/useProductDetail";
+import { useToggleFavorite } from "@/features/favorites/hooks";
+import { useAuth } from "@/contexts/AuthContext";
 import { ExternalLink, Heart } from "lucide-react";
-import { notFound } from "next/navigation";
-import { use, useState } from "react";
+import { notFound, useRouter } from "next/navigation";
+import { use } from "react";
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data: productData, isLoading, error } = useProductDetail(id);
+  const { data: productData, isLoading, error, refetch } = useProductDetail(id);
+  const { user } = useAuth();
+  const router = useRouter();
+  const toggleFavorite = useToggleFavorite(user?.id || "");
 
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [favoriteCount, setFavoriteCount] = useState(0);
+  const handleFavoriteClick = async () => {
+    if (!user) {
+      // 현재 페이지 URL을 저장하여 로그인 후 돌아올 수 있도록 함
+      router.push(`/auth/login?redirectedFrom=/products/${id}`);
+      return;
+    }
 
-  const handleFavoriteClick = () => {
-    setIsFavorited(!isFavorited);
-    setFavoriteCount((prev) => (isFavorited ? prev - 1 : prev + 1));
+    // DB 업데이트
+    toggleFavorite.mutate(
+      { productVariantId: id, currentStatus: productData?.is_favorited || false },
+      {
+        onSuccess: () => {
+          // 성공시 데이터 새로고침
+          refetch();
+        }
+      }
+    );
   };
 
   if (isLoading) {
@@ -83,10 +99,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     return selectedVariant.primary_image ? [selectedVariant.primary_image] : [];
   })();
 
-  // favorites_count 초기화
-  if (favoriteCount === 0 && selectedVariant.favorites_count) {
-    setFavoriteCount(selectedVariant.favorites_count);
-  }
 
   const handlePurchase = () => {
     if (selectedVariant.purchase_url) {
@@ -125,9 +137,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               onClick={handleFavoriteClick}
               className="flex-1 flex items-center justify-center gap-2 py-6 text-xl"
               size="lg"
+              disabled={toggleFavorite.isPending}
             >
-              <Heart className={`h-6 w-6 ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
-              <span>{favoriteCount}</span>
+              <Heart className={`h-6 w-6 ${productData.is_favorited ? "fill-red-500 text-red-500" : ""}`} />
+              <span>{selectedVariant.favorites_count || 0}</span>
             </Button>
 
             {/* 구매하기 버튼 */}

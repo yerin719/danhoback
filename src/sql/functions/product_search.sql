@@ -47,8 +47,7 @@ RETURNS TABLE (
   protein numeric,
   carbs numeric,
   sugar numeric,
-  fat numeric,
-  sodium numeric
+  is_favorited boolean
 )
 LANGUAGE plpgsql
 STABLE
@@ -77,8 +76,16 @@ BEGIN
     pwd.protein::numeric,
     pwd.carbs::numeric,
     pwd.sugar::numeric,
-    pwd.fat::numeric,
-    pwd.sodium::numeric
+    -- 찜 여부 확인 (로그인한 사용자만)
+    CASE 
+      WHEN auth.uid() IS NOT NULL THEN
+        EXISTS (
+          SELECT 1 FROM favorites f 
+          WHERE f.product_variant_id = pwd.variant_id 
+          AND f.user_id = auth.uid()
+        )
+      ELSE false
+    END as is_favorited
   FROM products_with_details pwd
   WHERE
     -- 활성 상태 체크
@@ -218,7 +225,9 @@ RETURNS TABLE (
   -- 브랜드 정보
   brand_info jsonb,
   -- 같은 라인의 다른 variants (간소한 정보)
-  related_variants jsonb
+  related_variants jsonb,
+  -- 찜 여부
+  is_favorited boolean
 )
 LANGUAGE plpgsql
 STABLE
@@ -309,7 +318,17 @@ BEGIN
           AND other_pv.is_available = true
       ),
       '[]'::jsonb
-    ) as related_variants
+    ) as related_variants,
+    -- 찜 여부 확인
+    CASE 
+      WHEN auth.uid() IS NOT NULL THEN
+        EXISTS (
+          SELECT 1 FROM favorites f 
+          WHERE f.product_variant_id = variant_id_param 
+          AND f.user_id = auth.uid()
+        )
+      ELSE false
+    END as is_favorited
   FROM selected_variant_data svd
   INNER JOIN products p ON svd.product_id = p.id
   INNER JOIN brands b ON p.brand_id = b.id

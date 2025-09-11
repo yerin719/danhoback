@@ -161,6 +161,46 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          created_at: string
+          product_variant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          product_variant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          product_variant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_variant_id_product_variants_id_fk"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_product_variant_id_product_variants_id_fk"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["variant_id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_profiles_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_variants: {
         Row: {
           barcode: string | null
@@ -453,6 +493,16 @@ export type Database = {
       }
     }
     Functions: {
+      get_article_category_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_read_time: number
+          category: string
+          latest_published: string
+          total_articles: number
+          total_views: number
+        }[]
+      }
       get_filter_options: {
         Args: { filter_type?: string }
         Returns: {
@@ -464,9 +514,87 @@ export type Database = {
         Args: { variant_id_param: string }
         Returns: {
           brand_info: Json
+          is_favorited: boolean
           product_info: Json
           related_variants: Json
           selected_variant: Json
+        }[]
+      }
+      get_related_articles_advanced: {
+        Args: { article_id_param: string; limit_param?: number }
+        Returns: {
+          author_name: string
+          category: string
+          featured_image: string
+          id: string
+          published_at: string
+          similarity_score: number
+          summary: string
+          title: string
+          view_count: number
+        }[]
+      }
+      get_user_favorites: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          brand_id: string
+          brand_logo_url: string
+          brand_name: string
+          brand_name_en: string
+          calories: number
+          carbs: number
+          created_at: string
+          favorites_count: number
+          flavor_category: string
+          flavor_name: string
+          form: string
+          is_favorited: boolean
+          package_type: string
+          primary_image: string
+          product_id: string
+          product_name: string
+          protein: number
+          protein_type: string
+          purchase_url: string
+          size: string
+          sugar: number
+          variant_id: string
+          variant_name: string
+        }[]
+      }
+      increment_article_view_count: {
+        Args: { article_id_param: string }
+        Returns: boolean
+      }
+      search_articles: {
+        Args: {
+          category_param?: string
+          limit_param?: number
+          offset_param?: number
+          search_query_param?: string
+          sort_by_param?: string
+          sort_order_param?: string
+        }
+        Returns: {
+          author_id: string
+          author_name: string
+          category: string
+          content: string
+          created_at: string
+          featured_image: string
+          id: string
+          is_featured: boolean
+          meta_description: string
+          meta_keywords: string
+          published_at: string
+          read_time: number
+          relevance_score: number
+          slug: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+          view_count: number
         }[]
       }
       search_products: {
@@ -501,6 +629,7 @@ export type Database = {
           flavor_category: string
           flavor_name: string
           form: string
+          is_favorited: boolean
           package_type: string
           primary_image: string
           product_id: string

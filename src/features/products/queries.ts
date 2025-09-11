@@ -25,6 +25,7 @@ type ProductDetailRow = {
       | "images"
     >
   >;
+  is_favorited: boolean;
 };
 
 // 필터 옵션 인터페이스

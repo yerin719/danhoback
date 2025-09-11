@@ -71,6 +71,13 @@
       "when": 1757567493293,
       "tag": "0009_mighty_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1757573346378,
+      "tag": "0010_acoustic_shape",
+      "breakpoints": true
     }
   ]
 }
