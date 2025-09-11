@@ -16,7 +16,7 @@ export const userRoleEnum = pgEnum("user_role", [
 // Profiles table
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(), // References auth.users(id)
-  username: varchar("username", { length: 100 }).notNull(),
+  username: varchar("username", { length: 100 }).notNull().unique(),
   avatarUrl: text("avatar_url"),
   role: userRoleEnum("role").default("user"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

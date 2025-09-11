@@ -4,19 +4,37 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Settings, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const profileFormSchema = z.object({
+  username: z
+    .string()
+    .min(1, "사용자명을 입력해주세요")
+    .max(15, "사용자명은 최대 15자까지 가능합니다")
+    .regex(/^[a-zA-Z0-9가-힣_-]+$/, "한글, 영문, 숫자, _, - 만 사용 가능합니다"),
+});
 
 export default function ProfilePage() {
   const { user, profile, displayName: contextDisplayName, avatarInitial } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [displayName, setDisplayName] = useState(user?.user_metadata?.full_name || "");
   const [newEmail, setNewEmail] = useState("");
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [finalDeleteConfirmed, setFinalDeleteConfirmed] = useState(false);
@@ -24,20 +42,85 @@ export default function ProfilePage() {
 
   const supabase = createClient();
 
+  const form = useForm<z.infer<typeof profileFormSchema>>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      username: "",
+    },
+  });
+
+  // profile이 로드되면 form 값을 업데이트
+  useEffect(() => {
+    if (profile?.username) {
+      form.setValue("username", profile.username);
+    }
+  }, [profile?.username, form]);
+
+  // 사용자명 중복 체크 함수 (submit용)
+  const checkUsernameExists = async (username: string): Promise<boolean> => {
+    if (!username || username === profile?.username) {
+      return false; // 현재 사용자명과 같으면 중복 아님
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username)
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        // PGRST116: No rows found
+        throw error;
+      }
+
+      return !!data; // 데이터가 있으면 중복
+    } catch (error) {
+      console.error("Username check error:", error);
+      return false;
+    }
+  };
+
   // 프로필 업데이트
-  const handleUpdateProfile = async () => {
+  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+    if (!user?.id) {
+      toast.error("사용자 정보를 찾을 수 없습니다");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { full_name: displayName },
-      });
+      // 사용자명 중복 체크
+      const isUsernameExists = await checkUsernameExists(values.username);
+      if (isUsernameExists) {
+        form.setError("username", {
+          type: "manual",
+          message: "이미 사용중인 사용자명입니다",
+        });
+        return;
+      }
 
-      if (error) throw error;
-      toast.success("프로필이 업데이트되었습니다");
+      const { error } = await supabase
+        .from("profiles")
+        .update({ username: values.username })
+        .eq("id", user.id);
+
+      if (error) {
+        // PostgreSQL unique constraint violation
+        if (error.code === "23505") {
+          form.setError("username", {
+            type: "manual",
+            message: "이미 사용중인 사용자명입니다",
+          });
+          return;
+        }
+        throw error;
+      }
+      toast.success("사용자명이 업데이트되었습니다");
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "프로필 업데이트에 실패했습니다";
+        error instanceof Error ? error.message : "사용자명 업데이트에 실패했습니다";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -138,28 +221,33 @@ export default function ProfilePage() {
                   </div>
 
                   {/* 사용자명 */}
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="username">사용자 이름</Label>
-                      <Input
-                        id="username"
-                        type="text"
-                        value={profile?.username || ""}
-                        className="bg-muted"
-                        readOnly
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>닉네임</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <Button onClick={handleUpdateProfile} disabled={isLoading}>
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          저장 중...
-                        </>
-                      ) : (
-                        "프로필 저장"
-                      )}
-                    </Button>
-                  </div>
+                      <Button type="submit" disabled={isLoading}>
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            저장 중...
+                          </>
+                        ) : (
+                          "프로필 저장"
+                        )}
+                      </Button>
+                    </form>
+                  </Form>
                 </CardContent>
               </Card>
             </div>
@@ -213,8 +301,8 @@ export default function ProfilePage() {
                   ) : (
                     <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        소셜 로그인 계정은 해당 서비스({user.app_metadata?.provider})에서 이메일을 관리합니다.
-                        이메일을 변경하려면 로그인한 서비스에서 직접 변경해주세요.
+                        소셜 로그인 계정은 해당 서비스({user.app_metadata?.provider})에서 이메일을
+                        관리합니다. 이메일을 변경하려면 로그인한 서비스에서 직접 변경해주세요.
                       </p>
                     </div>
                   )}

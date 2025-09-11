@@ -64,6 +64,13 @@
       "when": 1757125643667,
       "tag": "0008_high_domino",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1757567493293,
+      "tag": "0009_mighty_shotgun",
+      "breakpoints": true
     }
   ]
 }
