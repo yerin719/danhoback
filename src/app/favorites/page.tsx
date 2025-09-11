@@ -3,27 +3,22 @@
 import EmptyFavorites from "@/components/EmptyFavorites";
 import ProductCard from "@/components/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/features/favorites/hooks";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const { data: favorites, isLoading, refetch } = useFavorites();
 
-  // 사용자 인증 확인
+  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        router.push("/auth/login");
-      } else {
-        setIsAuthenticated(true);
-      }
-    });
-  }, [router]);
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, user, router]);
 
   const handleFavoriteChange = () => {
     // 찜 목록 새로고침
@@ -31,7 +26,7 @@ export default function FavoritesPage() {
   };
 
   // 로딩 상태
-  if (!isAuthenticated || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
