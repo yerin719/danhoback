@@ -1,17 +1,17 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { BookOpen, Heart, Home, Package, User } from "lucide-react";
+import { BookOpen, Heart, Home, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const bottomNavItems = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/products", label: "상품", icon: Package },
+  // { href: "/products", label: "상품", icon: Package },
   { href: "/articles", label: "아티클", icon: BookOpen },
   // { href: "/community", label: "커뮤니티", icon: MessageSquare },
   { href: "/favorites", label: "찜", icon: Heart },
-  { href: "/users", label: "마이페이지", icon: User },
+  { href: "/profile", label: "마이페이지", icon: User },
 ];
 
 export default function MobileBottomNav() {
@@ -19,7 +19,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t">
-      <div className="grid grid-cols-6 h-16">
+      <div className="grid grid-cols-4 h-16">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -34,7 +34,6 @@ export default function MobileBottomNav() {
               )}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium leading-none">{item.label}</span>
             </Link>
           );
         })}
