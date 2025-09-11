@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,11 +26,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { deleteAvatar, updateAvatar } from "@/features/users/mutations";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Settings, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Loader2, Settings, Trash2, Upload, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -33,13 +45,16 @@ const profileFormSchema = z.object({
 });
 
 export default function ProfilePage() {
-  const { user, profile, displayName: contextDisplayName, avatarInitial } = useAuth();
+  const { user, profile, avatarInitial, refreshProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState("");
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [finalDeleteConfirmed, setFinalDeleteConfirmed] = useState(false);
   const [activeSection, setActiveSection] = useState<"profile" | "account">("profile");
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
@@ -55,6 +70,73 @@ export default function ProfilePage() {
       form.setValue("username", profile.username);
     }
   }, [profile?.username, form]);
+
+  // 아바타 파일 선택 처리
+  const handleAvatarFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 미리보기 생성
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // 파일 업로드 실행
+    handleAvatarUpload(file);
+  };
+
+  // 아바타 업로드 처리
+  const handleAvatarUpload = async (file: File) => {
+    if (!user?.id) {
+      toast.error("사용자 정보를 찾을 수 없습니다");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      await updateAvatar(user.id, file);
+      toast.success("프로필 이미지가 업데이트되었습니다");
+      setAvatarPreview(null); // 미리보기 초기화
+
+      // AuthContext를 통해 profile 데이터 새로고침
+      await refreshProfile();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "이미지 업로드에 실패했습니다";
+      toast.error(errorMessage);
+      setAvatarPreview(null);
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // input 초기화
+      }
+    }
+  };
+
+  // 아바타 삭제 처리
+  const handleAvatarDelete = async () => {
+    if (!user?.id) {
+      toast.error("사용자 정보를 찾을 수 없습니다");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      await deleteAvatar(user.id);
+      toast.success("프로필 이미지가 삭제되었습니다");
+
+      // AuthContext를 통해 profile 데이터 새로고침
+      await refreshProfile();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "이미지 삭제에 실패했습니다";
+      toast.error(errorMessage);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   // 사용자명 중복 체크 함수 (submit용)
   const checkUsernameExists = async (username: string): Promise<boolean> => {
@@ -202,21 +284,65 @@ export default function ProfilePage() {
                 <CardContent className="space-y-6">
                   {/* 프로필 이미지 */}
                   <div className="flex items-center space-x-6">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage
-                        src={profile?.avatar_url || user.user_metadata?.avatar_url}
-                        alt={contextDisplayName}
-                      />
-                      <AvatarFallback className="text-2xl">{avatarInitial}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-24 w-24">
+                        <AvatarImage
+                          src={avatarPreview || profile?.avatar_url || ""}
+                          alt={profile?.username}
+                        />
+                        <AvatarFallback className="text-2xl">{avatarInitial}</AvatarFallback>
+                      </Avatar>
+                      {isUploadingAvatar && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                          <Loader2 className="h-6 w-6 animate-spin text-white" />
+                        </div>
+                      )}
+                    </div>
                     <div className="space-y-2">
                       <p className="text-sm font-medium">프로필 이미지</p>
                       <p className="text-sm text-muted-foreground">
-                        JPG, PNG 파일을 업로드할 수 있습니다. (최대 2MB)
+                        JPG, PNG, WebP 파일을 업로드할 수 있습니다. (최대 2MB)
                       </p>
-                      <Button variant="outline" disabled>
-                        이미지 변경 (준비중)
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          disabled={isUploadingAvatar}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          이미지 변경
+                        </Button>
+                        {profile?.avatar_url && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="icon" disabled={isUploadingAvatar}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>프로필 이미지 삭제</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  프로필 이미지를 삭제하시겠습니까?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>취소</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleAvatarDelete}>
+                                  삭제
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        onChange={handleAvatarFileSelect}
+                        className="hidden"
+                      />
                     </div>
                   </div>
 

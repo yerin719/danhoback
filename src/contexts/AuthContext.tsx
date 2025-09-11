@@ -1,10 +1,15 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
-import { getProfile, type Profile, getDisplayName, getAvatarInitial } from "@/features/users/queries";
+import {
+  getAvatarInitial,
+  getDisplayName,
+  getProfile,
+  type Profile,
+} from "@/features/users/queries";
 import { isAuthRequiredPage } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -33,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   // 표시 이름과 아바타 이니셜 계산
-  const displayName = getDisplayName(profile, user?.user_metadata, user?.email || undefined);
+  const displayName = getDisplayName(profile);
   const avatarInitial = getAvatarInitial(displayName);
 
   // 프로필 정보 로드
@@ -58,10 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 현재 세션 체크
     const checkUser = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-        
+
         // 사용자가 있으면 프로필 정보 로드
         if (currentUser?.id) {
           await loadProfile(currentUser.id);
@@ -78,34 +85,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkUser();
 
     // 인증 상태 변화 구독
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (event === "SIGNED_IN" && currentUser?.id) {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (event === "SIGNED_IN" && currentUser?.id) {
+        try {
+          await loadProfile(currentUser.id);
+          router.refresh();
+        } catch (error) {
+          console.error("프로필 로드 실패:", error);
+        }
+      } else if (event === "SIGNED_OUT") {
+        setProfile(null);
+
+        // 현재 페이지가 인증이 필요한 페이지인지 확인
+        const needsRedirect = isAuthRequiredPage(pathname);
+
+        if (needsRedirect) {
           try {
-            await loadProfile(currentUser.id);
-            router.refresh();
+            router.push("/");
           } catch (error) {
-            console.error("프로필 로드 실패:", error);
-          }
-        } else if (event === "SIGNED_OUT") {
-          setProfile(null);
-          
-          // 현재 페이지가 인증이 필요한 페이지인지 확인
-          const needsRedirect = isAuthRequiredPage(pathname);
-          
-          if (needsRedirect) {
-            try {
-              router.push("/");
-            } catch (error) {
-              console.error("리디렉션 실패:", error);
-            }
+            console.error("리디렉션 실패:", error);
           }
         }
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();

@@ -96,10 +96,7 @@ export default function Navigation() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={profile?.avatar_url || user.user_metadata?.avatar_url}
-                          alt={displayName}
-                        />
+                        <AvatarImage src={profile?.avatar_url || ""} alt={displayName} />
                         <AvatarFallback>{avatarInitial}</AvatarFallback>
                       </Avatar>
                     </Button>

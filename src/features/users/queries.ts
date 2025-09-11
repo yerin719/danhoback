@@ -19,11 +19,7 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
  */
 export async function getProfile(userId: string): Promise<Profile | null> {
   try {
-    const { data, error } = await client
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
+    const { data, error } = await client.from("profiles").select("*").eq("id", userId).single();
 
     if (error) {
       if (error.code === "PGRST116") {
@@ -50,13 +46,10 @@ export async function getProfile(userId: string): Promise<Profile | null> {
  */
 export async function isUsernameAvailable(
   username: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): Promise<boolean> {
   try {
-    let query = client
-      .from("profiles")
-      .select("id")
-      .eq("username", username);
+    let query = client.from("profiles").select("id").eq("username", username);
 
     if (excludeUserId) {
       query = query.neq("id", excludeUserId);
@@ -85,7 +78,7 @@ export async function isUsernameAvailable(
  */
 export async function updateProfile(
   userId: string,
-  updates: Partial<Pick<Profile, "username" | "avatar_url">>
+  updates: Partial<Pick<Profile, "username" | "avatar_url">>,
 ): Promise<boolean> {
   try {
     const { error } = await client
@@ -116,24 +109,12 @@ export async function updateProfile(
  * 사용자 표시 이름 생성
  * 우선순위: profile.username > user_metadata.full_name > email prefix
  */
-export function getDisplayName(
-  profile: Profile | null,
-  userMetadata?: { full_name?: string },
-  email?: string
-): string {
+export function getDisplayName(profile: Profile | null): string {
   if (profile?.username) {
     return profile.username;
   }
 
-  if (userMetadata?.full_name) {
-    return userMetadata.full_name;
-  }
-
-  if (email) {
-    return email.split("@")[0];
-  }
-
-  return "사용자";
+  return "";
 }
 
 /**
