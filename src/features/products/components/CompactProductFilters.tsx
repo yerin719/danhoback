@@ -31,43 +31,43 @@ export default function CompactProductFilters({
   filters,
   onFiltersChange,
 }: CompactProductFiltersProps) {
-  // DB에서 실제 필터 옵션 가져오기
-  const { flavors, proteinTypes, forms, packageTypes, isLoading } = useAllFilterOptions();
+  // DB에서 실제 필터 옵션 가져오기 (한 번의 API 호출)
+  const { data: filterOptions, isLoading } = useAllFilterOptions();
 
   // DB에서 받은 코드를 한글 레이블과 매핑
   const flavorOptions = useMemo(() => {
-    if (!flavors.data) return [];
-    return flavors.data
+    if (!filterOptions?.flavors) return [];
+    return filterOptions.flavors
       .map((code) => ({
         code,
         label: FLAVOR_CATEGORIES[code as keyof typeof FLAVOR_CATEGORIES] || code,
       }))
       .filter((item) => item.label !== item.code);
-  }, [flavors.data]);
+  }, [filterOptions?.flavors]);
 
   const proteinTypeOptions = useMemo(() => {
-    if (!proteinTypes.data) return [];
-    return proteinTypes.data.map((code) => ({
+    if (!filterOptions?.proteinTypes) return [];
+    return filterOptions.proteinTypes.map((code) => ({
       code,
       label: PROTEIN_TYPES[code as keyof typeof PROTEIN_TYPES] || code,
     }));
-  }, [proteinTypes.data]);
+  }, [filterOptions?.proteinTypes]);
 
   const formOptions = useMemo(() => {
-    if (!forms.data) return [];
-    return forms.data.map((code) => ({
+    if (!filterOptions?.forms) return [];
+    return filterOptions.forms.map((code) => ({
       code,
       label: PRODUCT_FORMS[code as keyof typeof PRODUCT_FORMS] || code,
     }));
-  }, [forms.data]);
+  }, [filterOptions?.forms]);
 
   const packageTypeOptions = useMemo(() => {
-    if (!packageTypes.data) return [];
-    return packageTypes.data.map((code) => ({
+    if (!filterOptions?.packageTypes) return [];
+    return filterOptions.packageTypes.map((code) => ({
       code,
       label: PACKAGE_TYPES[code as keyof typeof PACKAGE_TYPES] || code,
     }));
-  }, [packageTypes.data]);
+  }, [filterOptions?.packageTypes]);
 
   // 필터 활성화 상태 확인
   const activeStates = getFilterActiveState(filters);

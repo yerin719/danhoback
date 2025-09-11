@@ -149,7 +149,53 @@ export async function getFilterOptions(
 }
 
 /**
+ * 모든 필터 옵션을 한 번에 가져오는 함수
+ * 한 번의 API 호출로 모든 필터 데이터를 가져와서 타입별로 분류
+ */
+export async function getAllFilterOptions() {
+  const { data, error } = await client.rpc("get_filter_options");
+
+  if (error) {
+    console.error("Error fetching all filter options:", error);
+    return {
+      flavors: [],
+      proteinTypes: [],
+      forms: [],
+      packageTypes: [],
+      brands: [],
+    };
+  }
+
+  const allOptions = (data as FilterOption[]) || [];
+
+  // 타입별로 옵션 분류 및 정렬
+  return {
+    flavors: allOptions
+      .filter((opt) => opt.option_type === "flavor")
+      .map((opt) => opt.option_value)
+      .sort(),
+    proteinTypes: allOptions
+      .filter((opt) => opt.option_type === "protein_type")
+      .map((opt) => opt.option_value)
+      .sort(),
+    forms: allOptions
+      .filter((opt) => opt.option_type === "form")
+      .map((opt) => opt.option_value)
+      .sort(),
+    packageTypes: allOptions
+      .filter((opt) => opt.option_type === "package_type")
+      .map((opt) => opt.option_value)
+      .sort(),
+    brands: allOptions
+      .filter((opt) => opt.option_type === "brand")
+      .map((opt) => opt.option_value)
+      .sort((a, b) => a.localeCompare(b)),
+  };
+}
+
+/**
  * 특정 타입의 필터 옵션만 조회 (헬퍼 함수들)
+ * @deprecated getAllFilterOptions를 사용하세요
  */
 export async function getFlavorOptions(): Promise<string[]> {
   const options = await getFilterOptions("flavor");
