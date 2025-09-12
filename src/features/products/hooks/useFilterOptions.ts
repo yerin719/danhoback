@@ -5,8 +5,10 @@ import { getAllFilterOptions } from "@/features/products/queries";
 export function useAllFilterOptions() {
   return useQuery({
     queryKey: ["filters", "all"],
-    queryFn: getAllFilterOptions,
+    queryFn: () => getAllFilterOptions(),
     staleTime: 30 * 60 * 1000, // 30분
     gcTime: 60 * 60 * 1000, // 1시간
+    refetchOnMount: false, // 마운트 시 refetch 비활성화
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 refetch 비활성화
   });
 }

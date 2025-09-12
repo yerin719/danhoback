@@ -1,9 +1,13 @@
-import client from "@/lib/supabase/client";
+import defaultClient from "@/lib/supabase/client";
 import { Database } from "../../../database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
+
+// 제품 검색 결과 타입 (search_products RPC 함수의 반환 타입)
+export type ProductSearchResult = Database["public"]["Functions"]["search_products"]["Returns"][0];
 
 // Database 기반으로 Json을 구체적인 타입으로 변환
 type ProductDetailRow = {
@@ -47,6 +51,7 @@ export interface FilterState {
   searchQuery?: string;
 }
 
+
 // ============================================
 // QUERY FUNCTIONS
 // ============================================
@@ -61,7 +66,9 @@ export async function searchProducts(
   sortOrder: "asc" | "desc" = "desc",
   limit: number = 100,
   offset: number = 0,
-) {
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<ProductSearchResult[]> {
+  const client = supabaseClient || defaultClient;
   const rpcParams = {
     filter_flavors: filters.flavors.length > 0 ? filters.flavors : undefined,
     filter_protein_types: filters.proteinTypes.length > 0 ? filters.proteinTypes : undefined,
@@ -96,7 +103,11 @@ export async function searchProducts(
  * 단일 제품 상세 정보 조회 (variant_id 기준)
  * 선택된 variant의 상세 정보와 같은 라인의 다른 variants 반환
  */
-export async function getProductDetail(variantId: string): Promise<ProductDetailRow | null> {
+export async function getProductDetail(
+  variantId: string,
+  supabaseClient?: SupabaseClient<Database>
+): Promise<ProductDetailRow | null> {
+  const client = supabaseClient || defaultClient;
   const { data, error } = await client.rpc("get_product_detail", {
     variant_id_param: variantId,
   });
@@ -118,7 +129,9 @@ export async function getProductDetail(variantId: string): Promise<ProductDetail
  */
 export async function getFilterOptions(
   optionType?: "flavor" | "protein_type" | "form" | "package_type" | "brand",
+  supabaseClient?: SupabaseClient<Database>
 ): Promise<FilterOption[]> {
+  const client = supabaseClient || defaultClient;
   const { data, error } = await client.rpc("get_filter_options", {
     filter_type: optionType || undefined,
   });
@@ -152,7 +165,8 @@ export async function getFilterOptions(
  * 모든 필터 옵션을 한 번에 가져오는 함수
  * 한 번의 API 호출로 모든 필터 데이터를 가져와서 타입별로 분류
  */
-export async function getAllFilterOptions() {
+export async function getAllFilterOptions(supabaseClient?: SupabaseClient<Database>) {
+  const client = supabaseClient || defaultClient;
   const { data, error } = await client.rpc("get_filter_options");
 
   if (error) {
@@ -225,7 +239,12 @@ export async function getBrands(): Promise<string[]> {
 /**
  * View를 직접 조회하는 간단한 쿼리 (필요시 사용)
  */
-export async function getProductsFromView(limit: number = 100, offset: number = 0) {
+export async function getProductsFromView(
+  limit: number = 100,
+  offset: number = 0,
+  supabaseClient?: SupabaseClient<Database>
+) {
+  const client = supabaseClient || defaultClient;
   const { data, error } = await client
     .from("products_with_details")
     .select("*")
@@ -257,23 +276,6 @@ export function groupProductsByProductId<T extends { product_id: string }>(
   });
 
   return grouped;
-}
-
-/**
- * 필터 초기값 생성 헬퍼
- */
-export function getDefaultFilters(): FilterState {
-  return {
-    flavors: [],
-    proteinTypes: [],
-    proteinRange: [0, 100],
-    caloriesRange: [0, 1000],
-    carbsRange: [0, 100],
-    sugarRange: [0, 50],
-    forms: [],
-    packageTypes: [],
-    searchQuery: "",
-  };
 }
 
 /**

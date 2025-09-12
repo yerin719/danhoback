@@ -1,3 +1,4 @@
+import { FILTER_RANGES } from "@/features/products/constants";
 import { FilterState } from "@/features/products/queries";
 
 /**
@@ -41,10 +42,10 @@ export function formatMultiSelectValue(selectedValues: string[], totalOptions: n
  */
 export function getFilterActiveState(filters: FilterState) {
   const defaultFilters = {
-    proteinRange: [0, 100] as [number, number],
-    caloriesRange: [0, 1000] as [number, number],
-    carbsRange: [0, 100] as [number, number],
-    sugarRange: [0, 50] as [number, number],
+    proteinRange: [FILTER_RANGES.PROTEIN.MIN, FILTER_RANGES.PROTEIN.MAX] as [number, number],
+    caloriesRange: [FILTER_RANGES.CALORIES.MIN, FILTER_RANGES.CALORIES.MAX] as [number, number],
+    carbsRange: [FILTER_RANGES.CARBS.MIN, FILTER_RANGES.CARBS.MAX] as [number, number],
+    sugarRange: [FILTER_RANGES.SUGAR.MIN, FILTER_RANGES.SUGAR.MAX] as [number, number],
   };
 
   return {

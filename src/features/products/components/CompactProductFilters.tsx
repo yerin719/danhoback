@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  FILTER_RANGES,
   FLAVOR_CATEGORIES,
   PACKAGE_TYPES,
   PRODUCT_FORMS,
@@ -10,6 +11,7 @@ import {
 } from "@/features/products/constants";
 import { useAllFilterOptions } from "@/features/products/hooks/useFilterOptions";
 import { FilterState } from "@/features/products/queries";
+import { getDefaultFilters } from "@/features/products/utils/urlParams";
 import { RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import FilterButton from "./filters/FilterButton";
@@ -73,10 +75,26 @@ export default function CompactProductFilters({
   const activeStates = getFilterActiveState(filters);
 
   // 필터 값 포맷팅
-  const proteinValue = formatRangeValue(filters.proteinRange, [0, 100], "g");
-  const caloriesValue = formatRangeValue(filters.caloriesRange, [0, 1000], "kcal");
-  const carbsValue = formatRangeValue(filters.carbsRange, [0, 100], "g");
-  const sugarValue = formatRangeValue(filters.sugarRange, [0, 50], "g");
+  const proteinValue = formatRangeValue(
+    filters.proteinRange, 
+    [FILTER_RANGES.PROTEIN.MIN, FILTER_RANGES.PROTEIN.MAX], 
+    "g"
+  );
+  const caloriesValue = formatRangeValue(
+    filters.caloriesRange, 
+    [FILTER_RANGES.CALORIES.MIN, FILTER_RANGES.CALORIES.MAX], 
+    "kcal"
+  );
+  const carbsValue = formatRangeValue(
+    filters.carbsRange, 
+    [FILTER_RANGES.CARBS.MIN, FILTER_RANGES.CARBS.MAX], 
+    "g"
+  );
+  const sugarValue = formatRangeValue(
+    filters.sugarRange, 
+    [FILTER_RANGES.SUGAR.MIN, FILTER_RANGES.SUGAR.MAX], 
+    "g"
+  );
   const flavorsValue = formatMultiSelectValue(filters.flavors, flavorOptions.length);
   const proteinTypesValue = formatMultiSelectValue(filters.proteinTypes, proteinTypeOptions.length);
   const formsValue = formatMultiSelectValue(filters.forms, formOptions.length);
@@ -114,17 +132,7 @@ export default function CompactProductFilters({
   };
 
   const resetFilters = () => {
-    onFiltersChange({
-      flavors: [],
-      proteinTypes: [],
-      proteinRange: [0, 100],
-      caloriesRange: [0, 1000],
-      carbsRange: [0, 100],
-      sugarRange: [0, 50],
-      forms: [],
-      packageTypes: [],
-      searchQuery: "",
-    });
+    onFiltersChange(getDefaultFilters());
   };
 
   // 필터 버튼 스켈레톤 컴포넌트
@@ -180,8 +188,8 @@ export default function CompactProductFilters({
               <RangeFilterPopover
                 label="단백질 함량"
                 value={filters.proteinRange}
-                min={0}
-                max={100}
+                min={FILTER_RANGES.PROTEIN.MIN}
+                max={FILTER_RANGES.PROTEIN.MAX}
                 step={1}
                 unit="g"
                 onApply={(value) => handleRangeChange("proteinRange", value)}
@@ -201,8 +209,8 @@ export default function CompactProductFilters({
               <RangeFilterPopover
                 label="칼로리"
                 value={filters.caloriesRange}
-                min={0}
-                max={1000}
+                min={FILTER_RANGES.CALORIES.MIN}
+                max={FILTER_RANGES.CALORIES.MAX}
                 step={10}
                 unit="kcal"
                 onApply={(value) => handleRangeChange("caloriesRange", value)}
@@ -222,8 +230,8 @@ export default function CompactProductFilters({
               <RangeFilterPopover
                 label="탄수화물 함량"
                 value={filters.carbsRange}
-                min={0}
-                max={100}
+                min={FILTER_RANGES.CARBS.MIN}
+                max={FILTER_RANGES.CARBS.MAX}
                 step={1}
                 unit="g"
                 onApply={(value) => handleRangeChange("carbsRange", value)}
@@ -238,8 +246,8 @@ export default function CompactProductFilters({
               <RangeFilterPopover
                 label="당 함량"
                 value={filters.sugarRange}
-                min={0}
-                max={50}
+                min={FILTER_RANGES.SUGAR.MIN}
+                max={FILTER_RANGES.SUGAR.MAX}
                 step={0.5}
                 unit="g"
                 onApply={(value) => handleRangeChange("sugarRange", value)}

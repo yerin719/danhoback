@@ -24,5 +24,7 @@ export function useProductSearch({
     enabled,
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000, // 10분
+    refetchOnMount: false, // 컴포넌트 마운트 시 refetch 비활성화
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 refetch 비활성화
   });
 }
