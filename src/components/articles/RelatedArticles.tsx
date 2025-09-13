@@ -8,6 +8,7 @@ import ArticleImage from "./ArticleImage";
 interface RelatedArticlesProps {
   articles: Array<{
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     category: string;
@@ -15,6 +16,7 @@ interface RelatedArticlesProps {
   }>;
   latestArticles: Array<{
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     category: string;
@@ -74,6 +76,7 @@ function RelatedArticleHorizontalCard({
 }: { 
   article: {
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     category: string;
@@ -81,7 +84,7 @@ function RelatedArticleHorizontalCard({
   }
 }) {
   return (
-    <Link href={`/articles/${article.id}`}>
+    <Link href={`/articles/${article.slug}`}>
       <div className="flex gap-4 rounded-lg cursor-pointer mb-6">
         {/* 이미지 */}
         <div className="flex-shrink-0 w-20 h-16 relative overflow-hidden rounded-lg">

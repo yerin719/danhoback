@@ -4,7 +4,7 @@ import RelatedArticles from "@/components/articles/RelatedArticles";
 import { Button } from "@/components/ui/button";
 import { getCategoryDisplayName } from "@/features/articles/constants";
 import {
-  getArticleById,
+  getArticleDetail,
   getLatestArticles,
   getRelatedArticles,
   incrementViewCount,
@@ -15,17 +15,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface ArticleDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
-  const { id } = await params;
+  const { slug } = await params;
 
   // 서버용 Supabase 클라이언트 생성
   const supabase = await createServerSupabaseClient();
 
   // 상세 정보 가져오기 (태그 포함)
-  const article = await getArticleById(id, supabase);
+  const article = await getArticleDetail(slug, supabase);
 
   if (!article) {
     notFound();

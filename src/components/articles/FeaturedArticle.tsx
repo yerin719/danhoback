@@ -8,6 +8,7 @@ import ArticleImage from "./ArticleImage";
 interface FeaturedArticleProps {
   article: {
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     category: ArticleCategory;
@@ -17,7 +18,7 @@ interface FeaturedArticleProps {
 
 export default function FeaturedArticle({ article }: FeaturedArticleProps) {
   return (
-    <Link href={`/articles/${article.id}`}>
+    <Link href={`/articles/${article.slug}`}>
       <Card className="cursor-pointer border-none shadow-none overflow-hidden p-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
           {/* 왼쪽: 이미지 */}

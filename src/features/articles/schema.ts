@@ -40,7 +40,7 @@ export const articles = pgTable(
   "articles",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    slug: varchar("slug", { length: 200 }).unique(),
+    slug: varchar("slug", { length: 200 }).notNull().unique(),
     title: varchar("title", { length: 300 }).notNull(),
     summary: text("summary"),
     content: text("content").notNull(),

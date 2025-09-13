@@ -79,7 +79,7 @@ export type Database = {
           meta_keywords: string | null
           published_at: string | null
           read_time: number | null
-          slug: string | null
+          slug: string
           status: Database["public"]["Enums"]["article_status"] | null
           summary: string | null
           title: string
@@ -99,7 +99,7 @@ export type Database = {
           meta_keywords?: string | null
           published_at?: string | null
           read_time?: number | null
-          slug?: string | null
+          slug: string
           status?: Database["public"]["Enums"]["article_status"] | null
           summary?: string | null
           title: string
@@ -119,7 +119,7 @@ export type Database = {
           meta_keywords?: string | null
           published_at?: string | null
           read_time?: number | null
-          slug?: string | null
+          slug?: string
           status?: Database["public"]["Enums"]["article_status"] | null
           summary?: string | null
           title?: string
@@ -473,13 +473,13 @@ export type Database = {
           serving_size: number | null
           servings_per_container: number | null
           size: string | null
+          slug: string | null
           sodium: number | null
           sugar: number | null
           total_amount: number | null
           updated_at: string | null
           variant_id: string | null
           variant_name: string | null
-          variant_slug: string | null
         }
         Relationships: [
           {

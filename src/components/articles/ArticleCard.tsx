@@ -8,6 +8,7 @@ import ArticleImage from "./ArticleImage";
 interface ArticleCardProps {
   article: {
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     category: string;
@@ -17,7 +18,7 @@ interface ArticleCardProps {
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   return (
-    <Link href={`/articles/${article.id}`}>
+    <Link href={`/articles/${article.slug}`}>
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
         <div className="aspect-video relative mb-4 overflow-hidden rounded-lg">
           <ArticleImage

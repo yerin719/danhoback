@@ -111,10 +111,10 @@ export async function getArticlesByCategory(
 }
 
 /**
- * 단일 Article 상세 조회 (ID 또는 Slug 기준, 태그 포함)
+ * 단일 Article 상세 조회 (Slug 기준, 태그 포함)
  */
-export async function getArticleById(
-  id: string,
+export async function getArticleDetail(
+  slug: string,
   supabaseClient?: SupabaseClient<Database>,
 ): Promise<ArticleWithTags | null> {
   try {
@@ -130,7 +130,7 @@ export async function getArticleById(
           )
         )
       `)
-      .or(`id.eq.${id},slug.eq.${id}`)
+      .eq("slug", slug)
       .eq("status", "published")
       .single();
 
@@ -149,7 +149,7 @@ export async function getArticleById(
       tags: data.tagRelations?.map(rel => rel.tag).filter(Boolean) || []
     };
   } catch (error) {
-    console.error("Error in getArticleById:", error);
+    console.error("Error in getArticleDetail:", error);
     return null;
   }
 }
