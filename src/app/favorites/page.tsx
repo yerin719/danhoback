@@ -16,7 +16,7 @@ export default function FavoritesPage() {
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/auth/login");
+      router.push("/auth/login?redirectedFrom=%2Ffavorites");
     }
   }, [authLoading, user, router]);
 

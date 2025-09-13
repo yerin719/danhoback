@@ -25,7 +25,7 @@ import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } fr
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,7 +33,11 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const { signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithKakao } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+
+  // redirectedFrom 쿼리 파라미터에서 이전 페이지 URL 가져오기
+  const redirectedFrom = searchParams.get("redirectedFrom");
 
   // 로그인 폼
   const loginForm = useForm<LoginFormData>({
@@ -59,7 +63,10 @@ export default function LoginPage() {
     try {
       await signInWithEmail(data.email, data.password);
       toast.success("로그인되었습니다!");
-      router.push("/");
+
+      // redirectedFrom이 있으면 해당 페이지로, 없으면 홈페이지로 이동
+      const targetUrl = redirectedFrom && redirectedFrom.startsWith('/') ? redirectedFrom : '/';
+      router.push(targetUrl);
     } catch (error) {
       let errorMessage = "로그인에 실패했습니다";
 

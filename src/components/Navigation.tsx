@@ -30,6 +30,9 @@ export default function Navigation() {
   const { user, profile, displayName, avatarInitial, signOut, loading } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  // 로그인 버튼 URL 생성
+  const loginUrl = `/auth/login?redirectedFrom=${encodeURIComponent(pathname)}`;
+
   const handleSignOut = async () => {
     if (isSigningOut) {
       return;
@@ -132,7 +135,7 @@ export default function Navigation() {
             ) : (
               /* 비로그인 상태 */
               <Button variant="default" size="sm" asChild>
-                <Link href="/auth/login">로그인</Link>
+                <Link href={loginUrl}>로그인</Link>
               </Button>
             )}
           </div>
@@ -196,7 +199,7 @@ export default function Navigation() {
               </>
             ) : (
               <Button variant="default" size="sm" asChild className="text-xs">
-                <Link href="/auth/login">로그인</Link>
+                <Link href={loginUrl}>로그인</Link>
               </Button>
             )}
           </div>

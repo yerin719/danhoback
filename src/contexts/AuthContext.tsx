@@ -138,11 +138,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
+  // OAuth 로그인용 콜백 URL 생성 헬퍼 함수
+  const getOAuthCallbackUrl = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectedFrom = urlParams.get("redirectedFrom");
+
+    return redirectedFrom
+      ? `${window.location.origin}/auth/callback?redirectedFrom=${encodeURIComponent(redirectedFrom)}`
+      : `${window.location.origin}/auth/callback`;
+  };
+
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getOAuthCallbackUrl(),
       },
     });
     if (error) throw error;
@@ -152,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getOAuthCallbackUrl(),
       },
     });
     if (error) throw error;

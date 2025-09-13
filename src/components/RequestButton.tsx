@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface RequestButtonProps {
   size?: "sm" | "default" | "lg";
@@ -22,11 +22,12 @@ export default function RequestButton({
 }: RequestButtonProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleClick = () => {
     if (!user) {
-      // 로그인되지 않은 경우 로그인 페이지로 리디렉션
-      router.push("/auth/login");
+      // 로그인되지 않은 경우 현재 페이지 정보와 함께 로그인 페이지로 리디렉션
+      router.push(`/auth/login?redirectedFrom=${encodeURIComponent(pathname)}`);
       return;
     }
 
