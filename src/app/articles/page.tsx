@@ -5,6 +5,7 @@ import FeaturedArticle from "@/components/articles/FeaturedArticle";
 import { Button } from "@/components/ui/button";
 import { getCategoryDisplayName } from "@/features/articles/constants";
 import { getArticles, getFeaturedArticle } from "@/features/articles/queries";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -16,12 +17,15 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
   const params = await searchParams;
   const category = params.category as "guide" | "brand" | "exercise" | "diet" | "trend" | undefined;
 
+  // 서버용 Supabase 클라이언트 생성
+  const supabase = await createServerSupabaseClient();
+
   // 데이터 가져오기
   const [featuredArticle, articles] = await Promise.all([
-    getFeaturedArticle(),
+    getFeaturedArticle(supabase),
     category
-      ? getArticles("publishedAt", "desc", 100, 0, { category })
-      : getArticles("publishedAt", "desc", 100, 0),
+      ? getArticles("publishedAt", "desc", 100, 0, { category }, supabase)
+      : getArticles("publishedAt", "desc", 100, 0, undefined, supabase),
   ]);
 
   // Featured 글을 제외한 나머지 글들

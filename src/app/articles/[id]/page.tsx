@@ -9,6 +9,7 @@ import {
   getRelatedArticles,
   incrementViewCount,
 } from "@/features/articles/queries";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,8 +21,11 @@ interface ArticleDetailPageProps {
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
   const { id } = await params;
 
+  // 서버용 Supabase 클라이언트 생성
+  const supabase = await createServerSupabaseClient();
+
   // 상세 정보 가져오기 (태그 포함)
-  const article = await getArticleById(id);
+  const article = await getArticleById(id, supabase);
 
   if (!article) {
     notFound();
@@ -33,12 +37,13 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
       article.id,
       article.category as "guide" | "brand" | "exercise" | "diet" | "trend",
       3,
+      supabase,
     ),
-    getLatestArticles(5),
+    getLatestArticles(5, supabase),
   ]);
 
   // 조회수 증가 (비동기로 처리, 결과 대기 안 함)
-  incrementViewCount(article.id).catch(console.error);
+  incrementViewCount(article.id, supabase).catch(console.error);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

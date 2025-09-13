@@ -1,4 +1,5 @@
-import client from "@/lib/supabase/client";
+import defaultClient from "@/lib/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../../../database.types";
 
 // ============================================
@@ -47,8 +48,10 @@ export async function getArticles(
   limit: number = 100,
   offset: number = 0,
   filters?: ArticleFilters,
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<Article[]> {
   try {
+    const client = supabaseClient || defaultClient;
     let query = client
       .from("articles")
       .select("*")
@@ -102,15 +105,20 @@ export async function getArticlesByCategory(
   sortOrder: SortOrder = "desc",
   limit: number = 100,
   offset: number = 0,
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<Article[]> {
-  return getArticles(sortBy, sortOrder, limit, offset, { category });
+  return getArticles(sortBy, sortOrder, limit, offset, { category }, supabaseClient);
 }
 
 /**
  * 단일 Article 상세 조회 (ID 또는 Slug 기준, 태그 포함)
  */
-export async function getArticleById(id: string): Promise<ArticleWithTags | null> {
+export async function getArticleById(
+  id: string,
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<ArticleWithTags | null> {
   try {
+    const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
       .select(`
@@ -149,8 +157,12 @@ export async function getArticleById(id: string): Promise<ArticleWithTags | null
 /**
  * 최신글 조회 (사이드바, 홈페이지 등에서 사용)
  */
-export async function getLatestArticles(limit: number = 5): Promise<Article[]> {
+export async function getLatestArticles(
+  limit: number = 5,
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<Article[]> {
   try {
+    const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
       .select("*")
@@ -177,8 +189,10 @@ export async function getRelatedArticles(
   currentId: string,
   category: "guide" | "brand" | "exercise" | "diet" | "trend",
   limit: number = 3,
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<Article[]> {
   try {
+    const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
       .select("*")
@@ -210,19 +224,24 @@ export async function searchArticles(
   limit: number = 100,
   offset: number = 0,
   category?: "guide" | "brand" | "exercise" | "diet" | "trend",
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<Article[]> {
   if (!query.trim()) {
-    return getArticles(sortBy, sortOrder, limit, offset, { category });
+    return getArticles(sortBy, sortOrder, limit, offset, { category }, supabaseClient);
   }
 
-  return getArticles(sortBy, sortOrder, limit, offset, { searchQuery: query, category });
+  return getArticles(sortBy, sortOrder, limit, offset, { searchQuery: query, category }, supabaseClient);
 }
 
 /**
  * Article 조회수 증가
  */
-export async function incrementViewCount(articleId: string): Promise<boolean> {
+export async function incrementViewCount(
+  articleId: string,
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<boolean> {
   try {
+    const client = supabaseClient || defaultClient;
     // 현재 조회수를 가져와서 1 증가
     const { data: currentData, error: fetchError } = await client
       .from("articles")
@@ -266,8 +285,12 @@ export async function incrementViewCount(articleId: string): Promise<boolean> {
 /**
  * Article 수 조회 (페이지네이션용)
  */
-export async function getArticlesCount(filters?: ArticleFilters): Promise<number> {
+export async function getArticlesCount(
+  filters?: ArticleFilters,
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<number> {
   try {
+    const client = supabaseClient || defaultClient;
     let query = client
       .from("articles")
       .select("*", { count: "exact", head: true })
@@ -302,8 +325,11 @@ export async function getArticlesCount(filters?: ArticleFilters): Promise<number
 /**
  * 카테고리별 Article 수 조회
  */
-export async function getArticleCountByCategory(): Promise<Record<string, number>> {
+export async function getArticleCountByCategory(
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<Record<string, number>> {
   try {
+    const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
       .select("category")
@@ -331,8 +357,11 @@ export async function getArticleCountByCategory(): Promise<Record<string, number
 /**
  * Featured Article 조회 (is_featured가 true인 최신 글)
  */
-export async function getFeaturedArticle(): Promise<Article | null> {
+export async function getFeaturedArticle(
+  supabaseClient?: SupabaseClient<Database>,
+): Promise<Article | null> {
   try {
+    const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
       .select("*")
