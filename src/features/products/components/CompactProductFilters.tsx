@@ -142,7 +142,7 @@ export default function CompactProductFilters({
 
   if (isLoading) {
     return (
-      <div className="border-b pb-4 mb-6">
+      <div className="border-b pb-4 mb-4">
         <div
           className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
           style={{
@@ -168,7 +168,7 @@ export default function CompactProductFilters({
   }
 
   return (
-    <div className="border-b pb-4 mb-6">
+    <div className="border-b pb-4 mb-4">
       <div
         className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
         style={{

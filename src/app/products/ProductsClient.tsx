@@ -4,13 +4,6 @@ import ProductCard from "@/components/ProductCard";
 import RequestButton from "@/components/RequestButton";
 import { CarouselAdBanner } from "@/components/advertising";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import CompactProductFilters from "@/features/products/components/CompactProductFilters";
 import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
@@ -18,7 +11,6 @@ import { productPageBannerCampaigns } from "@/features/products/data/bannerCampa
 import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
-import { ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -79,30 +71,15 @@ export default function ProductsClient({
     [sortBy, sortOrder, updateUrl],
   );
 
-  // 정렬 변경 핸들러
+  // 정렬 변경 핸들러 (정렬 기준과 순서를 함께 처리)
   const handleSortChange = useCallback(
-    (newSortBy: string) => {
-      if (newSortBy === sortBy) {
-        // 같은 정렬 기준 클릭 시 순서 반전
-        const newOrder = sortOrder === "asc" ? "desc" : "asc";
-        setSortOrder(newOrder);
-        updateUrl(filters, sortBy, newOrder);
-      } else {
-        // 새로운 정렬 기준
-        setSortBy(newSortBy);
-        setSortOrder("desc");
-        updateUrl(filters, newSortBy, "desc");
-      }
+    (newSortBy: string, newSortOrder: "asc" | "desc") => {
+      setSortBy(newSortBy);
+      setSortOrder(newSortOrder);
+      updateUrl(filters, newSortBy, newSortOrder);
     },
-    [filters, sortBy, sortOrder, updateUrl],
+    [filters, updateUrl],
   );
-
-  // 정렬 순서 토글
-  const handleOrderToggle = useCallback(() => {
-    const newOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newOrder);
-    updateUrl(filters, sortBy, newOrder);
-  }, [filters, sortBy, sortOrder, updateUrl]);
 
   // 필터 초기화
   const handleResetFilters = useCallback(() => {
@@ -124,25 +101,59 @@ export default function ProductsClient({
       <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       {/* 정렬 옵션 */}
-      <div className="mb-6 flex items-center justify-end">
-        <div className="flex items-center gap-2">
-          <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="favorites_count">인기순</SelectItem>
-              <SelectItem value="protein">단백질 함량순</SelectItem>
-              <SelectItem value="calories">칼로리순</SelectItem>
-              <SelectItem value="name">이름순</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" onClick={handleOrderToggle} className="px-3">
-            <ArrowUpDown className="h-4 w-4" />
-            {sortOrder === "asc" ? "오름차순" : "내림차순"}
+      <div className="mb-6 flex items-center justify-between ">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("favorites_count", "desc")}
+            className={`pl-0 pr-3 hover:bg-transparent hover:cursor-pointer ${
+              sortBy === "favorites_count" && sortOrder === "desc"
+                ? "font-bold text-black"
+                : "text-gray-500"
+            }`}
+          >
+            인기순
           </Button>
-          <RequestButton />
+          <span className="text-gray-300">·</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("protein", "desc")}
+            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+              sortBy === "protein" && sortOrder === "desc"
+                ? "font-bold text-black"
+                : "text-gray-500"
+            }`}
+          >
+            높은 단백질순
+          </Button>
+          <span className="text-gray-300">·</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("protein", "asc")}
+            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+              sortBy === "protein" && sortOrder === "asc" ? "font-bold text-black" : "text-gray-500"
+            }`}
+          >
+            낮은 단백질순
+          </Button>
+          <span className="text-gray-300">·</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("calories", "asc")}
+            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+              sortBy === "calories" && sortOrder === "asc"
+                ? "font-bold text-black"
+                : "text-gray-500"
+            }`}
+          >
+            낮은 칼로리순
+          </Button>
         </div>
+        <RequestButton />
       </div>
 
       {/* 초기 로딩 상태 */}
