@@ -9,51 +9,96 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
+import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from "@/features/auth/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const { signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithKakao } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 로그인 폼
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  // 회원가입 폼
+  const signupForm = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleEmailLogin = async (data: LoginFormData) => {
     setIsLoading(true);
 
     try {
-      await signInWithEmail(email, password);
+      await signInWithEmail(data.email, data.password);
       toast.success("로그인되었습니다!");
       router.push("/");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "로그인에 실패했습니다";
+      let errorMessage = "로그인에 실패했습니다";
+
+      if (error instanceof Error) {
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "이메일 인증을 완료해주세요";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleEmailSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleEmailSignup = async (data: SignupFormData) => {
     setIsLoading(true);
 
     try {
-      await signUpWithEmail(email, password);
+      await signUpWithEmail(data.email, data.password);
       toast.success("회원가입되었습니다! 이메일을 확인해주세요.");
-      setEmail("");
-      setPassword("");
+      signupForm.reset();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "회원가입에 실패했습니다";
+      let errorMessage = "회원가입에 실패했습니다";
+
+      if (error instanceof Error) {
+        if (error.message.includes("User already registered")) {
+          errorMessage = "이미 가입된 이메일입니다";
+        } else if (error.message.includes("Password should be at least")) {
+          errorMessage = "비밀번호는 최소 6자 이상이어야 합니다";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -110,67 +155,95 @@ export default function LoginPage() {
             </TabsList>
 
             <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleEmailLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">이메일</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="example@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    required
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleEmailLogin)} className="space-y-4" noValidate>
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>이메일</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="example@email.com"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">비밀번호</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    required
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>비밀번호</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "로그인 중..." : "로그인"}
-                </Button>
-              </form>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "로그인 중..." : "로그인"}
+                  </Button>
+                </form>
+              </Form>
             </TabsContent>
 
             <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleEmailSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">이메일</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="example@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    required
+              <Form {...signupForm}>
+                <form onSubmit={signupForm.handleSubmit(handleEmailSignup)} className="space-y-4" noValidate>
+                  <FormField
+                    control={signupForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>이메일</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="example@email.com"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">비밀번호</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    required
+                  <FormField
+                    control={signupForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>비밀번호</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "가입 중..." : "회원가입"}
-                </Button>
-              </form>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "가입 중..." : "회원가입"}
+                  </Button>
+                </form>
+              </Form>
             </TabsContent>
           </Tabs>
 
