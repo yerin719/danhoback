@@ -124,10 +124,7 @@ export default function ProductsClient({
       <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       {/* 정렬 옵션 */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {products && products.length > 0 && <span>{products.length}개의 제품</span>}
-        </div>
+      <div className="mb-6 flex items-center justify-end">
         <div className="flex items-center gap-2">
           <Select value={sortBy} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[140px]">
