@@ -30,18 +30,18 @@ export default function RelatedProductThumbnails({
             if (variant.primary_image) {
               return variant.primary_image;
             }
-            
+
             // images가 배열이면 첫 번째 이미지 사용
             if (Array.isArray(variant.images) && variant.images.length > 0) {
               const firstImage = variant.images[0];
-              return typeof firstImage === 'string' ? firstImage : "/placeholder.svg";
+              return typeof firstImage === "string" ? firstImage : "/placeholder.svg";
             }
-            
+
             return "/placeholder.svg";
           })();
 
           return (
-            <Link key={variant.id} href={`/products/${variant.id}`} className="group block">
+            <Link key={variant.id} href={`/products/${variant.slug}`} className="group block">
               <div className="space-y-1">
                 {/* 썸네일 이미지 */}
                 <div className="aspect-square relative rounded-md overflow-hidden border border-muted transition-colors group-hover:border-muted-foreground">

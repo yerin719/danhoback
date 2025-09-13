@@ -220,7 +220,7 @@ export type Database = {
           serving_size: number | null
           servings_per_container: number | null
           size: string | null
-          slug: string | null
+          slug: string
           total_amount: number | null
           updated_at: string
         }
@@ -244,7 +244,7 @@ export type Database = {
           serving_size?: number | null
           servings_per_container?: number | null
           size?: string | null
-          slug?: string | null
+          slug: string
           total_amount?: number | null
           updated_at?: string
         }
@@ -268,7 +268,7 @@ export type Database = {
           serving_size?: number | null
           servings_per_container?: number | null
           size?: string | null
-          slug?: string | null
+          slug?: string
           total_amount?: number | null
           updated_at?: string
         }
@@ -511,7 +511,7 @@ export type Database = {
         }[]
       }
       get_product_detail: {
-        Args: { variant_id_param: string }
+        Args: { variant_slug_param: string }
         Returns: {
           brand_info: Json
           is_favorited: boolean
@@ -543,7 +543,6 @@ export type Database = {
           brand_name_en: string
           calories: number
           carbs: number
-          created_at: string
           favorites_count: number
           flavor_category: string
           flavor_name: string
@@ -624,7 +623,6 @@ export type Database = {
           brand_name_en: string
           calories: number
           carbs: number
-          fat: number
           favorites_count: number
           flavor_category: string
           flavor_name: string
@@ -638,7 +636,7 @@ export type Database = {
           protein_type: string
           purchase_url: string
           size: string
-          sodium: number
+          slug: string
           sugar: number
           variant_id: string
           variant_name: string

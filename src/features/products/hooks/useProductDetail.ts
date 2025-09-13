@@ -1,11 +1,11 @@
 import { getProductDetail } from "@/features/products/queries";
 import { useQuery } from "@tanstack/react-query";
 
-export function useProductDetail(productId: string) {
+export function useProductDetail(productSlug: string) {
   return useQuery({
-    queryKey: ["product", "detail", productId],
-    queryFn: () => getProductDetail(productId),
-    enabled: !!productId,
+    queryKey: ["product", "detail", productSlug],
+    queryFn: () => getProductDetail(productSlug),
+    enabled: !!productSlug,
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000, // 10분
   });

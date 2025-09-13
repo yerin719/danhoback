@@ -36,6 +36,7 @@ RETURNS TABLE (
   brand_logo_url text,
   variant_id uuid,
   variant_name text,
+  slug text,
   flavor_category text,
   flavor_name text,
   package_type text,
@@ -65,6 +66,7 @@ BEGIN
     pwd.brand_logo_url::text,
     pwd.variant_id,
     pwd.variant_name::text,
+    pwd.slug::text,
     pwd.flavor_category::text,
     pwd.flavor_name::text,
     pwd.package_type::text,
@@ -212,10 +214,10 @@ END;
 $$;
 
 -- ============================================
--- 단일 제품 상세 조회 함수 (variant_id 기준)
+-- 단일 제품 상세 조회 함수 (slug 기준)
 -- ============================================
 CREATE OR REPLACE FUNCTION get_product_detail(
-  variant_id_param uuid
+  variant_slug_param varchar
 )
 RETURNS TABLE (
   -- 선택된 variant 상세 정보
@@ -232,7 +234,21 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 STABLE
 AS $$
+DECLARE
+  target_variant_id uuid;
+  target_product_id uuid;
 BEGIN
+  -- slug로 variant_id와 product_id 찾기
+  SELECT id, product_id INTO target_variant_id, target_product_id
+  FROM product_variants
+  WHERE slug = variant_slug_param AND is_available = true
+  LIMIT 1;
+
+  -- variant를 찾지 못한 경우 빈 결과 반환
+  IF target_variant_id IS NULL THEN
+    RETURN;
+  END IF;
+
   RETURN QUERY
   WITH selected_variant_data AS (
     -- 선택된 variant의 상세 정보
@@ -277,7 +293,7 @@ BEGIN
       ) as variant_data
     FROM product_variants pv
     LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
-    WHERE pv.id = variant_id_param AND pv.is_available = true
+    WHERE pv.id = target_variant_id
   )
   SELECT 
     svd.variant_data as selected_variant,
@@ -298,23 +314,25 @@ BEGIN
       'website', b.website,
       'is_active', b.is_active
     ) as brand_info,
-    -- 같은 라인의 다른 variants (선택된 것 제외)
+    -- 같은 라인의 다른 variants (선택된 것 제외)  
     COALESCE(
       (
         SELECT jsonb_agg(
           jsonb_build_object(
             'id', other_pv.id,
             'name', other_pv.name,
+            'slug', other_pv.slug,
             'flavor_category', other_pv.flavor_category::text,
             'flavor_name', other_pv.flavor_name,
             'primary_image', other_pv.primary_image,
             'package_type', other_pv.package_type::text,
-            'size', other_pv.size
+            'size', other_pv.size,
+            'images', other_pv.images
           ) ORDER BY other_pv.display_order, other_pv.name
         )
         FROM product_variants other_pv
-        WHERE other_pv.product_id = svd.product_id 
-          AND other_pv.id != variant_id_param 
+        WHERE other_pv.product_id = target_product_id 
+          AND other_pv.id != target_variant_id 
           AND other_pv.is_available = true
       ),
       '[]'::jsonb
@@ -324,7 +342,7 @@ BEGIN
       WHEN auth.uid() IS NOT NULL THEN
         EXISTS (
           SELECT 1 FROM favorites f 
-          WHERE f.product_variant_id = variant_id_param 
+          WHERE f.product_variant_id = target_variant_id 
           AND f.user_id = auth.uid()
         )
       ELSE false
@@ -353,4 +371,4 @@ COMMENT ON FUNCTION get_filter_options IS
 '필터 UI를 위한 옵션값과 개수를 반환하는 함수';
 
 COMMENT ON FUNCTION get_product_detail IS 
-'단일 제품의 상세 정보를 JSON 형태로 반환하는 함수';
+'slug를 사용하여 단일 제품의 상세 정보를 JSON 형태로 반환하는 함수';

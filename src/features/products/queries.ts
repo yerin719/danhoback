@@ -1,13 +1,16 @@
 import defaultClient from "@/lib/supabase/client";
-import { Database } from "../../../database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "../../../database.types";
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
 
 // 제품 검색 결과 타입 (search_products RPC 함수의 반환 타입)
-export type ProductSearchResult = Database["public"]["Functions"]["search_products"]["Returns"][0];
+export type ProductSearchResult =
+  Database["public"]["Functions"]["search_products"]["Returns"][0] & {
+    slug: string; // slug 필드 추가
+  };
 
 // Database 기반으로 Json을 구체적인 타입으로 변환
 type ProductDetailRow = {
@@ -21,6 +24,7 @@ type ProductDetailRow = {
       Database["public"]["Tables"]["product_variants"]["Row"],
       | "id"
       | "name"
+      | "slug"
       | "flavor_category"
       | "flavor_name"
       | "primary_image"
@@ -50,7 +54,6 @@ export interface FilterState {
   packageTypes: string[];
   searchQuery?: string;
 }
-
 
 // ============================================
 // QUERY FUNCTIONS
@@ -100,16 +103,16 @@ export async function searchProducts(
 }
 
 /**
- * 단일 제품 상세 정보 조회 (variant_id 기준)
+ * 단일 제품 상세 정보 조회 (slug 기준)
  * 선택된 variant의 상세 정보와 같은 라인의 다른 variants 반환
  */
 export async function getProductDetail(
-  variantId: string,
-  supabaseClient?: SupabaseClient<Database>
+  slug: string,
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<ProductDetailRow | null> {
   const client = supabaseClient || defaultClient;
   const { data, error } = await client.rpc("get_product_detail", {
-    variant_id_param: variantId,
+    variant_slug_param: slug,
   });
 
   if (error) {
@@ -129,7 +132,7 @@ export async function getProductDetail(
  */
 export async function getFilterOptions(
   optionType?: "flavor" | "protein_type" | "form" | "package_type" | "brand",
-  supabaseClient?: SupabaseClient<Database>
+  supabaseClient?: SupabaseClient<Database>,
 ): Promise<FilterOption[]> {
   const client = supabaseClient || defaultClient;
   const { data, error } = await client.rpc("get_filter_options", {
@@ -242,7 +245,7 @@ export async function getBrands(): Promise<string[]> {
 export async function getProductsFromView(
   limit: number = 100,
   offset: number = 0,
-  supabaseClient?: SupabaseClient<Database>
+  supabaseClient?: SupabaseClient<Database>,
 ) {
   const client = supabaseClient || defaultClient;
   const { data, error } = await client

@@ -7,16 +7,18 @@ import ProductInfo from "@/components/ProductInfo";
 import RelatedProductThumbnails from "@/components/RelatedProductThumbnails";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useProductDetail } from "@/features/products/hooks/useProductDetail";
-import { useToggleFavorite } from "@/features/favorites/hooks";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToggleFavorite } from "@/features/favorites/hooks";
+import { useProductDetail } from "@/features/products/hooks/useProductDetail";
 import { ExternalLink, Heart } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
-import { use } from "react";
 
-export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const { data: productData, isLoading, error, refetch } = useProductDetail(id);
+interface ProductDetailClientProps {
+  slug: string;
+}
+
+export default function ProductDetailClient({ slug }: ProductDetailClientProps) {
+  const { data: productData, isLoading, error, refetch } = useProductDetail(slug);
   const { user } = useAuth();
   const router = useRouter();
   const toggleFavorite = useToggleFavorite(user?.id || "");
@@ -24,13 +26,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const handleFavoriteClick = async () => {
     if (!user) {
       // 현재 페이지 URL을 저장하여 로그인 후 돌아올 수 있도록 함
-      router.push(`/auth/login?redirectedFrom=/products/${id}`);
+      router.push(`/auth/login?redirectedFrom=/products/${slug}`);
       return;
     }
 
     // DB 업데이트
     toggleFavorite.mutate(
-      { productVariantId: id, currentStatus: productData?.is_favorited || false },
+      { 
+        productVariantId: productData?.selected_variant.id || "", 
+        currentStatus: productData?.is_favorited || false 
+      },
       {
         onSuccess: () => {
           // 성공시 데이터 새로고침

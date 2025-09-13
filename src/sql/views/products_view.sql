@@ -23,7 +23,7 @@ SELECT
   
   -- Variant 정보
   pv.id as variant_id,
-  pv.slug as variant_slug,
+  pv.slug as slug,
   pv.name as variant_name,
   pv.flavor_category::text as flavor_category,
   pv.flavor_name,

@@ -106,7 +106,7 @@ export const productVariants = pgTable(
     productId: uuid("product_id")
       .references(() => products.id)
       .notNull(),
-    slug: varchar("slug", { length: 200 }).unique(),
+    slug: varchar("slug", { length: 200 }).unique().notNull(),
     name: varchar("name", { length: 200 }).notNull(),
     flavorCategory: flavorCategoryEnum("flavor_category"),
     flavorName: varchar("flavor_name", { length: 100 }),
@@ -129,6 +129,7 @@ export const productVariants = pgTable(
     return {
       productIdx: index("idx_variants_product").on(table.productId),
       flavorIdx: index("idx_variants_flavor").on(table.flavorCategory),
+      slugIdx: index("idx_variants_slug").on(table.slug),
     };
   },
 );

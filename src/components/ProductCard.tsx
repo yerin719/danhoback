@@ -14,6 +14,7 @@ interface Product {
   product_id: string;
   product_name: string;
   variant_name: string;
+  slug: string;
   brand_name: string;
   brand_name_en?: string;
   brand_logo_url?: string;
@@ -56,7 +57,7 @@ export default function ProductCard({
 
     if (!user) {
       // 로그인 페이지로 리다이렉트
-      router.push(`/auth/login?redirectedFrom=/products/${product.variant_id}`);
+      router.push(`/auth/login?redirectedFrom=/products/${product.slug}`);
       return;
     }
 
@@ -80,7 +81,7 @@ export default function ProductCard({
   };
 
   return (
-    <Link href={`/products/${product.variant_id}`}>
+    <Link href={`/products/${product.slug}`}>
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
         <CardHeader className="py-4 px-0 pb-2">
           <div className="aspect-square relative mb-4">
