@@ -13,12 +13,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import CompactProductFilters from "@/features/products/components/CompactProductFilters";
 import { productPageBannerCampaigns } from "@/features/products/data/bannerCampaigns";
-import { useProductSearch } from "@/features/products/hooks/useProductSearch";
+import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
+import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
 import { ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useState } from "react";
 
 interface ProductsClientProps {
   initialFilters: FilterState;
@@ -32,24 +33,30 @@ export default function ProductsClient({
   initialSortOrder,
 }: ProductsClientProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   // 현재 필터와 정렬 상태
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(initialSortOrder);
 
-  // React Query로 데이터 가져오기 (서버에서 prefetch한 데이터 사용)
+  // React Query 무한스크롤로 데이터 가져오기
   const {
-    data: products,
+    data,
     isLoading,
     isError,
     error,
-  } = useProductSearch({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProductSearch({
     filters,
     sortBy,
     sortOrder,
+    limit: PRODUCTS_PER_PAGE,
   });
+
+  // 모든 페이지의 제품을 flat하게 만들기
+  const products = data?.pages.flatMap((page) => page) ?? [];
 
   // URL 파라미터 업데이트 함수
   const updateUrl = useCallback(
@@ -57,9 +64,7 @@ export default function ProductsClient({
       const params = filtersToSearchParams(newFilters, newSortBy, newSortOrder);
 
       // URL 업데이트 (페이지 리로드 없이)
-      startTransition(() => {
-        router.push(`/products${params.toString() ? `?${params.toString()}` : ""}`);
-      });
+      router.push(`/products${params.toString() ? `?${params.toString()}` : ""}`);
     },
     [router],
   );
@@ -100,9 +105,7 @@ export default function ProductsClient({
 
   // 필터 초기화
   const handleResetFilters = useCallback(() => {
-    startTransition(() => {
-      router.push("/products");
-    });
+    router.push("/products");
   }, [router]);
 
   return (
@@ -143,8 +146,8 @@ export default function ProductsClient({
         </div>
       </div>
 
-      {/* 로딩 상태 */}
-      {(isLoading || isPending) && (
+      {/* 초기 로딩 상태 */}
+      {isLoading && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="space-y-3">
@@ -159,7 +162,7 @@ export default function ProductsClient({
       )}
 
       {/* 에러 상태 */}
-      {isError && !isPending && (
+      {isError && (
         <div className="text-center py-12">
           <p className="text-red-600">제품을 불러오는 중 오류가 발생했습니다.</p>
           <p className="text-sm text-muted-foreground mt-2">
@@ -169,16 +172,47 @@ export default function ProductsClient({
       )}
 
       {/* 제품 목록 */}
-      {!isLoading && !isError && !isPending && products && products.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.variant_id} product={product} />
-          ))}
-        </div>
+      {!isLoading && !isError && products && products.length > 0 && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.variant_id} product={product} />
+            ))}
+          </div>
+
+          {/* 무한스크롤 트리거 */}
+          <div
+            className="h-10 mt-8 flex items-center justify-center"
+            ref={(el) => {
+              if (el && hasNextPage && !isFetchingNextPage) {
+                const observer = new IntersectionObserver(
+                  (entries) => {
+                    if (entries[0].isIntersecting) {
+                      fetchNextPage();
+                    }
+                  },
+                  { threshold: 0.1 }
+                );
+                observer.observe(el);
+                return () => observer.disconnect();
+              }
+            }}
+          >
+            {isFetchingNextPage && (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-sm text-muted-foreground">더 많은 제품 불러오는 중...</span>
+              </div>
+            )}
+            {!hasNextPage && products.length > 0 && (
+              <span className="text-sm text-muted-foreground">모든 제품을 불러왔습니다</span>
+            )}
+          </div>
+        </>
       )}
 
       {/* 검색 결과 없음 */}
-      {!isLoading && !isError && !isPending && products && products.length === 0 && (
+      {!isLoading && !isError && products && products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">조건에 맞는 제품이 없습니다.</p>
           <button

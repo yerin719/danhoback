@@ -1,4 +1,19 @@
 // ============================================
+// PAGINATION & QUERY SETTINGS
+// ============================================
+
+// 페이지네이션 관련 상수
+export const PRODUCTS_PER_PAGE = 20;
+
+// 정렬 관련 상수
+export const DEFAULT_SORT_BY = "favorites_count";
+export const DEFAULT_SORT_ORDER = "desc" as const;
+
+// 쿼리 캐시 시간 (밀리초)
+export const QUERY_STALE_TIME = 5 * 60 * 1000; // 5분
+export const QUERY_GC_TIME = 10 * 60 * 1000; // 10분
+
+// ============================================
 // FILTER RANGES
 // ============================================
 
