@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import SearchInput from "@/components/SearchInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { Heart, LogOut, User } from "lucide-react";
@@ -52,13 +53,14 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        {/* 데스크탑 네비게이션 */}
+        <div className="hidden md:flex h-16 items-center justify-between">
           {/* 좌측 - 로고와 메뉴 */}
           <div className="flex items-center">
             <Link href="/" className="mr-8 flex items-center">
               <Image src="/images/logo.png" alt="단호박" width={60} height={60} />
             </Link>
-            <div className="hidden md:flex items-baseline space-x-4">
+            <div className="flex items-baseline space-x-4">
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
@@ -76,8 +78,10 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* 우측 - 사용자 영역 */}
-          <div className="flex items-center space-x-4">
+          {/* 우측 - 검색 및 사용자 영역 */}
+          <div className="flex items-center space-x-3">
+            {/* 검색창 - 찜 버튼 좌측에 위치 */}
+            <SearchInput className="w-64" />
             {loading ? (
               <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
             ) : user ? (
@@ -128,6 +132,70 @@ export default function Navigation() {
             ) : (
               /* 비로그인 상태 */
               <Button variant="default" size="sm" asChild>
+                <Link href="/auth/login">로그인</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* 모바일 네비게이션 */}
+        <div className="md:hidden flex h-16 items-center justify-between">
+          {/* 로고 */}
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <Image src="/images/logo.png" alt="단호박" width={50} height={50} />
+          </Link>
+
+          {/* 검색창 - 중앙에 위치하며 가능한 공간 모두 사용 */}
+          <div className="flex-1 mx-3">
+            <SearchInput className="w-full" placeholder="검색" />
+          </div>
+
+          {/* 사용자 메뉴 */}
+          <div className="flex items-center space-x-1 flex-shrink-0">
+            {loading ? (
+              <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+            ) : user ? (
+              <>
+                <Button variant="ghost" size="sm" asChild className="px-2">
+                  <Link href="/favorites">
+                    <Heart className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={profile?.avatar_url || ""} alt={displayName} />
+                        <AvatarFallback>{avatarInitial}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{displayName}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        프로필
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                        로그아웃
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button variant="default" size="sm" asChild className="text-xs">
                 <Link href="/auth/login">로그인</Link>
               </Button>
             )}

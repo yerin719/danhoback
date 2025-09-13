@@ -18,7 +18,7 @@ export function getDefaultFilters(): FilterState {
     sugarRange: [FILTER_RANGES.SUGAR.MIN, FILTER_RANGES.SUGAR.MAX],
     forms: [],
     packageTypes: [],
-    searchQuery: "",
+    searchQuery: undefined,
   };
 }
 
@@ -171,8 +171,8 @@ export function parseSearchParams(params: SearchParamsType): {
   };
 
   // 검색어 검증
-  const validateSearchQuery = (query: string | undefined): string => {
-    if (!query) return "";
+  const validateSearchQuery = (query: string | undefined): string | undefined => {
+    if (!query || !query.trim()) return undefined;
 
     // HTML 태그 제거 및 길이 제한
     const cleaned = query

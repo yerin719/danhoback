@@ -87,7 +87,7 @@ export default function ProductCard({
           <div className="aspect-square relative mb-4">
             <ProductImage
               src={product.primary_image || "/placeholder.png"}
-              alt={product.product_name}
+              alt={product.variant_name}
               className="object-cover rounded-lg"
             />
             <Button
@@ -106,7 +106,7 @@ export default function ProductCard({
           </div>
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">{product.brand_name}</p>
-            <h3 className="font-semibold text-sm leading-tight">{product.product_name}</h3>
+            <h3 className="font-semibold text-sm leading-tight">{product.variant_name}</h3>
           </div>
         </CardHeader>
 

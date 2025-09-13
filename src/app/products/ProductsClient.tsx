@@ -19,7 +19,7 @@ import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
 import { ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface ProductsClientProps {
   initialFilters: FilterState;
@@ -38,6 +38,13 @@ export default function ProductsClient({
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(initialSortOrder);
+
+  // URL 파라미터 변경 시 상태 업데이트
+  useEffect(() => {
+    setFilters(initialFilters);
+    setSortBy(initialSortBy);
+    setSortOrder(initialSortOrder);
+  }, [initialFilters, initialSortBy, initialSortOrder]);
 
   // React Query 무한스크롤로 데이터 가져오기
   const {
