@@ -556,6 +556,7 @@ export type Database = {
           protein_type: string
           purchase_url: string
           size: string
+          slug: string
           sugar: number
           variant_id: string
           variant_name: string
