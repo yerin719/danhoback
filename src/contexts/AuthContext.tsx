@@ -168,6 +168,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+
+      // 페이지 새로고침으로 모든 상태 초기화
+      window.location.reload();
     } catch (error) {
       throw error;
     }
