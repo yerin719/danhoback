@@ -107,7 +107,7 @@ export default function ProductsClient({
             variant="ghost"
             size="sm"
             onClick={() => handleSortChange("favorites_count", "desc")}
-            className={`pl-0 pr-3 hover:bg-transparent hover:cursor-pointer ${
+            className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "favorites_count" && sortOrder === "desc"
                 ? "font-bold text-black"
                 : "text-gray-500"
@@ -120,7 +120,7 @@ export default function ProductsClient({
             variant="ghost"
             size="sm"
             onClick={() => handleSortChange("protein", "desc")}
-            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "protein" && sortOrder === "desc"
                 ? "font-bold text-black"
                 : "text-gray-500"
@@ -133,7 +133,7 @@ export default function ProductsClient({
             variant="ghost"
             size="sm"
             onClick={() => handleSortChange("protein", "asc")}
-            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "protein" && sortOrder === "asc" ? "font-bold text-black" : "text-gray-500"
             }`}
           >
@@ -144,7 +144,7 @@ export default function ProductsClient({
             variant="ghost"
             size="sm"
             onClick={() => handleSortChange("calories", "asc")}
-            className={`px-3 hover:bg-transparent hover:cursor-pointer ${
+            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "calories" && sortOrder === "asc"
                 ? "font-bold text-black"
                 : "text-gray-500"
