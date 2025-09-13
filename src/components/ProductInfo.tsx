@@ -1,6 +1,7 @@
 "use client";
 
 import { getProteinTypeDisplayName, ProductForm, ProteinType } from "@/features/products/constants";
+import RequestButton from "@/components/RequestButton";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 
@@ -32,13 +33,18 @@ interface ProductInfoProps {
 export default function ProductInfo({ productInfo, brandInfo, variant }: ProductInfoProps) {
   return (
     <div className="space-y-6">
-      {/* 브랜드 */}
-      <div className="flex items-center gap-1">
-        <Avatar>
-          <AvatarImage src={brandInfo?.logo_url || ""} />
-          <AvatarFallback>{brandInfo?.name?.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <span className="font-medium">{brandInfo?.name}</span>
+      {/* 브랜드와 요청 버튼 */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-1">
+          <Avatar>
+            <AvatarImage src={brandInfo?.logo_url || ""} />
+            <AvatarFallback>{brandInfo?.name?.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <span className="font-medium">{brandInfo?.name}</span>
+        </div>
+        <RequestButton
+          prefillUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+        />
       </div>
 
       {/* 제품명 */}

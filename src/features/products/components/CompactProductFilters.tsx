@@ -76,24 +76,24 @@ export default function CompactProductFilters({
 
   // 필터 값 포맷팅
   const proteinValue = formatRangeValue(
-    filters.proteinRange, 
-    [FILTER_RANGES.PROTEIN.MIN, FILTER_RANGES.PROTEIN.MAX], 
-    "g"
+    filters.proteinRange,
+    [FILTER_RANGES.PROTEIN.MIN, FILTER_RANGES.PROTEIN.MAX],
+    "g",
   );
   const caloriesValue = formatRangeValue(
-    filters.caloriesRange, 
-    [FILTER_RANGES.CALORIES.MIN, FILTER_RANGES.CALORIES.MAX], 
-    "kcal"
+    filters.caloriesRange,
+    [FILTER_RANGES.CALORIES.MIN, FILTER_RANGES.CALORIES.MAX],
+    "kcal",
   );
   const carbsValue = formatRangeValue(
-    filters.carbsRange, 
-    [FILTER_RANGES.CARBS.MIN, FILTER_RANGES.CARBS.MAX], 
-    "g"
+    filters.carbsRange,
+    [FILTER_RANGES.CARBS.MIN, FILTER_RANGES.CARBS.MAX],
+    "g",
   );
   const sugarValue = formatRangeValue(
-    filters.sugarRange, 
-    [FILTER_RANGES.SUGAR.MIN, FILTER_RANGES.SUGAR.MAX], 
-    "g"
+    filters.sugarRange,
+    [FILTER_RANGES.SUGAR.MIN, FILTER_RANGES.SUGAR.MAX],
+    "g",
   );
   const flavorsValue = formatMultiSelectValue(filters.flavors, flavorOptions.length);
   const proteinTypesValue = formatMultiSelectValue(filters.proteinTypes, proteinTypeOptions.length);

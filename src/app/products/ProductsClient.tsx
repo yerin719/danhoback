@@ -1,6 +1,7 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
+import RequestButton from "@/components/RequestButton";
 import { CarouselAdBanner } from "@/components/advertising";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,9 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import CompactProductFilters from "@/features/products/components/CompactProductFilters";
+import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
 import { productPageBannerCampaigns } from "@/features/products/data/bannerCampaigns";
 import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
-import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
 import { ArrowUpDown } from "lucide-react";
@@ -47,20 +48,13 @@ export default function ProductsClient({
   }, [initialFilters, initialSortBy, initialSortOrder]);
 
   // React Query 무한스크롤로 데이터 가져오기
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteProductSearch({
-    filters,
-    sortBy,
-    sortOrder,
-    limit: PRODUCTS_PER_PAGE,
-  });
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProductSearch({
+      filters,
+      sortBy,
+      sortOrder,
+      limit: PRODUCTS_PER_PAGE,
+    });
 
   // 모든 페이지의 제품을 flat하게 만들기
   const products = data?.pages.flatMap((page) => page) ?? [];
@@ -150,6 +144,7 @@ export default function ProductsClient({
             <ArrowUpDown className="h-4 w-4" />
             {sortOrder === "asc" ? "오름차순" : "내림차순"}
           </Button>
+          <RequestButton />
         </div>
       </div>
 
@@ -198,7 +193,7 @@ export default function ProductsClient({
                       fetchNextPage();
                     }
                   },
-                  { threshold: 0.1 }
+                  { threshold: 0.1 },
                 );
                 observer.observe(el);
                 return () => observer.disconnect();
