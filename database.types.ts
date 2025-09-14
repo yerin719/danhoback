@@ -213,15 +213,10 @@ export type Database = {
           images: Json | null
           is_available: boolean | null
           name: string
-          package_type: Database["public"]["Enums"]["package_type"] | null
           primary_image: string | null
           product_id: string
           purchase_url: string | null
-          serving_size: number | null
-          servings_per_container: number | null
-          size: string | null
           slug: string
-          total_amount: number | null
           updated_at: string
         }
         Insert: {
@@ -237,15 +232,10 @@ export type Database = {
           images?: Json | null
           is_available?: boolean | null
           name: string
-          package_type?: Database["public"]["Enums"]["package_type"] | null
           primary_image?: string | null
           product_id: string
           purchase_url?: string | null
-          serving_size?: number | null
-          servings_per_container?: number | null
-          size?: string | null
           slug: string
-          total_amount?: number | null
           updated_at?: string
         }
         Update: {
@@ -261,15 +251,10 @@ export type Database = {
           images?: Json | null
           is_available?: boolean | null
           name?: string
-          package_type?: Database["public"]["Enums"]["package_type"] | null
           primary_image?: string | null
           product_id?: string
           purchase_url?: string | null
-          serving_size?: number | null
-          servings_per_container?: number | null
-          size?: string | null
           slug?: string
-          total_amount?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -297,7 +282,11 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          package_type: Database["public"]["Enums"]["package_type"] | null
           protein_type: Database["public"]["Enums"]["protein_type"]
+          serving_size: number | null
+          servings_per_container: number | null
+          total_amount: number | null
           updated_at: string
         }
         Insert: {
@@ -307,7 +296,11 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          package_type?: Database["public"]["Enums"]["package_type"] | null
           protein_type: Database["public"]["Enums"]["protein_type"]
+          serving_size?: number | null
+          servings_per_container?: number | null
+          total_amount?: number | null
           updated_at?: string
         }
         Update: {
@@ -317,7 +310,11 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          package_type?: Database["public"]["Enums"]["package_type"] | null
           protein_type?: Database["public"]["Enums"]["protein_type"]
+          serving_size?: number | null
+          servings_per_container?: number | null
+          total_amount?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -472,7 +469,6 @@ export type Database = {
           saturated_fat: number | null
           serving_size: number | null
           servings_per_container: number | null
-          size: string | null
           slug: string | null
           sodium: number | null
           sugar: number | null
@@ -640,7 +636,6 @@ export type Database = {
           protein: number
           protein_type: string
           purchase_url: string
-          size: string
           slug: string
           sugar: number
           variant_id: string

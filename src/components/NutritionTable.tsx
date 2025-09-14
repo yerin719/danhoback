@@ -1,7 +1,7 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { ProductNutrition } from "@/features/products/hooks/useProductDetail";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 interface NutritionTableProps {
   nutrition: ProductNutrition;
@@ -27,7 +27,7 @@ const calculatePercentage = (value: number, nutrient: string): string => {
   return `${percentage}%`;
 };
 
-export default function NutritionTable({ nutrition, servingSize = 30 }: NutritionTableProps) {
+export default function NutritionTable({ nutrition, servingSize }: NutritionTableProps) {
   const nutritionRows = [
     {
       name: "열량",
@@ -40,9 +40,7 @@ export default function NutritionTable({ nutrition, servingSize = 30 }: Nutritio
       name: "나트륨",
       value: nutrition.sodium,
       unit: "mg",
-      percentage: nutrition.sodium
-        ? calculatePercentage(nutrition.sodium, "sodium")
-        : "-",
+      percentage: nutrition.sodium ? calculatePercentage(nutrition.sodium, "sodium") : "-",
       indent: false,
     },
     {
@@ -95,9 +93,7 @@ export default function NutritionTable({ nutrition, servingSize = 30 }: Nutritio
       name: "칼슘",
       value: nutrition.calcium,
       unit: "mg",
-      percentage: nutrition.calcium
-        ? calculatePercentage(nutrition.calcium, "calcium")
-        : "-",
+      percentage: nutrition.calcium ? calculatePercentage(nutrition.calcium, "calcium") : "-",
       indent: false,
     },
   ].filter((row) => row.value !== undefined && row.value !== null);
@@ -112,7 +108,7 @@ export default function NutritionTable({ nutrition, servingSize = 30 }: Nutritio
               <TableRow>
                 <TableHead className="w-[140px] px-6">영양성분</TableHead>
                 <TableHead className="text-center w-[120px] px-6">
-                  1회 제공량 ({servingSize}g)
+                  1회 제공량 {servingSize && `(${servingSize}g)`}
                 </TableHead>
                 <TableHead className="text-center w-[100px] px-6">%영양성분 기준치</TableHead>
               </TableRow>

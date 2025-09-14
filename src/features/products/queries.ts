@@ -14,7 +14,8 @@ export type ProductSearchResult =
 
 // Database 기반으로 Json을 구체적인 타입으로 변환
 type ProductDetailRow = {
-  selected_variant: Database["public"]["Tables"]["product_variants"]["Row"] & {
+  selected_variant: Omit<Database["public"]["Tables"]["product_variants"]["Row"],
+    "package_type" | "total_amount" | "servings_per_container" | "serving_size"> & {
     nutrition?: Database["public"]["Tables"]["variant_nutrition"]["Row"];
   };
   product_info: Database["public"]["Tables"]["products"]["Row"];
@@ -28,8 +29,6 @@ type ProductDetailRow = {
       | "flavor_category"
       | "flavor_name"
       | "primary_image"
-      | "package_type"
-      | "size"
       | "images"
     >
   >;

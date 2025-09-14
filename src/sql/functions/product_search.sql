@@ -40,7 +40,6 @@ RETURNS TABLE (
   flavor_category text,
   flavor_name text,
   package_type text,
-  size text,
   primary_image text,
   purchase_url text,
   favorites_count int,
@@ -70,7 +69,6 @@ BEGIN
     pwd.flavor_category::text,
     pwd.flavor_name::text,
     pwd.package_type::text,
-    pwd.size::text,
     pwd.primary_image::text,
     pwd.purchase_url::text,
     pwd.favorites_count::int,
@@ -251,8 +249,8 @@ BEGIN
 
   RETURN QUERY
   WITH selected_variant_data AS (
-    -- 선택된 variant의 상세 정보
-    SELECT 
+    -- 선택된 variant의 상세 정보 (package fields removed from variant)
+    SELECT
       pv.id,
       pv.product_id,
       jsonb_build_object(
@@ -261,18 +259,13 @@ BEGIN
         'slug', pv.slug,
         'flavor_category', pv.flavor_category::text,
         'flavor_name', pv.flavor_name,
-        'package_type', pv.package_type::text,
-        'size', pv.size,
-        'total_amount', pv.total_amount,
-        'servings_per_container', pv.servings_per_container,
-        'serving_size', pv.serving_size,
         'barcode', pv.barcode,
         'primary_image', pv.primary_image,
         'images', pv.images,
         'purchase_url', pv.purchase_url,
         'favorites_count', pv.favorites_count,
         'is_available', pv.is_available,
-        'nutrition', CASE 
+        'nutrition', CASE
           WHEN vn.id IS NOT NULL THEN
             jsonb_build_object(
               'calories', vn.calories,
@@ -295,14 +288,18 @@ BEGIN
     LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
     WHERE pv.id = target_variant_id
   )
-  SELECT 
+  SELECT
     svd.variant_data as selected_variant,
-    -- 제품 정보
+    -- 제품 정보 (package fields now from products table)
     jsonb_build_object(
       'id', p.id,
       'name', p.name,
       'protein_type', p.protein_type::text,
       'form', p.form::text,
+      'package_type', p.package_type::text,  -- Now from products table
+      'total_amount', p.total_amount,         -- Now from products table
+      'servings_per_container', p.servings_per_container,  -- Now from products table
+      'serving_size', p.serving_size,         -- Now from products table
       'is_active', p.is_active
     ) as product_info,
     -- 브랜드 정보
@@ -314,7 +311,7 @@ BEGIN
       'website', b.website,
       'is_active', b.is_active
     ) as brand_info,
-    -- 같은 라인의 다른 variants (선택된 것 제외)  
+    -- 같은 라인의 다른 variants (선택된 것 제외, package fields removed)
     COALESCE(
       (
         SELECT jsonb_agg(
@@ -325,14 +322,12 @@ BEGIN
             'flavor_category', other_pv.flavor_category::text,
             'flavor_name', other_pv.flavor_name,
             'primary_image', other_pv.primary_image,
-            'package_type', other_pv.package_type::text,
-            'size', other_pv.size,
             'images', other_pv.images
           ) ORDER BY other_pv.display_order, other_pv.name
         )
         FROM product_variants other_pv
-        WHERE other_pv.product_id = target_product_id 
-          AND other_pv.id != target_variant_id 
+        WHERE other_pv.product_id = target_product_id
+          AND other_pv.id != target_variant_id
           AND other_pv.is_available = true
       ),
       '[]'::jsonb

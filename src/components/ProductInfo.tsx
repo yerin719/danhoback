@@ -1,7 +1,7 @@
 "use client";
 
-import { getProteinTypeDisplayName, ProductForm, ProteinType } from "@/features/products/constants";
 import RequestButton from "@/components/RequestButton";
+import { getProteinTypeDisplayName, ProductForm, ProteinType } from "@/features/products/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 
@@ -12,6 +12,9 @@ interface ProductInfoProps {
     protein_type: ProteinType;
     form: ProductForm;
     is_active: boolean;
+    total_amount?: number | null;
+    servings_per_container?: number | null;
+    package_type?: string | null;
   };
   brandInfo: {
     id: string;
@@ -24,9 +27,6 @@ interface ProductInfoProps {
   variant: {
     id: string;
     name: string;
-    total_amount?: number | null;
-    servings_per_container?: number | null;
-    package_type?: string | null;
   };
 }
 
@@ -43,7 +43,7 @@ export default function ProductInfo({ productInfo, brandInfo, variant }: Product
           <span className="font-medium">{brandInfo?.name}</span>
         </div>
         <RequestButton
-          prefillUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+          prefillUrl={typeof window !== "undefined" ? window.location.href : undefined}
         />
       </div>
 
@@ -59,15 +59,15 @@ export default function ProductInfo({ productInfo, brandInfo, variant }: Product
             {getProteinTypeDisplayName(productInfo.protein_type)}
           </Badge>
           {/* 총 내용량 칩 */}
-          {variant.total_amount && (
+          {productInfo.total_amount && (
             <Badge variant="outline" className="text-sm">
-              {variant.total_amount}g
+              {`${productInfo.total_amount}g`}
             </Badge>
           )}
           {/* 회분 칩 - 벌크일 때만 노출 */}
-          {variant.servings_per_container && variant.package_type === "bulk" && (
+          {productInfo.servings_per_container && productInfo.package_type === "bulk" && (
             <Badge variant="outline" className="text-sm">
-              {variant.servings_per_container}회분
+              {productInfo.servings_per_container}회분
             </Badge>
           )}
         </div>

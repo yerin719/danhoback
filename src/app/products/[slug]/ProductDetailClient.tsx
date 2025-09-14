@@ -32,16 +32,16 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
 
     // DB 업데이트
     toggleFavorite.mutate(
-      { 
-        productVariantId: productData?.selected_variant.id || "", 
-        currentStatus: productData?.is_favorited || false 
+      {
+        productVariantId: productData?.selected_variant.id || "",
+        currentStatus: productData?.is_favorited || false,
       },
       {
         onSuccess: () => {
           // 성공시 데이터 새로고침
           refetch();
-        }
-      }
+        },
+      },
     );
   };
 
@@ -104,7 +104,6 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     return selectedVariant.primary_image ? [selectedVariant.primary_image] : [];
   })();
 
-
   const handlePurchase = () => {
     if (selectedVariant.purchase_url) {
       window.open(selectedVariant.purchase_url, "_blank", "noopener,noreferrer");
@@ -144,7 +143,9 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
               size="lg"
               disabled={toggleFavorite.isPending}
             >
-              <Heart className={`h-6 w-6 ${productData.is_favorited ? "fill-red-500 text-red-500" : ""}`} />
+              <Heart
+                className={`h-6 w-6 ${productData.is_favorited ? "fill-red-500 text-red-500" : ""}`}
+              />
               <span>{selectedVariant.favorites_count || 0}</span>
             </Button>
 
@@ -166,7 +167,10 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       {/* 영양성분표 - 전체 너비 */}
       {selectedVariant.nutrition && (
         <div className="mt-12">
-          <NutritionTable nutrition={selectedVariant.nutrition} />
+          <NutritionTable
+            nutrition={selectedVariant.nutrition}
+            servingSize={productInfo.serving_size ?? undefined}
+          />
         </div>
       )}
     </div>
