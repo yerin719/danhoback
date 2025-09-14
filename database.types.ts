@@ -364,12 +364,15 @@ export type Database = {
           carbs: number | null
           cholesterol: number | null
           created_at: string
+          dietary_fiber: number | null
           fat: number | null
           id: string
           protein: number
           saturated_fat: number | null
           sodium: number | null
           sugar: number | null
+          trans_fat: number | null
+          unsaturated_fat: number | null
           updated_at: string
           variant_id: string
         }
@@ -382,12 +385,15 @@ export type Database = {
           carbs?: number | null
           cholesterol?: number | null
           created_at?: string
+          dietary_fiber?: number | null
           fat?: number | null
           id?: string
           protein: number
           saturated_fat?: number | null
           sodium?: number | null
           sugar?: number | null
+          trans_fat?: number | null
+          unsaturated_fat?: number | null
           updated_at?: string
           variant_id: string
         }
@@ -400,12 +406,15 @@ export type Database = {
           carbs?: number | null
           cholesterol?: number | null
           created_at?: string
+          dietary_fiber?: number | null
           fat?: number | null
           id?: string
           protein?: number
           saturated_fat?: number | null
           sodium?: number | null
           sugar?: number | null
+          trans_fat?: number | null
+          unsaturated_fat?: number | null
           updated_at?: string
           variant_id?: string
         }

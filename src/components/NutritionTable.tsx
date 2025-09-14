@@ -36,6 +36,12 @@ export default function NutritionTable({ nutrition, servingSize }: NutritionTabl
       indent: true,
     },
     {
+      name: "식이섬유",
+      value: nutrition.dietary_fiber,
+      unit: "g",
+      indent: true,
+    },
+    {
       name: "단백질",
       value: nutrition.protein,
       unit: "g",
@@ -50,6 +56,18 @@ export default function NutritionTable({ nutrition, servingSize }: NutritionTabl
     {
       name: "포화지방",
       value: nutrition.saturated_fat,
+      unit: "g",
+      indent: true,
+    },
+    {
+      name: "불포화지방",
+      value: nutrition.unsaturated_fat,
+      unit: "g",
+      indent: true,
+    },
+    {
+      name: "트랜스지방",
+      value: nutrition.trans_fat,
       unit: "g",
       indent: true,
     },

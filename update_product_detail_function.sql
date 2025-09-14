@@ -57,7 +57,6 @@ BEGIN
               'sodium', vn.sodium,
               'cholesterol', vn.cholesterol,
               'calcium', vn.calcium,
-              'bcaa', vn.bcaa,
               'additional_nutrients', vn.additional_nutrients,
               'allergen_info', vn.allergen_info
             )

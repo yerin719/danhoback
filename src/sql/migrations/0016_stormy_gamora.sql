@@ -1,0 +1,1 @@
+ALTER TABLE "variant_nutrition" DROP COLUMN "bcaa";

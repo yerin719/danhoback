@@ -48,7 +48,6 @@ SELECT
   vn.sodium,
   vn.cholesterol,
   vn.calcium,
-  vn.bcaa,
   vn.additional_nutrients,
   vn.allergen_info,
 
