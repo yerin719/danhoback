@@ -6,6 +6,7 @@ import {
   getProfile,
   type Profile,
 } from "@/features/users/queries";
+import { deleteUserAccount } from "@/features/users/mutations";
 import { isAuthRequiredPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -25,6 +26,7 @@ interface AuthContextType {
   signInWithNaver: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -186,6 +188,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      if (!user?.id) {
+        throw new Error("사용자 정보를 찾을 수 없습니다");
+      }
+
+      // RPC 함수를 통한 계정 삭제
+      await deleteUserAccount();
+
+      // 계정은 삭제되었지만 클라이언트 세션은 남아있으므로 강제로 정리
+      try {
+        await supabase.auth.signOut();
+      } catch (signOutError) {
+        // 이미 삭제된 계정이므로 signOut 에러는 무시
+        console.log("Session cleanup:", signOutError);
+      }
+
+      // 홈페이지로 리디렉션
+      window.location.href = "/";
+    } catch (error) {
+      console.error("계정 삭제 실패:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -201,6 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithNaver,
         signOut,
         refreshProfile,
+        deleteAccount,
       }}
     >
       {children}

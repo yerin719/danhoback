@@ -1,5 +1,22 @@
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * 사용자 계정 삭제
+ * RPC 함수를 통해 트랜잭션으로 안전하게 처리
+ * @returns void
+ * @throws Error if deletion fails
+ */
+export async function deleteUserAccount(): Promise<void> {
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc("delete_user_account");
+
+  if (error) {
+    console.error("Account deletion error:", error);
+    throw new Error(error.message || "계정 삭제에 실패했습니다");
+  }
+}
+
 // 파일 검증 유틸리티
 export function validateImageFile(file: File): { isValid: boolean; error?: string } {
   // 파일 크기 검증 (2MB 제한)
@@ -18,10 +35,7 @@ export function validateImageFile(file: File): { isValid: boolean; error?: strin
 }
 
 // 아바타 이미지 업로드 및 업데이트
-export async function updateAvatar(
-  userId: string,
-  file: File
-): Promise<string> {
+export async function updateAvatar(userId: string, file: File): Promise<string> {
   const supabase = createClient();
 
   // 파일 검증
@@ -33,41 +47,37 @@ export async function updateAvatar(
   try {
     // 파일명 생성 (timestamp + 원본 파일명)
     const timestamp = Date.now();
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     const fileName = `${timestamp}-avatar.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
 
     // Supabase Storage에 업로드
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
 
     if (uploadError) {
       throw new Error(`이미지 업로드 실패: ${uploadError.message}`);
     }
 
     // 업로드된 파일의 공개 URL 생성
-    const { data: urlData } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
     const avatarUrl = urlData.publicUrl;
 
     // profiles 테이블의 avatar_url 업데이트
     const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ 
+      .from("profiles")
+      .update({
         avatar_url: avatarUrl,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', userId);
+      .eq("id", userId);
 
     if (updateError) {
       // DB 업데이트 실패 시 업로드된 파일 삭제
-      await supabase.storage.from('avatars').remove([filePath]);
+      await supabase.storage.from("avatars").remove([filePath]);
       throw new Error(`프로필 업데이트 실패: ${updateError.message}`);
     }
 
@@ -76,7 +86,7 @@ export async function updateAvatar(
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('아바타 업데이트에 실패했습니다.');
+    throw new Error("아바타 업데이트에 실패했습니다.");
   }
 }
 
@@ -87,9 +97,9 @@ export async function deleteAvatar(userId: string): Promise<void> {
   try {
     // 현재 프로필에서 avatar_url 가져오기
     const { data: profile, error: fetchError } = await supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('id', userId)
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", userId)
       .single();
 
     if (fetchError) {
@@ -97,31 +107,29 @@ export async function deleteAvatar(userId: string): Promise<void> {
     }
 
     // avatar_url이 있고 Supabase Storage URL인 경우만 삭제
-    if (profile?.avatar_url && profile.avatar_url.includes('/avatars/')) {
+    if (profile?.avatar_url && profile.avatar_url.includes("/avatars/")) {
       // URL에서 파일 경로 추출
-      const urlParts = profile.avatar_url.split('/avatars/');
+      const urlParts = profile.avatar_url.split("/avatars/");
       if (urlParts.length > 1) {
         const filePath = urlParts[1];
-        
+
         // Storage에서 파일 삭제
-        const { error: deleteError } = await supabase.storage
-          .from('avatars')
-          .remove([filePath]);
+        const { error: deleteError } = await supabase.storage.from("avatars").remove([filePath]);
 
         if (deleteError) {
-          console.warn('Storage 파일 삭제 실패:', deleteError.message);
+          console.warn("Storage 파일 삭제 실패:", deleteError.message);
         }
       }
     }
 
     // profiles 테이블의 avatar_url을 null로 업데이트
     const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ 
+      .from("profiles")
+      .update({
         avatar_url: null,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', userId);
+      .eq("id", userId);
 
     if (updateError) {
       throw new Error(`프로필 업데이트 실패: ${updateError.message}`);
@@ -130,47 +138,49 @@ export async function deleteAvatar(userId: string): Promise<void> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('아바타 삭제에 실패했습니다.');
+    throw new Error("아바타 삭제에 실패했습니다.");
   }
 }
 
 // 사용자명 업데이트 (기존 로직을 이곳으로 이동 가능)
 export async function updateUsername(
-  userId: string, 
+  userId: string,
   username: string,
-  currentUsername?: string
+  currentUsername?: string,
 ): Promise<void> {
   const supabase = createClient();
 
   // 사용자명 중복 체크
   if (username !== currentUsername) {
     const { data, error } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('username', username)
+      .from("profiles")
+      .select("username")
+      .eq("username", username)
       .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116: No rows found
+    if (error && error.code !== "PGRST116") {
+      // PGRST116: No rows found
       throw error;
     }
 
     if (data) {
-      throw new Error('이미 사용중인 사용자명입니다.');
+      throw new Error("이미 사용중인 사용자명입니다.");
     }
   }
 
   // 사용자명 업데이트
   const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ 
+    .from("profiles")
+    .update({
       username,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
-    .eq('id', userId);
+    .eq("id", userId);
 
   if (updateError) {
-    if (updateError.code === '23505') { // PostgreSQL unique constraint violation
-      throw new Error('이미 사용중인 사용자명입니다.');
+    if (updateError.code === "23505") {
+      // PostgreSQL unique constraint violation
+      throw new Error("이미 사용중인 사용자명입니다.");
     }
     throw new Error(`사용자명 업데이트 실패: ${updateError.message}`);
   }

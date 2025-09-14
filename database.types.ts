@@ -493,6 +493,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_user_account: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_article_category_stats: {
         Args: Record<PropertyKey, never>
         Returns: {

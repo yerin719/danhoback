@@ -31,6 +31,7 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Settings, Trash2, Upload, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -45,7 +46,8 @@ const profileFormSchema = z.object({
 });
 
 export default function ProfilePage() {
-  const { user, profile, avatarInitial, refreshProfile } = useAuth();
+  const { user, profile, avatarInitial, refreshProfile, deleteAccount } = useAuth();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -53,6 +55,7 @@ export default function ProfilePage() {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [finalDeleteConfirmed, setFinalDeleteConfirmed] = useState(false);
   const [activeSection, setActiveSection] = useState<"profile" | "account">("profile");
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
@@ -506,13 +509,33 @@ export default function ProfilePage() {
                     <Button
                       variant="destructive"
                       className="w-full"
-                      disabled={!deleteConfirmed || !finalDeleteConfirmed}
-                      onClick={() => {
-                        // 기능은 구현하지 않음 (UI만)
-                        alert("회원탈퇴 기능은 아직 구현되지 않았습니다.");
+                      disabled={!deleteConfirmed || !finalDeleteConfirmed || isDeletingAccount}
+                      onClick={async () => {
+                        try {
+                          setIsDeletingAccount(true);
+                          await deleteAccount();
+                          toast.success("계정이 삭제되었습니다. 이용해 주셔서 감사합니다.");
+                          // deleteAccount 내부에서 홈으로 리디렉션 처리됨
+                        } catch (error) {
+                          console.error("계정 삭제 실패:", error);
+                          toast.error(
+                            error instanceof Error
+                              ? error.message
+                              : "계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+                          );
+                        } finally {
+                          setIsDeletingAccount(false);
+                        }
                       }}
                     >
-                      계정 영구 삭제
+                      {isDeletingAccount ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          계정 삭제 중...
+                        </>
+                      ) : (
+                        "계정 영구 삭제"
+                      )}
                     </Button>
                   </div>
                 </CardContent>
