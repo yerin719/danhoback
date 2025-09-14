@@ -9,11 +9,35 @@ import { createClient } from "@/lib/supabase/client";
 export async function deleteUserAccount(): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await supabase.rpc("delete_user_account");
+  try {
+    // 1. 현재 사용자 정보 가져오기
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("Account deletion error:", error);
-    throw new Error(error.message || "계정 삭제에 실패했습니다");
+    if (!user?.id) {
+      throw new Error("사용자 정보를 찾을 수 없습니다");
+    }
+
+    // 2. 유저 ID 폴더의 모든 아바타 파일 삭제
+    const { data: files } = await supabase.storage.from("avatars").list(user.id);
+
+    if (files && files.length > 0) {
+      const filesToDelete = files.map((file) => `${user.id}/${file.name}`);
+      await supabase.storage.from("avatars").remove(filesToDelete);
+    }
+
+    // 3. RPC 함수를 통한 계정 삭제
+    const { error } = await supabase.rpc("delete_user_account");
+
+    if (error) {
+      throw new Error(error.message || "계정 삭제에 실패했습니다");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("계정 삭제에 실패했습니다");
   }
 }
 
