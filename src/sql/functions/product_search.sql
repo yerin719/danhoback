@@ -50,6 +50,7 @@ RETURNS TABLE (
   is_favorited boolean
 )
 LANGUAGE plpgsql
+SET search_path = ''
 STABLE
 AS $$
 BEGIN
@@ -80,13 +81,13 @@ BEGIN
     CASE 
       WHEN auth.uid() IS NOT NULL THEN
         EXISTS (
-          SELECT 1 FROM favorites f 
-          WHERE f.product_variant_id = pwd.variant_id 
+          SELECT 1 FROM public.favorites f
+          WHERE f.product_variant_id = pwd.variant_id
           AND f.user_id = auth.uid()
         )
       ELSE false
     END as is_favorited
-  FROM products_with_details pwd
+  FROM public.products_with_details pwd
   WHERE
     -- 활성 상태 체크
     pwd.is_active = true
@@ -167,35 +168,36 @@ RETURNS TABLE (
   option_value text
 )
 LANGUAGE plpgsql
+SET search_path = ''
 STABLE
 AS $$
 BEGIN
   IF filter_type IS NULL OR filter_type = 'flavor' THEN
     RETURN QUERY
-    SELECT 
+    SELECT
       'flavor'::text as option_type,
-      unnest(enum_range(NULL::flavor_category))::text as option_value;
+      unnest(enum_range(NULL::public.flavor_category))::text as option_value;
   END IF;
-  
+
   IF filter_type IS NULL OR filter_type = 'protein_type' THEN
     RETURN QUERY
-    SELECT 
+    SELECT
       'protein_type'::text as option_type,
-      unnest(enum_range(NULL::protein_type))::text as option_value;
+      unnest(enum_range(NULL::public.protein_type))::text as option_value;
   END IF;
-  
+
   IF filter_type IS NULL OR filter_type = 'form' THEN
     RETURN QUERY
-    SELECT 
+    SELECT
       'form'::text as option_type,
-      unnest(enum_range(NULL::product_form))::text as option_value;
+      unnest(enum_range(NULL::public.product_form))::text as option_value;
   END IF;
-  
+
   IF filter_type IS NULL OR filter_type = 'package_type' THEN
     RETURN QUERY
-    SELECT 
+    SELECT
       'package_type'::text as option_type,
-      unnest(enum_range(NULL::package_type))::text as option_value;
+      unnest(enum_range(NULL::public.package_type))::text as option_value;
   END IF;
   
   IF filter_type IS NULL OR filter_type = 'brand' THEN
@@ -203,8 +205,8 @@ BEGIN
     SELECT 
       'brand'::text as option_type,
       b.name::text as option_value
-    FROM brands b
-    INNER JOIN products p ON p.brand_id = b.id
+    FROM public.brands b
+    INNER JOIN public.products p ON p.brand_id = b.id
     WHERE b.is_active = true AND p.is_active = true
     GROUP BY b.name;
   END IF;
@@ -230,6 +232,7 @@ RETURNS TABLE (
   is_favorited boolean
 )
 LANGUAGE plpgsql
+SET search_path = ''
 STABLE
 AS $$
 DECLARE
@@ -238,7 +241,7 @@ DECLARE
 BEGIN
   -- slug로 variant_id와 product_id 찾기
   SELECT id, product_id INTO target_variant_id, target_product_id
-  FROM product_variants
+  FROM public.product_variants
   WHERE slug = variant_slug_param AND is_available = true
   LIMIT 1;
 
@@ -283,8 +286,8 @@ BEGIN
           ELSE NULL
         END
       ) as variant_data
-    FROM product_variants pv
-    LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
+    FROM public.product_variants pv
+    LEFT JOIN public.variant_nutrition vn ON pv.id = vn.variant_id
     WHERE pv.id = target_variant_id
   )
   SELECT
@@ -324,7 +327,7 @@ BEGIN
             'images', other_pv.images
           ) ORDER BY other_pv.display_order, other_pv.name
         )
-        FROM product_variants other_pv
+        FROM public.product_variants other_pv
         WHERE other_pv.product_id = target_product_id
           AND other_pv.id != target_variant_id
           AND other_pv.is_available = true
@@ -335,15 +338,15 @@ BEGIN
     CASE 
       WHEN auth.uid() IS NOT NULL THEN
         EXISTS (
-          SELECT 1 FROM favorites f 
-          WHERE f.product_variant_id = target_variant_id 
+          SELECT 1 FROM public.favorites f
+          WHERE f.product_variant_id = target_variant_id
           AND f.user_id = auth.uid()
         )
       ELSE false
     END as is_favorited
   FROM selected_variant_data svd
-  INNER JOIN products p ON svd.product_id = p.id
-  INNER JOIN brands b ON p.brand_id = b.id
+  INNER JOIN public.products p ON svd.product_id = p.id
+  INNER JOIN public.brands b ON p.brand_id = b.id
   WHERE p.is_active = true AND b.is_active = true;
 END;
 $$;

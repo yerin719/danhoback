@@ -30,6 +30,7 @@ RETURNS TABLE (
   is_favorited boolean
 )
 LANGUAGE plpgsql
+SET search_path = ''
 STABLE
 AS $$
 BEGIN
@@ -62,8 +63,8 @@ BEGIN
     pwd.carbs::numeric,
     pwd.sugar::numeric,
     true as is_favorited  -- 찜 목록이므로 항상 true
-  FROM products_with_details pwd
-  INNER JOIN favorites f ON f.product_variant_id = pwd.variant_id
+  FROM public.products_with_details pwd
+  INNER JOIN public.favorites f ON f.product_variant_id = pwd.variant_id
   WHERE 
     f.user_id = auth.uid()
     AND pwd.is_active = true

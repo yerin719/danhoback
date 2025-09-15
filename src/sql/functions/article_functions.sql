@@ -10,14 +10,15 @@ CREATE OR REPLACE FUNCTION increment_article_view_count(article_id_param uuid)
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
-  UPDATE articles 
-  SET 
+  UPDATE public.articles
+  SET
     view_count = COALESCE(view_count, 0) + 1,
     updated_at = NOW()
-  WHERE 
-    id = article_id_param 
+  WHERE
+    id = article_id_param
     AND status = 'published';
     
   -- 업데이트된 행이 있는지 확인
@@ -66,6 +67,7 @@ RETURNS TABLE (
   relevance_score float
 )
 LANGUAGE plpgsql
+SET search_path = ''
 AS $$
 DECLARE
   search_term text;
@@ -121,13 +123,13 @@ BEGIN
           CASE WHEN a.content ILIKE $1 THEN 1.0 ELSE 0.0 END +
           -- 태그 매칭 점수 (가중치 2.5)
           CASE WHEN EXISTS (
-            SELECT 1 FROM article_tag_relations atr
-            JOIN article_tags at ON atr.tag_id = at.id
+            SELECT 1 FROM public.article_tag_relations atr
+            JOIN public.article_tags at ON atr.tag_id = at.id
             WHERE atr.article_id = a.id AND at.name ILIKE $1
           ) THEN 2.5 ELSE 0.0 END
         )
       END as relevance_score
-    FROM articles a
+    FROM public.articles a
     WHERE a.status = ''published''';
 
   -- 검색 조건 추가
@@ -138,8 +140,8 @@ BEGIN
         a.summary ILIKE $1 OR 
         a.content ILIKE $1 OR
         EXISTS (
-          SELECT 1 FROM article_tag_relations atr
-          JOIN article_tags at ON atr.tag_id = at.id
+          SELECT 1 FROM public.article_tag_relations atr
+          JOIN public.article_tags at ON atr.tag_id = at.id
           WHERE atr.article_id = a.id AND at.name ILIKE $1
         )
       )';
@@ -191,6 +193,7 @@ RETURNS TABLE (
   similarity_score float
 )
 LANGUAGE plpgsql
+SET search_path = ''
 AS $$
 BEGIN
   RETURN QUERY
@@ -205,13 +208,13 @@ BEGIN
     a.view_count,
     (
       -- 같은 카테고리 점수 (가중치 1.0)
-      CASE WHEN a.category = (SELECT category FROM articles WHERE id = article_id_param) 
+      CASE WHEN a.category = (SELECT category FROM public.articles WHERE id = article_id_param) 
            THEN 1.0 ELSE 0.0 END +
       -- 공통 태그 수 (가중치 0.5 per tag)
-      (SELECT COUNT(*) * 0.5 FROM article_tag_relations atr1
+      (SELECT COUNT(*) * 0.5 FROM public.article_tag_relations atr1
        WHERE atr1.article_id = a.id
        AND atr1.tag_id IN (
-         SELECT tag_id FROM article_tag_relations atr2 
+         SELECT tag_id FROM public.article_tag_relations atr2 
          WHERE atr2.article_id = article_id_param
        )) +
       -- 최신성 점수 (최근 30일 내 글에 보너스)
@@ -241,6 +244,7 @@ RETURNS TABLE (
   latest_published timestamp
 )
 LANGUAGE plpgsql
+SET search_path = ''
 AS $$
 BEGIN
   RETURN QUERY

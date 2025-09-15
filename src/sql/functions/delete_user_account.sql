@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION delete_user_account()
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   current_user_id uuid;
@@ -22,7 +22,7 @@ BEGIN
   -- 트랜잭션으로 처리 (모두 성공하거나 모두 실패)
 
   -- 1. Articles 테이블의 author_id를 NULL로 업데이트 (익명화)
-  UPDATE articles
+  UPDATE public.articles
   SET
     author_id = NULL,
     author_name = '탈퇴한 사용자',
@@ -30,7 +30,7 @@ BEGIN
   WHERE author_id = current_user_id;
 
   -- 2. Profiles 삭제 (favorites는 CASCADE로 자동 삭제됨)
-  DELETE FROM profiles
+  DELETE FROM public.profiles
   WHERE id = current_user_id;
 
   -- profiles 삭제 확인
