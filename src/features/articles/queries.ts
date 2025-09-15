@@ -121,7 +121,8 @@ export async function getArticleDetail(
     const client = supabaseClient || defaultClient;
     const { data, error } = await client
       .from("articles")
-      .select(`
+      .select(
+        `
         *,
         tagRelations:article_tag_relations(
           tag:article_tags(
@@ -129,7 +130,8 @@ export async function getArticleDetail(
             name
           )
         )
-      `)
+      `,
+      )
       .eq("slug", slug)
       .eq("status", "published")
       .single();
@@ -146,7 +148,7 @@ export async function getArticleDetail(
     // 태그 데이터 변환
     return {
       ...data,
-      tags: data.tagRelations?.map(rel => rel.tag).filter(Boolean) || []
+      tags: data.tagRelations?.map((rel) => rel.tag).filter(Boolean) || [],
     };
   } catch (error) {
     console.error("Error in getArticleDetail:", error);
@@ -230,11 +232,19 @@ export async function searchArticles(
     return getArticles(sortBy, sortOrder, limit, offset, { category }, supabaseClient);
   }
 
-  return getArticles(sortBy, sortOrder, limit, offset, { searchQuery: query, category }, supabaseClient);
+  return getArticles(
+    sortBy,
+    sortOrder,
+    limit,
+    offset,
+    { searchQuery: query, category },
+    supabaseClient,
+  );
 }
 
 /**
  * Article 조회수 증가
+ * SQL RPC 함수를 호출하여 원자적으로 처리
  */
 export async function incrementViewCount(
   articleId: string,
@@ -242,36 +252,18 @@ export async function incrementViewCount(
 ): Promise<boolean> {
   try {
     const client = supabaseClient || defaultClient;
-    // 현재 조회수를 가져와서 1 증가
-    const { data: currentData, error: fetchError } = await client
-      .from("articles")
-      .select("view_count")
-      .eq("id", articleId)
-      .eq("status", "published")
-      .single();
 
-    if (fetchError) {
-      console.error("Error fetching current view count:", fetchError);
-      return false;
-    }
-
-    const currentViewCount = currentData?.view_count || 0;
-
-    const { error } = await client
-      .from("articles")
-      .update({
-        view_count: currentViewCount + 1,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", articleId)
-      .eq("status", "published");
+    // RPC 함수 호출 - 원자적 업데이트 보장
+    const { data, error } = await client.rpc("increment_article_view_count", {
+      article_id_param: articleId,
+    });
 
     if (error) {
       console.error("Error incrementing view count:", error);
       return false;
     }
 
-    return true;
+    return data || false;
   } catch (error) {
     console.error("Error in incrementViewCount:", error);
     return false;
