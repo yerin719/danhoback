@@ -4,11 +4,23 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+    generated_username text;
 begin
+    -- 유저네임 생성 시도
+    begin
+        generated_username := public.generate_random_username();
+    exception
+        when others then
+            raise warning 'Username generation failed for user %: %', new.id, sqlerrm;
+            generated_username := 'user_' || substr(md5(new.id::text), 1, 8); -- 폴백
+    end;
+
+    -- 프로필 생성
     insert into public.profiles (id, username, avatar_url, role)
     values (
         new.id,
-        'user_' || substr(md5(new.id::text), 1, 8),
+        generated_username,
         (new.raw_user_meta_data->>'avatar_url'),
         'user'
     );
