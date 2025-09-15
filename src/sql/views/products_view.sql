@@ -5,7 +5,9 @@
 -- 클라이언트에서 쉽게 조회할 수 있도록 합니다.
 -- enum 타입을 text로 캐스팅하여 타입 안전성을 확보합니다.
 
-CREATE OR REPLACE VIEW products_with_details AS
+CREATE OR REPLACE VIEW products_with_details
+with (security_invoker=on)
+AS
 SELECT
   -- Product 정보
   p.id as product_id,
@@ -91,7 +93,9 @@ ON variant_nutrition (calories);
 -- ============================================
 -- 필터 옵션을 위한 고유값들을 미리 계산합니다
 
-CREATE OR REPLACE VIEW product_filter_options AS
+CREATE OR REPLACE VIEW product_filter_options
+with (security_invoker=on)
+AS
 SELECT DISTINCT
   unnest(ARRAY[
     -- Flavor categories
