@@ -15,7 +15,7 @@ import { getDefaultFilters } from "@/features/products/utils/urlParams";
 import { RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import FilterButton from "./filters/FilterButton";
-import MultiSelectFilterPopover from "./filters/MultiSelectFilterPopover";
+import ButtonSelectFilterPopover from "./filters/ButtonSelectFilterPopover";
 import RangeFilterPopover from "./filters/RangeFilterPopover";
 import {
   formatMultiSelectValue,
@@ -135,6 +135,7 @@ export default function CompactProductFilters({
     onFiltersChange(getDefaultFilters());
   };
 
+
   // 필터 버튼 스켈레톤 컴포넌트
   const FilterButtonSkeleton = ({ width }: { width: string }) => (
     <Skeleton className={`h-9 ${width} rounded-md flex-shrink-0`} />
@@ -241,7 +242,12 @@ export default function CompactProductFilters({
           </FilterButton>
 
           {/* 당 필터 */}
-          <FilterButton label="당" value={sugarValue} isActive={activeStates.sugar} type="range">
+          <FilterButton
+            label="당"
+            value={sugarValue}
+            isActive={activeStates.sugar}
+            type="range"
+          >
             {({ onClose }) => (
               <RangeFilterPopover
                 label="당 함량"
@@ -258,9 +264,13 @@ export default function CompactProductFilters({
 
           {/* 맛 필터 */}
           {flavorOptions.length > 0 && (
-            <FilterButton label="맛" value={flavorsValue} isActive={activeStates.flavors}>
+            <FilterButton
+              label="맛"
+              value={flavorsValue}
+              isActive={activeStates.flavors}
+            >
               {({ onClose }) => (
-                <MultiSelectFilterPopover
+                <ButtonSelectFilterPopover
                   label="맛"
                   options={flavorOptions}
                   selectedValues={filters.flavors}
@@ -279,7 +289,7 @@ export default function CompactProductFilters({
               isActive={activeStates.proteinTypes}
             >
               {({ onClose }) => (
-                <MultiSelectFilterPopover
+                <ButtonSelectFilterPopover
                   label="단백질 종류"
                   options={proteinTypeOptions}
                   selectedValues={filters.proteinTypes}
@@ -292,14 +302,19 @@ export default function CompactProductFilters({
 
           {/* 제품 형태 필터 */}
           {formOptions.length > 0 && (
-            <FilterButton label="제품 형태" value={formsValue} isActive={activeStates.forms}>
+            <FilterButton
+              label="제품 형태"
+              value={formsValue}
+              isActive={activeStates.forms}
+            >
               {({ onClose }) => (
-                <MultiSelectFilterPopover
+                <ButtonSelectFilterPopover
                   label="제품 형태"
                   options={formOptions}
                   selectedValues={filters.forms}
                   onApply={(values) => handleMultiSelectChange("forms", values)}
                   onClose={onClose}
+                  onRealTimeChange={(values) => handleMultiSelectChange("forms", values)}
                 />
               )}
             </FilterButton>
@@ -313,7 +328,7 @@ export default function CompactProductFilters({
               isActive={activeStates.packageTypes}
             >
               {({ onClose }) => (
-                <MultiSelectFilterPopover
+                <ButtonSelectFilterPopover
                   label="포장 타입"
                   options={packageTypeOptions}
                   selectedValues={filters.packageTypes}

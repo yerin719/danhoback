@@ -62,7 +62,7 @@ export default function FilterButton({
         <DrawerContent className="h-[50vh] p-0 flex flex-col">
           {/* 제목 */}
           <div className="px-6 py-4 border-b flex-shrink-0">
-            <h3 className="text-lg font-semibold">{label}</h3>
+            <h3 className="text-lg font-semibold text-center">{label}</h3>
           </div>
 
           {/* 필터 내용 */}
@@ -76,7 +76,12 @@ export default function FilterButton({
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
-      <PopoverContent className="w-72 p-0" align="start" sideOffset={4}>
+      <PopoverContent
+        className="w-[450px] p-0 z-40"
+        align="start"
+        sideOffset={8}
+        avoidCollisions={true}
+      >
         {filterContent}
       </PopoverContent>
     </Popover>
