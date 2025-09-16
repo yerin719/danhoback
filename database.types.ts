@@ -358,7 +358,6 @@ export type Database = {
         Row: {
           additional_nutrients: Json | null
           allergen_info: string | null
-          bcaa: number | null
           calcium: number | null
           calories: number | null
           carbs: number | null
@@ -379,7 +378,6 @@ export type Database = {
         Insert: {
           additional_nutrients?: Json | null
           allergen_info?: string | null
-          bcaa?: number | null
           calcium?: number | null
           calories?: number | null
           carbs?: number | null
@@ -400,7 +398,6 @@ export type Database = {
         Update: {
           additional_nutrients?: Json | null
           allergen_info?: string | null
-          bcaa?: number | null
           calcium?: number | null
           calories?: number | null
           carbs?: number | null
@@ -448,7 +445,6 @@ export type Database = {
           additional_nutrients: Json | null
           allergen_info: string | null
           barcode: string | null
-          bcaa: number | null
           brand_id: string | null
           brand_logo_url: string | null
           brand_name: string | null
@@ -459,6 +455,7 @@ export type Database = {
           carbs: number | null
           cholesterol: number | null
           created_at: string | null
+          dietary_fiber: number | null
           display_order: number | null
           fat: number | null
           favorites_count: number | null
@@ -482,6 +479,8 @@ export type Database = {
           sodium: number | null
           sugar: number | null
           total_amount: number | null
+          trans_fat: number | null
+          unsaturated_fat: number | null
           updated_at: string | null
           variant_id: string | null
           variant_name: string | null
@@ -501,6 +500,10 @@ export type Database = {
       delete_user_account: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_random_username: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_article_category_stats: {
         Args: Record<PropertyKey, never>
@@ -564,7 +567,6 @@ export type Database = {
           protein: number
           protein_type: string
           purchase_url: string
-          size: string
           slug: string
           sugar: number
           variant_id: string
@@ -656,14 +658,18 @@ export type Database = {
       article_category: "guide" | "brand" | "exercise" | "diet" | "trend"
       article_status: "draft" | "review" | "published" | "archived"
       flavor_category:
+        | "grain"
         | "chocolate"
         | "strawberry"
         | "banana"
+        | "milk"
+        | "coffee"
+        | "original"
+        | "black_sesame"
         | "matcha"
-        | "grain"
         | "milktea"
         | "greentea"
-        | "coffee"
+        | "anilla"
         | "other"
       package_type: "bulk" | "pouch" | "stick"
       product_form: "powder" | "rtd"
@@ -815,14 +821,18 @@ export const Constants = {
       article_category: ["guide", "brand", "exercise", "diet", "trend"],
       article_status: ["draft", "review", "published", "archived"],
       flavor_category: [
+        "grain",
         "chocolate",
         "strawberry",
         "banana",
+        "milk",
+        "coffee",
+        "original",
+        "black_sesame",
         "matcha",
-        "grain",
         "milktea",
         "greentea",
-        "coffee",
+        "anilla",
         "other",
       ],
       package_type: ["bulk", "pouch", "stick"],

@@ -120,6 +120,20 @@
       "when": 1757826238385,
       "tag": "0016_stormy_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1758017157074,
+      "tag": "0017_classy_the_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1758017556120,
+      "tag": "0018_blushing_blue_marvel",
+      "breakpoints": true
     }
   ]
 }

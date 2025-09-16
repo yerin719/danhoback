@@ -18,14 +18,17 @@ import {
 // ============================================
 
 export const flavorCategoryEnum = pgEnum("flavor_category", [
+  "grain", // 곡물
   "chocolate",
   "strawberry",
   "banana",
-  "matcha",
-  "grain", // 곡물
+  "milk", // 우유
+  "coffee",
+  "original", // 오리지날
+  "black_sesame", // 흑임자
   "milktea",
   "greentea",
-  "coffee",
+  "anilla", // 바닐라
   "other",
 ]);
 

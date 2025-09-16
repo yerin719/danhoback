@@ -30,14 +30,17 @@ export const FILTER_RANGES = {
 // ============================================
 
 export const FLAVOR_CATEGORIES = {
+  grain: "곡물",
   chocolate: "초코",
   strawberry: "딸기",
   banana: "바나나",
-  matcha: "말차",
-  grain: "곡물",
+  milk: "우유",
+  coffee: "커피",
+  original: "오리지날",
+  black_sesame: "흑임자",
   milktea: "밀크티",
   greentea: "녹차",
-  coffee: "커피",
+  anilla: "바닐라",
   other: "기타",
 } as const;
 
@@ -122,16 +125,17 @@ export function getPackageTypeDisplayName(
 // ============================================
 
 export const FLAVOR_SLUG_MAP = {
+  grain: "grain",
   chocolate: "choco",
   strawberry: "strawberry",
   banana: "banana",
-  matcha: "matcha",
-  grain: "grain",
+  milk: "milk",
+  coffee: "coffee",
+  original: "original",
+  black_sesame: "black-sesame",
   milktea: "milktea",
   greentea: "greentea",
-  coffee: "coffee",
-  mint: "mint",
-  cookies: "cookies",
+  anilla: "vanilla",
   other: "other",
 } as const;
 
