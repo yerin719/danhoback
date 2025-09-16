@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 언어 설정
+
+**모든 답변은 한국어로 제공해주세요.** Claude Code와의 모든 상호작용은 한국어를 사용하며, 코드 주석이나 설명이 필요한 경우에도 한국어로 작성해주세요.
+
 ## Project Overview
 
 Project Overview
