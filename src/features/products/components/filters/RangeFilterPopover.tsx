@@ -41,9 +41,9 @@ export default function RangeFilterPopover({
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
-    <div className={isMobile ? "flex flex-col h-full" : "p-4 space-y-4"}>
+    <div className={isMobile ? "flex flex-col h-full" : "p-8 space-y-4"}>
       {/* 슬라이더 영역 */}
-      <div className={isMobile ? "flex-1 px-6 pt-6" : ""}>
+      <div className={isMobile ? "flex-1 px-6 pt-10" : ""}>
         <div className={isMobile ? "space-y-4" : "space-y-3"}>
           {/* 설명 텍스트 */}
           <div className="text-center">
@@ -60,7 +60,7 @@ export default function RangeFilterPopover({
             </span>
           </div>
 
-          <div className={isMobile ? "py-4" : ""}>
+          <div className={isMobile ? "py-4 mb-12" : "mb-10"}>
             <Slider
               value={tempValue}
               onValueChange={(newValue) => setTempValue(newValue as [number, number])}
@@ -69,19 +69,6 @@ export default function RangeFilterPopover({
               step={step}
               className="w-full [&_[role=slider]]:!h-[30px] [&_[role=slider]]:!w-[30px] [&_[role=slider]]:!border-black [&_[role=slider]]:!border-1"
             />
-          </div>
-
-          <div
-            className={`flex justify-between text-muted-foreground ${isMobile ? "text-sm" : "text-xs"}`}
-          >
-            <span>
-              {min}
-              {unit}
-            </span>
-            <span>
-              {max}
-              {unit}
-            </span>
           </div>
         </div>
       </div>

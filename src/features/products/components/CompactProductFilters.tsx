@@ -254,7 +254,7 @@ export default function CompactProductFilters({
                 value={filters.sugarRange}
                 min={FILTER_RANGES.SUGAR.MIN}
                 max={FILTER_RANGES.SUGAR.MAX}
-                step={0.5}
+                step={1}
                 unit="g"
                 onApply={(value) => handleRangeChange("sugarRange", value)}
                 onClose={onClose}
