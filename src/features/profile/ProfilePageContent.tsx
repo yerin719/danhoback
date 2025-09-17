@@ -295,6 +295,7 @@ export default function ProfilePageContent() {
                         <AvatarImage
                           src={avatarPreview || profile?.avatar_url || ""}
                           alt={profile?.username}
+                          className="object-cover"
                         />
                         <AvatarFallback className="text-2xl">{avatarInitial}</AvatarFallback>
                       </Avatar>
