@@ -56,8 +56,10 @@ export default function ProductsClient({
     (newFilters: FilterState, newSortBy: string, newSortOrder: "asc" | "desc") => {
       const params = filtersToSearchParams(newFilters, newSortBy, newSortOrder);
 
-      // URL 업데이트 (페이지 리로드 없이)
-      router.push(`/products${params.toString() ? `?${params.toString()}` : ""}`);
+      // URL 업데이트 (페이지 리로드 없이, 스크롤 위치 유지)
+      router.replace(`/products${params.toString() ? `?${params.toString()}` : ""}`, {
+        scroll: false,
+      });
     },
     [router],
   );
@@ -83,7 +85,7 @@ export default function ProductsClient({
 
   // 필터 초기화
   const handleResetFilters = useCallback(() => {
-    router.push("/products");
+    router.replace("/products", { scroll: false });
   }, [router]);
 
   return (
