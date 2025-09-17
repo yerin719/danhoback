@@ -293,7 +293,7 @@ export default function ProfilePageContent() {
                     <div className="relative">
                       <Avatar className="h-24 w-24">
                         <AvatarImage
-                          src={avatarPreview || profile?.avatar_url || ""}
+                          src={avatarPreview || profile?.avatar_url || undefined}
                           alt={profile?.username}
                           className="object-cover"
                         />
