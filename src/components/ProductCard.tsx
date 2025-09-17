@@ -155,7 +155,7 @@ export default function ProductCard({
               size="sm"
             >
               <ExternalLink className="h-4 w-4" />
-              구매하기
+              최저가 확인하러 가기
             </Button>
           )}
         </CardContent>
