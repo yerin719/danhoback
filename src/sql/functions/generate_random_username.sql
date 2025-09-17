@@ -58,12 +58,12 @@ BEGIN
             -- 동사 + 명사 조합
             first_word_idx := (shuffled_num % array_length(verbs, 1)) + 1;
             noun_idx := ((shuffled_num / array_length(verbs, 1)) % array_length(nouns, 1)) + 1;
-            generated_username := verbs[first_word_idx] || ' ' || nouns[noun_idx];
+            generated_username := verbs[first_word_idx] || nouns[noun_idx];
         ELSE
             -- 형용사 + 명사 조합
             first_word_idx := (shuffled_num % array_length(adjectives, 1)) + 1;
             noun_idx := ((shuffled_num / array_length(adjectives, 1)) % array_length(nouns, 1)) + 1;
-            generated_username := adjectives[first_word_idx] || ' ' || nouns[noun_idx];
+            generated_username := adjectives[first_word_idx] || nouns[noun_idx];
         END IF;
 
         -- 중복 체크 (안전장치)
