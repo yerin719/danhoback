@@ -1,5 +1,6 @@
 "use client";
 
+import SearchInput from "@/components/SearchInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SearchInput from "@/components/SearchInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { Heart, LogOut, User } from "lucide-react";
@@ -61,7 +61,7 @@ export default function Navigation() {
           {/* 좌측 - 로고와 메뉴 */}
           <div className="flex items-center">
             <Link href="/" className="mr-8 flex items-center">
-              <Image src="/images/logo.png" alt="단호박" width={60} height={60} />
+              <Image src="/images/logo.png" alt="단호박" width={60} height={60} priority />
             </Link>
             <div className="flex items-baseline space-x-4">
               {navigationItems.map((item) => (
@@ -103,7 +103,11 @@ export default function Navigation() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} className="object-cover" />
+                        <AvatarImage
+                          src={profile?.avatar_url || undefined}
+                          alt={displayName}
+                          className="object-cover"
+                        />
                         <AvatarFallback>{avatarInitial}</AvatarFallback>
                       </Avatar>
                     </Button>
@@ -145,7 +149,7 @@ export default function Navigation() {
         <div className="md:hidden flex h-16 items-center justify-between">
           {/* 로고 */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <Image src="/images/logo.png" alt="단호박" width={50} height={50} />
+            <Image src="/images/logo.png" alt="단호박" width={50} height={50} priority />
           </Link>
 
           {/* 검색창 - 중앙에 위치하며 가능한 공간 모두 사용 */}
