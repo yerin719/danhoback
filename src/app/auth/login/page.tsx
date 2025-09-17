@@ -203,6 +203,14 @@ export default function LoginPage() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "로그인 중..." : "로그인"}
                   </Button>
+                  <div className="text-center">
+                    <Link
+                      href="/auth/reset-password"
+                      className="text-sm text-muted-foreground hover:text-primary hover:underline"
+                    >
+                      비밀번호를 잊으셨나요?
+                    </Link>
+                  </div>
                 </form>
               </Form>
             </TabsContent>
