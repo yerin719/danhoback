@@ -12,7 +12,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import {
   CarouselAdBannerProps,
   CarouselCampaign,
@@ -51,9 +51,29 @@ export default function CarouselAdBanner({
   const responsiveHeight = getResponsiveHeight();
 
   const plugin = useRef(Autoplay({ delay: interval, stopOnInteraction: true }));
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<any>(null);
 
   // Filter only active campaigns
   const activeCampaigns = campaigns.filter((campaign) => campaign.isActive);
+
+  // Carousel API 이벤트 리스너 설정
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      const selected = carouselApi.selectedScrollSnap();
+      setCurrentSlide(selected);
+      onSlideChange?.(selected, activeCampaigns[selected]);
+    };
+
+    carouselApi.on("select", onSelect);
+    onSelect(); // 초기 상태 설정
+
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi, onSlideChange, activeCampaigns]);
 
   const handleCampaignClick = useCallback(
     (campaign: CarouselCampaign) => {
@@ -156,10 +176,7 @@ export default function CarouselAdBanner({
         }}
         plugins={autoPlay ? [plugin.current] : []}
         className="w-full"
-        onSelect={() => {
-          // Handle slide change if needed
-          onSlideChange?.(0, activeCampaigns[0]); // TODO: get actual current slide index
-        }}
+        setApi={setCarouselApi}
       >
         <CarouselContent>
           {activeCampaigns.map((campaign) => (
@@ -210,12 +227,13 @@ export default function CarouselAdBanner({
               key={index}
               className={cn(
                 "w-2 h-2 rounded-full transition-all duration-200",
-                "bg-white/50 hover:bg-white/80",
-                // TODO: Add active state based on current slide
-                "first:bg-white", // Temporary - should be dynamic
+                "hover:bg-white/80",
+                currentSlide === index
+                  ? "bg-white"
+                  : "bg-white/50"
               )}
               onClick={() => {
-                // TODO: Navigate to specific slide
+                carouselApi?.scrollTo(index);
               }}
             />
           ))}
