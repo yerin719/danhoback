@@ -46,7 +46,7 @@ const profileFormSchema = z.object({
 });
 
 export default function ProfilePageContent() {
-  const { user, profile, avatarInitial, refreshProfile, deleteAccount } = useAuth();
+  const { user, profile, avatarInitial, refreshProfile, deleteAccount, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -245,7 +245,7 @@ export default function ProfilePageContent() {
   }
 
   return (
-    <div className="container mx-auto py-8 max-w-6xl">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold mb-8">프로필 설정</h1>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
@@ -355,33 +355,54 @@ export default function ProfilePageContent() {
                   {/* 사용자명 */}
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>닉네임</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit" disabled={isLoading}>
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            저장 중...
-                          </>
-                        ) : (
-                          "프로필 저장"
-                        )}
-                      </Button>
+                      <div className="flex gap-4 items-end">
+                        <FormField
+                          control={form.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem className="w-full md:w-1/2">
+                              <FormLabel>닉네임</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type="submit" disabled={isLoading} className="mb-0">
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              저장 중...
+                            </>
+                          ) : (
+                            "저장"
+                          )}
+                        </Button>
+                      </div>
                     </form>
                   </Form>
                 </CardContent>
               </Card>
+
+              {/* 로그아웃 버튼 - 모바일에서만 노출 */}
+              <div className="flex justify-center md:hidden">
+                <Button
+                  variant="ghost"
+                  onClick={async () => {
+                    try {
+                      await signOut();
+                      toast.success("로그아웃되었습니다");
+                      router.push("/");
+                    } catch {
+                      toast.error("로그아웃 중 오류가 발생했습니다");
+                    }
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  로그아웃
+                </Button>
+              </div>
             </div>
           )}
 
@@ -524,7 +545,7 @@ export default function ProfilePageContent() {
                           toast.error(
                             error instanceof Error
                               ? error.message
-                              : "계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+                              : "계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
                           );
                         } finally {
                           setIsDeletingAccount(false);
