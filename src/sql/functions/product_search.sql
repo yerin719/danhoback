@@ -296,6 +296,7 @@ BEGIN
     jsonb_build_object(
       'id', p.id,
       'name', p.name,
+      'description', p.description,           -- SEO description 필드 추가
       'protein_type', p.protein_type::text,
       'form', p.form::text,
       'package_type', p.package_type::text,  -- Now from products table

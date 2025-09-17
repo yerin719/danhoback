@@ -13,9 +13,42 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: ArticleDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createServerSupabaseClient();
+  const article = await getArticleDetail(slug, supabase);
+
+  if (!article) {
+    return {
+      title: "아티클을 찾을 수 없습니다 - 단호박",
+      description: "요청하신 아티클 정보를 찾을 수 없습니다."
+    };
+  }
+
+  return {
+    title: article.title,
+    description: article.summary || article.title,
+    openGraph: {
+      title: `${article.title} - 단호박`,
+      description: article.summary || article.title,
+      type: "article",
+      locale: "ko_KR",
+      siteName: "단호박",
+      images: article.featured_image ? [article.featured_image] : [],
+      article: {
+        publishedTime: article.published_at || undefined,
+        authors: article.author_name ? [article.author_name] : [],
+        tags: article.tags?.map(tag => tag.name) || []
+      }
+    },
+    keywords: article.tags?.map(tag => tag.name).join(", ") || undefined
+  };
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {

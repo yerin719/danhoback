@@ -12,6 +12,7 @@ SELECT
   -- Product 정보
   p.id as product_id,
   p.name as product_name,
+  p.description as product_description,   -- SEO description 필드 추가
   p.brand_id,
   p.protein_type::text as protein_type,
   p.form::text as form,

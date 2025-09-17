@@ -278,6 +278,7 @@ export type Database = {
         Row: {
           brand_id: string
           created_at: string
+          description: string | null
           form: Database["public"]["Enums"]["product_form"]
           id: string
           is_active: boolean
@@ -292,6 +293,7 @@ export type Database = {
         Insert: {
           brand_id: string
           created_at?: string
+          description?: string | null
           form?: Database["public"]["Enums"]["product_form"]
           id?: string
           is_active?: boolean
@@ -306,6 +308,7 @@ export type Database = {
         Update: {
           brand_id?: string
           created_at?: string
+          description?: string | null
           form?: Database["public"]["Enums"]["product_form"]
           id?: string
           is_active?: boolean

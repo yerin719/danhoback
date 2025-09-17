@@ -87,6 +87,7 @@ export const products = pgTable(
       .references(() => brands.id)
       .notNull(),
     name: varchar("name", { length: 200 }).notNull(),
+    description: text("description"), // SEO 메타 description용 제품 설명
     proteinType: proteinTypeEnum("protein_type").notNull(),
     form: productFormEnum("form").default("powder").notNull(),
     // 패키지 정보 (product_variants에서 이동)
