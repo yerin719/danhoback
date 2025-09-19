@@ -1,12 +1,12 @@
 "use client";
 
+import { deleteUserAccount } from "@/features/users/mutations";
 import {
   getAvatarInitial,
   getDisplayName,
   getProfile,
   type Profile,
 } from "@/features/users/queries";
-import { deleteUserAccount } from "@/features/users/mutations";
 import { isAuthRequiredPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -91,17 +91,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 인증 상태 변화 구독
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
       if (event === "SIGNED_IN" && currentUser?.id) {
-        try {
-          await loadProfile(currentUser.id);
-          router.refresh();
-        } catch (error) {
-          console.error("프로필 로드 실패:", error);
-        }
+        // async/await 제거하고 Promise로 처리
+        loadProfile(currentUser.id)
+          .then(() => {
+            router.refresh();
+          })
+          .catch((error) => {
+            console.error("프로필 로드 실패:", error);
+          });
       } else if (event === "SIGNED_OUT") {
         setProfile(null);
 
@@ -109,11 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const needsRedirect = isAuthRequiredPage(pathname);
 
         if (needsRedirect) {
-          try {
-            router.push("/");
-          } catch (error) {
-            console.error("리디렉션 실패:", error);
-          }
+          router.push("/");
         }
       }
     });
