@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAvatar, updateAvatar } from "@/features/users/mutations";
+// API 라우트를 통해 서버사이드에서 R2 함수 실행
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,7 +103,22 @@ export default function ProfilePageContent() {
     setIsUploadingAvatar(true);
 
     try {
-      await updateAvatar(user.id, file);
+      // FormData 생성
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // API 라우트 호출
+      const response = await fetch('/api/avatar/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '업로드에 실패했습니다');
+      }
+
       toast.success("프로필 이미지가 업데이트되었습니다");
       setAvatarPreview(null); // 미리보기 초기화
 
@@ -131,7 +146,17 @@ export default function ProfilePageContent() {
     setIsUploadingAvatar(true);
 
     try {
-      await deleteAvatar(user.id);
+      // API 라우트 호출
+      const response = await fetch('/api/avatar/delete', {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '삭제에 실패했습니다');
+      }
+
       toast.success("프로필 이미지가 삭제되었습니다");
 
       // AuthContext를 통해 profile 데이터 새로고침
