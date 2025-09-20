@@ -141,6 +141,13 @@
       "when": 1758074104829,
       "tag": "0019_handy_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1758335202597,
+      "tag": "0020_fuzzy_wild_pack",
+      "breakpoints": true
     }
   ]
 }

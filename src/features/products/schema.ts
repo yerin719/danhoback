@@ -78,6 +78,16 @@ export const brands = pgTable("brands", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Protein Types table (단백질 타입 마스터)
+export const proteinTypes = pgTable("protein_types", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  type: proteinTypeEnum("type").unique().notNull(), // enum 사용
+  name: varchar("name", { length: 100 }).notNull(), // 한글명
+  description: text("description"), // 설명
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Products table (제품 라인)
 export const products = pgTable(
   "products",
@@ -88,9 +98,7 @@ export const products = pgTable(
       .notNull(),
     name: varchar("name", { length: 200 }).notNull(),
     description: text("description"), // SEO 메타 description용 제품 설명
-    proteinType: proteinTypeEnum("protein_type").notNull(),
     form: productFormEnum("form").default("powder").notNull(),
-    // 패키지 정보 (product_variants에서 이동)
     packageType: packageTypeEnum("package_type"),
     totalAmount: decimal("total_amount", { precision: 8, scale: 2 }),
     servingsPerContainer: integer("servings_per_container"),
@@ -102,7 +110,33 @@ export const products = pgTable(
   (table) => {
     return {
       brandIdx: index("idx_products_brand").on(table.brandId),
-      proteinTypeIdx: index("idx_products_protein").on(table.proteinType),
+    };
+  },
+);
+
+// Product Protein Types junction table (다대다 관계)
+export const productProteinTypes = pgTable(
+  "product_protein_types",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productId: uuid("product_id")
+      .references(() => products.id, { onDelete: "cascade" })
+      .notNull(),
+    proteinTypeId: uuid("protein_type_id")
+      .references(() => proteinTypes.id, { onDelete: "cascade" })
+      .notNull(),
+    isPrimary: boolean("is_primary").default(false).notNull(), // 주요 단백질 타입 표시
+    percentage: decimal("percentage", { precision: 5, scale: 2 }), // 해당 단백질의 비율 (선택사항)
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      productIdx: index("idx_product_protein_types_product").on(table.productId),
+      proteinTypeIdx: index("idx_product_protein_types_protein").on(table.proteinTypeId),
+      uniqueProductProtein: index("unique_product_protein").on(
+        table.productId,
+        table.proteinTypeId,
+      ),
     };
   },
 );
@@ -171,12 +205,28 @@ export const brandsRelations = relations(brands, ({ many }) => ({
   products: many(products),
 }));
 
+export const proteinTypesRelations = relations(proteinTypes, ({ many }) => ({
+  productProteinTypes: many(productProteinTypes),
+}));
+
 export const productsRelations = relations(products, ({ one, many }) => ({
   brand: one(brands, {
     fields: [products.brandId],
     references: [brands.id],
   }),
   variants: many(productVariants),
+  productProteinTypes: many(productProteinTypes),
+}));
+
+export const productProteinTypesRelations = relations(productProteinTypes, ({ one }) => ({
+  product: one(products, {
+    fields: [productProteinTypes.productId],
+    references: [products.id],
+  }),
+  proteinType: one(proteinTypes, {
+    fields: [productProteinTypes.proteinTypeId],
+    references: [proteinTypes.id],
+  }),
 }));
 
 export const productVariantsRelations = relations(productVariants, ({ one }) => ({
