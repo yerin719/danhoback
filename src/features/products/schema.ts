@@ -114,27 +114,25 @@ export const products = pgTable(
   },
 );
 
-// Product Protein Types junction table (다대다 관계)
-export const productProteinTypes = pgTable(
-  "product_protein_types",
+// Variant Protein Types junction table (다대다 관계)
+export const variantProteinTypes = pgTable(
+  "variant_protein_types",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    productId: uuid("product_id")
-      .references(() => products.id, { onDelete: "cascade" })
+    variantId: uuid("variant_id")
+      .references(() => productVariants.id, { onDelete: "cascade" })
       .notNull(),
     proteinTypeId: uuid("protein_type_id")
       .references(() => proteinTypes.id, { onDelete: "cascade" })
       .notNull(),
-    isPrimary: boolean("is_primary").default(false).notNull(), // 주요 단백질 타입 표시
-    percentage: decimal("percentage", { precision: 5, scale: 2 }), // 해당 단백질의 비율 (선택사항)
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => {
     return {
-      productIdx: index("idx_product_protein_types_product").on(table.productId),
-      proteinTypeIdx: index("idx_product_protein_types_protein").on(table.proteinTypeId),
-      uniqueProductProtein: index("unique_product_protein").on(
-        table.productId,
+      variantIdx: index("idx_variant_protein_types_variant").on(table.variantId),
+      proteinTypeIdx: index("idx_variant_protein_types_protein").on(table.proteinTypeId),
+      uniqueVariantProtein: index("unique_variant_protein").on(
+        table.variantId,
         table.proteinTypeId,
       ),
     };
@@ -206,7 +204,7 @@ export const brandsRelations = relations(brands, ({ many }) => ({
 }));
 
 export const proteinTypesRelations = relations(proteinTypes, ({ many }) => ({
-  productProteinTypes: many(productProteinTypes),
+  variantProteinTypes: many(variantProteinTypes),
 }));
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -215,21 +213,20 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [brands.id],
   }),
   variants: many(productVariants),
-  productProteinTypes: many(productProteinTypes),
 }));
 
-export const productProteinTypesRelations = relations(productProteinTypes, ({ one }) => ({
-  product: one(products, {
-    fields: [productProteinTypes.productId],
-    references: [products.id],
+export const variantProteinTypesRelations = relations(variantProteinTypes, ({ one }) => ({
+  variant: one(productVariants, {
+    fields: [variantProteinTypes.variantId],
+    references: [productVariants.id],
   }),
   proteinType: one(proteinTypes, {
-    fields: [productProteinTypes.proteinTypeId],
+    fields: [variantProteinTypes.proteinTypeId],
     references: [proteinTypes.id],
   }),
 }));
 
-export const productVariantsRelations = relations(productVariants, ({ one }) => ({
+export const productVariantsRelations = relations(productVariants, ({ one, many }) => ({
   product: one(products, {
     fields: [productVariants.productId],
     references: [products.id],
@@ -238,6 +235,7 @@ export const productVariantsRelations = relations(productVariants, ({ one }) => 
     fields: [productVariants.id],
     references: [variantNutrition.variantId],
   }),
+  variantProteinTypes: many(variantProteinTypes),
 }));
 
 export const variantNutritionRelations = relations(variantNutrition, ({ one }) => ({

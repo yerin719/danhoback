@@ -320,14 +320,12 @@ BEGIN
               'id', pt.id,
               'type', pt.type::text,
               'name', pt.name,
-              'description', pt.description,
-              'isPrimary', ppt.is_primary,
-              'percentage', ppt.percentage
-            ) ORDER BY ppt.is_primary DESC, pt.type
+              'description', pt.description
+            ) ORDER BY pt.type
           )
-          FROM public.product_protein_types ppt
-          JOIN public.protein_types pt ON ppt.protein_type_id = pt.id
-          WHERE ppt.product_id = p.id
+          FROM public.variant_protein_types vpt
+          JOIN public.protein_types pt ON vpt.protein_type_id = pt.id
+          WHERE vpt.variant_id = target_variant_id
         ),
         '[]'::jsonb
       ),
