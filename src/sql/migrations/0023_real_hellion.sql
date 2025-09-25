@@ -1,0 +1,1 @@
+ALTER TYPE "public"."flavor_category" ADD VALUE 'corn' BEFORE 'other';

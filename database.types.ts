@@ -284,7 +284,6 @@ export type Database = {
           is_active: boolean
           name: string
           package_type: Database["public"]["Enums"]["package_type"] | null
-          protein_type: Database["public"]["Enums"]["protein_type"]
           serving_size: number | null
           servings_per_container: number | null
           total_amount: number | null
@@ -299,7 +298,6 @@ export type Database = {
           is_active?: boolean
           name: string
           package_type?: Database["public"]["Enums"]["package_type"] | null
-          protein_type: Database["public"]["Enums"]["protein_type"]
           serving_size?: number | null
           servings_per_container?: number | null
           total_amount?: number | null
@@ -314,7 +312,6 @@ export type Database = {
           is_active?: boolean
           name?: string
           package_type?: Database["public"]["Enums"]["package_type"] | null
-          protein_type?: Database["public"]["Enums"]["protein_type"]
           serving_size?: number | null
           servings_per_container?: number | null
           total_amount?: number | null
@@ -354,6 +351,33 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
           username?: string
+        }
+        Relationships: []
+      }
+      protein_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["protein_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["protein_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["protein_type"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -435,6 +459,49 @@ export type Database = {
           },
         ]
       }
+      variant_protein_types: {
+        Row: {
+          created_at: string
+          id: string
+          protein_type_id: string
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          protein_type_id: string
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          protein_type_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_protein_types_protein_type_id_protein_types_id_fk"
+            columns: ["protein_type_id"]
+            isOneToOne: false
+            referencedRelation: "protein_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variant_protein_types_variant_id_product_variants_id_fk"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variant_protein_types_variant_id_product_variants_id_fk"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["variant_id"]
+          },
+        ]
+      }
     }
     Views: {
       product_filter_options: {
@@ -470,10 +537,11 @@ export type Database = {
           is_available: boolean | null
           package_type: string | null
           primary_image: string | null
+          product_description: string | null
           product_id: string | null
           product_name: string | null
           protein: number | null
-          protein_type: string | null
+          protein_types: Json | null
           purchase_url: string | null
           saturated_fat: number | null
           serving_size: number | null
@@ -521,6 +589,7 @@ export type Database = {
       get_filter_options: {
         Args: { filter_type?: string }
         Returns: {
+          option_name: string
           option_type: string
           option_value: string
         }[]
@@ -648,7 +717,7 @@ export type Database = {
           product_id: string
           product_name: string
           protein: number
-          protein_type: string
+          protein_types: Json
           purchase_url: string
           slug: string
           sugar: number
@@ -669,10 +738,10 @@ export type Database = {
         | "coffee"
         | "original"
         | "black_sesame"
-        | "matcha"
         | "milktea"
         | "greentea"
         | "anilla"
+        | "corn"
         | "other"
       package_type: "bulk" | "pouch" | "stick"
       product_form: "powder" | "rtd"
@@ -832,10 +901,10 @@ export const Constants = {
         "coffee",
         "original",
         "black_sesame",
-        "matcha",
         "milktea",
         "greentea",
         "anilla",
+        "corn",
         "other",
       ],
       package_type: ["bulk", "pouch", "stick"],
