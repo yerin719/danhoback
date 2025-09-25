@@ -5,11 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 
 interface NutritionTableProps {
   nutrition: ProductNutrition;
-  servingSize?: number;
 }
 
-
-export default function NutritionTable({ nutrition, servingSize }: NutritionTableProps) {
+export default function NutritionTable({ nutrition }: NutritionTableProps) {
   const nutritionRows = [
     {
       name: "열량",
@@ -95,7 +93,7 @@ export default function NutritionTable({ nutrition, servingSize }: NutritionTabl
               <TableRow>
                 <TableHead className="w-[140px] px-6">영양성분</TableHead>
                 <TableHead className="text-center w-[120px] px-6">
-                  1회 제공량 {servingSize && `(${servingSize}g)`}
+                  1회 제공량 {nutrition.serving_size && `(${nutrition.serving_size})`}
                 </TableHead>
               </TableRow>
             </TableHeader>

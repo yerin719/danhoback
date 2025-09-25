@@ -23,6 +23,12 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   const router = useRouter();
   const toggleFavorite = useToggleFavorite(user?.id || "");
 
+  // 데이터 로깅
+  console.log("ProductDetailClient - slug:", slug);
+  console.log("ProductDetailClient - productData:", productData);
+  console.log("ProductDetailClient - isLoading:", isLoading);
+  console.log("ProductDetailClient - error:", error);
+
   const handleFavoriteClick = async () => {
     if (!user) {
       // 현재 페이지 URL을 저장하여 로그인 후 돌아올 수 있도록 함
@@ -33,7 +39,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     // DB 업데이트
     toggleFavorite.mutate(
       {
-        productVariantId: productData?.selected_variant.id || "",
+        productSkuId: productData?.selected_sku?.id || "",
         currentStatus: productData?.is_favorited || false,
       },
       {
@@ -74,38 +80,55 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     );
   }
 
-  if (error || !productData) {
+  if (error) {
+    console.error("Error loading product:", error);
+    notFound();
+  }
+
+  if (!productData) {
     notFound();
   }
 
   // 새로운 데이터 구조에서 정보 추출
-  const selectedVariant = productData.selected_variant;
-  const productInfo = productData.product_info;
-  const brandInfo = productData.brand_info;
-  const relatedVariants = productData.related_variants || [];
+  console.log("Extracting data from productData:", {
+    hasSelectedSku: !!productData?.selected_sku,
+    hasProductLineInfo: !!productData?.product_line_info,
+    hasBrandInfo: !!productData?.brand_info,
+    productDataKeys: productData ? Object.keys(productData) : []
+  });
+
+  const selectedVariant = productData?.selected_sku;
+  const productInfo = productData?.product_line_info;
+  const brandInfo = productData?.brand_info;
+  const relatedVariants = productData?.related_skus || [];
+
+  console.log("Extracted data:", {
+    selectedVariant,
+    productInfo,
+    brandInfo,
+    relatedVariants
+  });
 
   if (!selectedVariant) {
+    console.error("No selected_sku in productData:", productData);
     return <div>제품 정보를 찾을 수 없습니다.</div>;
   }
 
-  // 이미지 배열 준비 - Json 타입을 안전하게 변환
-  const images: (string | { url: string })[] = (() => {
-    // selectedVariant.images가 Json 타입이므로 타입 가드 필요
-    const variantImages = selectedVariant.images;
+  // 이미지 배열 준비
+  const images: string[] = (() => {
+    // selectedVariant.images가 이미 string[] 타입
+    const variantImages = selectedVariant?.images;
 
     if (Array.isArray(variantImages)) {
-      return variantImages.filter(
-        (img): img is string | { url: string } =>
-          typeof img === "string" || (img !== null && typeof img === "object" && "url" in img),
-      );
+      return variantImages.filter((img): img is string => typeof img === "string");
     }
 
     // images가 없으면 primary_image 사용
-    return selectedVariant.primary_image ? [selectedVariant.primary_image] : [];
+    return selectedVariant?.primary_image ? [selectedVariant.primary_image] : [];
   })();
 
   const handlePurchase = () => {
-    if (selectedVariant.purchase_url) {
+    if (selectedVariant?.purchase_url) {
       window.open(selectedVariant.purchase_url, "_blank", "noopener,noreferrer");
     }
   };
@@ -115,18 +138,22 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
         <div className="lg:col-span-2">
-          <ProductImageGallery images={images} alt={selectedVariant.name || productInfo.name} />
+          <ProductImageGallery images={images} alt={selectedVariant?.name || productInfo?.name || ""} />
         </div>
         <div className="lg:col-span-3 space-y-8">
           {/* 오른쪽: 제품 정보 */}
           {/* 제품 기본 정보 */}
-          <ProductInfo productInfo={productInfo} brandInfo={brandInfo} variant={selectedVariant} />
+          <ProductInfo
+            productLineInfo={productInfo || { id: "", name: "", form: "" }}
+            brandInfo={brandInfo || { id: "", name: "" }}
+            selectedSku={selectedVariant || { id: "", name: "", size: "" }}
+          />
 
           {/* 연관 제품 썸네일 (다른 variants) */}
           {relatedVariants.length > 0 && (
             <RelatedProductThumbnails
               variants={relatedVariants}
-              currentVariantId={selectedVariant.id}
+              currentVariantId={selectedVariant?.id || ""}
             />
           )}
 
@@ -167,10 +194,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       {/* 영양성분표 - 전체 너비 */}
       {selectedVariant.nutrition && (
         <div className="mt-12">
-          <NutritionTable
-            nutrition={selectedVariant.nutrition}
-            servingSize={productInfo.serving_size ?? undefined}
-          />
+          <NutritionTable nutrition={selectedVariant.nutrition} />
         </div>
       )}
     </div>

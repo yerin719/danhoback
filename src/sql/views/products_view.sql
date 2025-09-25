@@ -1,157 +1,219 @@
 -- ============================================
 -- PRODUCTS WITH DETAILS VIEW
 -- ============================================
--- 이 View는 제품 정보와 관련 데이터를 조인하여
--- 클라이언트에서 쉽게 조회할 수 있도록 합니다.
--- protein_types는 이제 variant별로 다대다 관계로 JSON 배열로 집계합니다.
+-- 새로운 6계층 구조를 반영한 제품 상세 정보 뷰
+-- product_skus → product_flavors → line_flavors → product_lines → brands
 
-CREATE OR REPLACE VIEW products_with_details
-with (security_invoker=on)
+DROP VIEW IF EXISTS products_with_details CASCADE;
+CREATE VIEW products_with_details
+WITH (security_invoker=on)
 AS
 SELECT
-  -- Product 정보
-  p.id as product_id,
-  p.name as product_name,
-  p.description as product_description,
-  p.brand_id,
-  p.form::text as form,
-  p.package_type::text as package_type,
-  p.total_amount,
-  p.servings_per_container,
-  p.serving_size,
-  p.is_active,
+  -- SKU 정보
+  ps.id AS sku_id,
+  ps.barcode,
+  ps.slug,
+  ps.name AS sku_name,
+  ps.size,
+  ps.servings_per_container,
+  ps.primary_image,
+  ps.images,
+  ps.purchase_url,
+  ps.favorites_count,
+  ps.is_available,
+  ps.display_order,
+
+  -- Product Flavor 정보
+  pf.id AS product_flavor_id,
+
+  -- Product 정보 (패키지 타입)
+  p.id AS product_id,
+  p.package_type::text AS package_type,
+
+  -- Line Flavor 정보
+  lf.id AS line_flavor_id,
+  lf.flavor_category::text AS flavor_category,
+  lf.flavor_name,
+
+  -- Product Line 정보
+  pl.id AS product_line_id,
+  pl.name AS line_name,
+  pl.description AS line_description,
+  pl.form::text AS form,
 
   -- Brand 정보
-  b.name as brand_name,
-  b.name_en as brand_name_en,
-  b.logo_url as brand_logo_url,
-  b.website as brand_website,
+  b.id AS brand_id,
+  b.name AS brand_name,
+  b.name_en AS brand_name_en,
+  b.logo_url AS brand_logo_url,
+  b.website AS brand_website,
+  b.is_active AS brand_is_active,
 
-  -- Variant 정보
-  pv.id as variant_id,
-  pv.slug as slug,
-  pv.name as variant_name,
-  pv.flavor_category::text as flavor_category,
-  pv.flavor_name,
-  pv.barcode,
-  pv.primary_image,
-  pv.images,
-  pv.purchase_url,
-  pv.favorites_count,
-  pv.is_available,
-  pv.display_order,
+  -- Nutrition 정보
+  ni.serving_size,
+  ni.calories,
+  ni.protein,
+  ni.carbs,
+  ni.sugar,
+  ni.fat,
+  ni.saturated_fat,
+  ni.unsaturated_fat,
+  ni.trans_fat,
+  ni.dietary_fiber,
+  ni.sodium,
+  ni.cholesterol,
+  ni.calcium,
+  ni.additional_nutrients,
+  ni.allergen_info,
 
-  -- Protein Types (variant별 JSON 배열로 집계)
+  -- Protein Types (JSON 배열로 집계)
   COALESCE(
     json_agg(
       jsonb_build_object(
         'id', pt.id,
         'type', pt.type::text,
         'name', pt.name,
-        'description', pt.description
+        'description', pt.description,
+        'percentage', lfpt.percentage
       ) ORDER BY pt.type
     ) FILTER (WHERE pt.id IS NOT NULL),
     '[]'::json
-  ) as protein_types,
+  ) AS protein_types,
 
-  -- Nutrition 정보
-  vn.calories,
-  vn.protein,
-  vn.carbs,
-  vn.sugar,
-  vn.dietary_fiber,
-  vn.fat,
-  vn.saturated_fat,
-  vn.unsaturated_fat,
-  vn.trans_fat,
-  vn.sodium,
-  vn.cholesterol,
-  vn.calcium,
-  vn.additional_nutrients,
-  vn.allergen_info,
-
-  -- 타임스탬프
-  p.created_at,
-  p.updated_at
-FROM products p
-INNER JOIN brands b ON p.brand_id = b.id
-LEFT JOIN product_variants pv ON p.id = pv.product_id
-LEFT JOIN variant_protein_types vpt ON pv.id = vpt.variant_id
-LEFT JOIN protein_types pt ON vpt.protein_type_id = pt.id
-LEFT JOIN variant_nutrition vn ON pv.id = vn.variant_id
+  -- Timestamps
+  ps.created_at,
+  ps.updated_at
+FROM
+  product_skus ps
+  INNER JOIN product_flavors pf ON pf.id = ps.product_flavor_id
+  INNER JOIN line_flavors lf ON lf.id = pf.line_flavor_id
+  INNER JOIN products p ON p.id = pf.product_id
+  INNER JOIN product_lines pl ON pl.id = lf.line_id AND pl.id = p.line_id
+  INNER JOIN brands b ON b.id = pl.brand_id
+  LEFT JOIN nutrition_info ni ON ni.line_flavor_id = lf.id
+  LEFT JOIN line_flavor_protein_types lfpt ON lfpt.line_flavor_id = lf.id
+  LEFT JOIN protein_types pt ON pt.id = lfpt.protein_type_id
 WHERE
-  p.is_active = true
-  AND b.is_active = true
-  AND (pv.is_available = true OR pv.id IS NULL)
+  b.is_active = true
+  AND ps.is_available = true
 GROUP BY
-  p.id, p.name, p.description, p.brand_id, p.form, p.package_type,
-  p.total_amount, p.servings_per_container, p.serving_size, p.is_active,
-  p.created_at, p.updated_at,
-  b.name, b.name_en, b.logo_url, b.website,
-  pv.id, pv.slug, pv.name, pv.flavor_category, pv.flavor_name,
-  pv.barcode, pv.primary_image, pv.images, pv.purchase_url,
-  pv.favorites_count, pv.is_available, pv.display_order,
-  vn.calories, vn.protein, vn.carbs, vn.sugar, vn.dietary_fiber,
-  vn.fat, vn.saturated_fat, vn.unsaturated_fat, vn.trans_fat,
-  vn.sodium, vn.cholesterol, vn.calcium, vn.additional_nutrients,
-  vn.allergen_info;
-
--- 인덱스 생성 (성능 최적화)
-CREATE INDEX IF NOT EXISTS idx_variant_protein_types_variant
-ON variant_protein_types (variant_id);
-
-CREATE INDEX IF NOT EXISTS idx_variant_protein_types_protein
-ON variant_protein_types (protein_type_id);
-
-CREATE INDEX IF NOT EXISTS idx_products_form
-ON products (form);
-
-CREATE INDEX IF NOT EXISTS idx_product_variants_flavor_category
-ON product_variants (flavor_category);
-
-CREATE INDEX IF NOT EXISTS idx_products_package_type
-ON products (package_type);
-
-CREATE INDEX IF NOT EXISTS idx_variant_nutrition_protein
-ON variant_nutrition (protein);
-
-CREATE INDEX IF NOT EXISTS idx_variant_nutrition_calories
-ON variant_nutrition (calories);
+  ps.id, ps.barcode, ps.slug, ps.name, ps.size, ps.servings_per_container,
+  ps.primary_image, ps.images, ps.purchase_url, ps.favorites_count,
+  ps.is_available, ps.display_order, ps.created_at, ps.updated_at,
+  pf.id,
+  p.id, p.package_type,
+  lf.id, lf.flavor_category, lf.flavor_name,
+  pl.id, pl.name, pl.description, pl.form,
+  b.id, b.name, b.name_en, b.logo_url, b.website, b.is_active,
+  ni.serving_size, ni.calories, ni.protein, ni.carbs, ni.sugar,
+  ni.fat, ni.saturated_fat, ni.unsaturated_fat, ni.trans_fat,
+  ni.dietary_fiber, ni.sodium, ni.cholesterol, ni.calcium,
+  ni.additional_nutrients, ni.allergen_info;
 
 -- ============================================
--- DISTINCT FILTER OPTIONS VIEW
+-- PRODUCT FILTER OPTIONS VIEW
 -- ============================================
--- 필터 옵션을 위한 고유값들을 미리 계산합니다
+-- 필터 옵션을 위한 뷰 - enum과 테이블에서 직접 조회
 
-CREATE OR REPLACE VIEW product_filter_options
-with (security_invoker=on)
+DROP VIEW IF EXISTS product_filter_options CASCADE;
+CREATE VIEW product_filter_options
+WITH (security_invoker=on)
 AS
-SELECT DISTINCT
-  unnest(ARRAY[
-    -- Flavor categories
-    jsonb_build_object('type', 'flavor', 'value', pv.flavor_category::text),
-    -- Protein types (이제 variant_protein_types 테이블에서)
-    jsonb_build_object('type', 'protein_type', 'value', pt.type::text, 'name', pt.name),
-    -- Forms
-    jsonb_build_object('type', 'form', 'value', p.form::text),
-    -- Package types
-    jsonb_build_object('type', 'package_type', 'value', p.package_type::text)
-  ]) as filter_option
-FROM products p
-LEFT JOIN product_variants pv ON p.id = pv.product_id
-LEFT JOIN variant_protein_types vpt ON pv.id = vpt.variant_id
-LEFT JOIN protein_types pt ON vpt.protein_type_id = pt.id
-WHERE
-  p.is_active = true
-  AND (pv.is_available = true OR pv.id IS NULL)
-  AND (pv.flavor_category IS NOT NULL OR pt.type IS NOT NULL OR p.package_type IS NOT NULL);
+WITH
+  -- Brands (테이블에서 직접)
+  brand_options AS (
+    SELECT
+      'brand' AS option_type,
+      id::text AS value,
+      name AS label,
+      name_en AS label_en,
+      logo_url,
+      NULL::integer AS product_count
+    FROM brands
+    WHERE is_active = true
+  ),
+
+  -- Flavor Categories (enum에서 직접)
+  flavor_options AS (
+    SELECT
+      'flavor' AS option_type,
+      enumlabel AS value,
+      enumlabel AS label,
+      NULL AS label_en,
+      NULL AS logo_url,
+      NULL::integer AS product_count
+    FROM pg_enum
+    WHERE enumtypid = 'flavor_category'::regtype
+  ),
+
+  -- Protein Types (테이블에서 직접)
+  protein_options AS (
+    SELECT
+      'protein_type' AS option_type,
+      type::text AS value,
+      name AS label,
+      NULL AS label_en,
+      NULL AS logo_url,
+      NULL::integer AS product_count
+    FROM protein_types
+  ),
+
+  -- Package Types (enum에서 직접)
+  package_options AS (
+    SELECT
+      'package_type' AS option_type,
+      enumlabel AS value,
+      CASE enumlabel
+        WHEN 'bulk' THEN '대용량'
+        WHEN 'pouch' THEN '파우치'
+        WHEN 'stick' THEN '스틱'
+        ELSE enumlabel
+      END AS label,
+      NULL AS label_en,
+      NULL AS logo_url,
+      NULL::integer AS product_count
+    FROM pg_enum
+    WHERE enumtypid = 'package_type'::regtype
+  ),
+
+  -- Product Forms (enum에서 직접)
+  form_options AS (
+    SELECT
+      'form' AS option_type,
+      enumlabel AS value,
+      CASE enumlabel
+        WHEN 'powder' THEN '파우더'
+        WHEN 'rtd' THEN '드링크 (RTD)'
+        ELSE enumlabel
+      END AS label,
+      NULL AS label_en,
+      NULL AS logo_url,
+      NULL::integer AS product_count
+    FROM pg_enum
+    WHERE enumtypid = 'product_form'::regtype
+  )
+
+-- 모든 옵션 통합
+SELECT * FROM brand_options
+UNION ALL
+SELECT * FROM flavor_options
+UNION ALL
+SELECT * FROM protein_options
+UNION ALL
+SELECT * FROM package_options
+UNION ALL
+SELECT * FROM form_options;
 
 -- ============================================
 -- COMMENT 추가 (문서화)
 -- ============================================
 
 COMMENT ON VIEW products_with_details IS
-'제품, 브랜드, 변형, 영양정보, 단백질 타입을 조인한 종합 뷰. protein_types는 variant별 JSON 배열로 집계';
+'새로운 6계층 구조 제품 정보 뷰: SKU → Product Flavors → Line Flavors → Product Lines → Brands';
 
 COMMENT ON VIEW product_filter_options IS
-'필터 UI를 위한 고유 옵션값들을 제공하는 뷰';
+'필터 UI를 위한 옵션값들 - brands/protein_types 테이블과 enum 타입에서 직접 조회';
+
+-- 권한 설정
+GRANT SELECT ON products_with_details TO anon, authenticated;
+GRANT SELECT ON product_filter_options TO anon, authenticated;

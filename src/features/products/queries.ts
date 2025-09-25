@@ -13,25 +13,75 @@ export type ProductSearchResult =
   };
 
 // Database 기반으로 Json을 구체적인 타입으로 변환
+// 새로운 테이블 구조에 맞게 타입 정의
 type ProductDetailRow = {
-  selected_variant: Omit<Database["public"]["Tables"]["product_variants"]["Row"],
-    "package_type" | "total_amount" | "servings_per_container" | "serving_size"> & {
-    nutrition?: Database["public"]["Tables"]["variant_nutrition"]["Row"];
+  selected_sku: {
+    id: string;
+    name: string;
+    barcode?: string;
+    slug?: string;
+    size: string;
+    servings_per_container?: number;
+    primary_image?: string;
+    images?: string[];
+    purchase_url?: string;
+    favorites_count: number;
+    is_available: boolean;
+    flavor?: {
+      category: string;
+      name: string;
+    };
+    package_type?: string;
+    nutrition?: {
+      serving_size?: string;
+      calories?: number;
+      protein?: number;
+      carbs?: number;
+      sugar?: number;
+      fat?: number;
+      saturated_fat?: number;
+      unsaturated_fat?: number;
+      trans_fat?: number;
+      dietary_fiber?: number;
+      sodium?: number;
+      cholesterol?: number;
+      calcium?: number;
+      additional_nutrients?: Record<string, unknown>;
+      allergen_info?: string;
+    };
+    protein_types?: Array<{
+      id: string;
+      type: string;
+      name: string;
+      description?: string;
+      percentage?: number;
+    }>;
   };
-  product_info: Database["public"]["Tables"]["products"]["Row"];
-  brand_info: Database["public"]["Tables"]["brands"]["Row"];
-  related_variants: Array<
-    Pick<
-      Database["public"]["Tables"]["product_variants"]["Row"],
-      | "id"
-      | "name"
-      | "slug"
-      | "flavor_category"
-      | "flavor_name"
-      | "primary_image"
-      | "images"
-    >
-  >;
+  product_line_info: {
+    id: string;
+    name: string;
+    description?: string;
+    form: string;
+  };
+  brand_info: {
+    id: string;
+    name: string;
+    name_en?: string;
+    logo_url?: string;
+    website?: string;
+    is_active: boolean;
+  };
+  related_skus: Array<{
+    id: string;
+    name: string;
+    slug?: string;
+    size: string;
+    primary_image?: string;
+    flavor?: {
+      category: string;
+      name: string;
+    };
+  }>;
   is_favorited: boolean;
 };
 
@@ -39,6 +89,16 @@ type ProductDetailRow = {
 export interface FilterOption {
   option_type: string;
   option_value: string;
+}
+
+// View에서 가져오는 필터 옵션 타입
+interface ViewFilterOption {
+  option_type: string;
+  value: string;
+  label?: string;
+  label_en?: string;
+  logo_url?: string;
+  product_count?: number;
 }
 
 // 필터 상태 인터페이스 (UI 컴포넌트용)
@@ -98,7 +158,7 @@ export async function searchProducts(
     throw new Error("Failed to search products");
   }
 
-  return data || [];
+  return (data || []) as ProductSearchResult[];
 }
 
 /**
@@ -110,8 +170,9 @@ export async function getProductDetail(
   supabaseClient?: SupabaseClient<Database>,
 ): Promise<ProductDetailRow | null> {
   const client = supabaseClient || defaultClient;
-  const { data, error } = await client.rpc("get_product_detail", {
-    variant_slug_param: slug,
+  // slug로 제품 조회
+  const { data, error } = await client.rpc("get_product_detail_by_slug", {
+    slug_param: slug,
   });
 
   if (error) {
@@ -119,11 +180,18 @@ export async function getProductDetail(
     return null;
   }
 
-  if (!data || data.length === 0) {
+  if (!data) {
     return null;
   }
 
-  return data[0] as ProductDetailRow;
+  // RPC 함수가 배열을 반환하는 경우 첫 번째 요소를 가져옴
+  const result = Array.isArray(data) ? data[0] : data;
+
+  if (!result) {
+    return null;
+  }
+
+  return result as unknown as ProductDetailRow;
 }
 
 /**
@@ -169,10 +237,15 @@ export async function getFilterOptions(
  */
 export async function getAllFilterOptions(supabaseClient?: SupabaseClient<Database>) {
   const client = supabaseClient || defaultClient;
-  const { data, error } = await client.rpc("get_filter_options");
+
+  // product_filter_options 뷰에서 직접 조회
+  const { data, error } = (await client.from("product_filter_options").select("*")) as unknown as {
+    data: ViewFilterOption[] | null;
+    error: Error | null;
+  };
 
   if (error) {
-    console.error("Error fetching all filter options:", error);
+    console.error("Error fetching filter options from view:", error);
     return {
       flavors: [],
       proteinTypes: [],
@@ -182,30 +255,29 @@ export async function getAllFilterOptions(supabaseClient?: SupabaseClient<Databa
     };
   }
 
-  const allOptions = (data as FilterOption[]) || [];
-
-  // 타입별로 옵션 분류 및 정렬
+  // 뷰에서 가져온 데이터를 타입별로 분류
+  const viewData = (data || []) as ViewFilterOption[];
   return {
-    flavors: allOptions
+    flavors: viewData
       .filter((opt) => opt.option_type === "flavor")
-      .map((opt) => opt.option_value)
+      .map((opt) => opt.value)
       .sort(),
-    proteinTypes: allOptions
+    proteinTypes: viewData
       .filter((opt) => opt.option_type === "protein_type")
-      .map((opt) => opt.option_value)
+      .map((opt) => opt.value)
       .sort(),
-    forms: allOptions
+    forms: viewData
       .filter((opt) => opt.option_type === "form")
-      .map((opt) => opt.option_value)
+      .map((opt) => opt.value)
       .sort(),
-    packageTypes: allOptions
+    packageTypes: viewData
       .filter((opt) => opt.option_type === "package_type")
-      .map((opt) => opt.option_value)
+      .map((opt) => opt.value)
       .sort(),
-    brands: allOptions
+    brands: viewData
       .filter((opt) => opt.option_type === "brand")
-      .map((opt) => opt.option_value)
-      .sort((a, b) => a.localeCompare(b)),
+      .map((opt) => opt.value)
+      .sort((a: string, b: string) => a.localeCompare(b)),
   };
 }
 

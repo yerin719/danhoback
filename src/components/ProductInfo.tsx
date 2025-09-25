@@ -1,36 +1,41 @@
 "use client";
 
 import RequestButton from "@/components/RequestButton";
-import { getProteinTypeDisplayName, ProductForm, ProteinType } from "@/features/products/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 
 interface ProductInfoProps {
-  productInfo: {
+  productLineInfo: {
     id: string;
     name: string;
-    protein_type: ProteinType;
-    form: ProductForm;
-    is_active: boolean;
-    total_amount?: number | null;
-    servings_per_container?: number | null;
-    package_type?: string | null;
+    description?: string;
+    form: string;
   };
   brandInfo: {
     id: string;
     name: string;
-    name_en?: string | null;
-    logo_url?: string | null;
-    website?: string | null;
-    is_active: boolean;
+    name_en?: string;
+    logo_url?: string;
+    website?: string;
+    is_active?: boolean;
   };
-  variant: {
+  selectedSku: {
     id: string;
     name: string;
+    size: string;
+    servings_per_container?: number;
+    package_type?: string;
+    protein_types?: Array<{
+      id: string;
+      type: string;
+      name: string;
+      description?: string;
+      percentage?: number;
+    }>;
   };
 }
 
-export default function ProductInfo({ productInfo, brandInfo, variant }: ProductInfoProps) {
+export default function ProductInfo({ productLineInfo, brandInfo, selectedSku }: ProductInfoProps) {
   return (
     <div className="space-y-6">
       {/* 브랜드와 요청 버튼 */}
@@ -50,24 +55,36 @@ export default function ProductInfo({ productInfo, brandInfo, variant }: Product
       {/* 제품명 */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3">
-          {variant.name || productInfo.name}
+          {selectedSku.name || productLineInfo.name}
         </h1>
         {/* 칩들 */}
         <div className="flex flex-wrap gap-2">
-          {/* 단백질 종류 칩 */}
-          <Badge variant="outline" className="text-sm">
-            {getProteinTypeDisplayName(productInfo.protein_type)}
-          </Badge>
-          {/* 총 내용량 칩 */}
-          {productInfo.total_amount && (
+          {/* 단백질 종류 칩들 */}
+          {selectedSku.protein_types?.map((proteinType) => (
+            <Badge key={proteinType.id} variant="outline" className="text-sm">
+              {proteinType.name}
+              {proteinType.percentage && ` ${proteinType.percentage}%`}
+            </Badge>
+          ))}
+
+          {/* 사이즈 칩 */}
+          {selectedSku.size && (
             <Badge variant="outline" className="text-sm">
-              {`${productInfo.total_amount}g`}
+              {selectedSku.size}
             </Badge>
           )}
+
           {/* 회분 칩 - 벌크일 때만 노출 */}
-          {productInfo.servings_per_container && productInfo.package_type === "bulk" && (
+          {selectedSku.servings_per_container && selectedSku.package_type === "bulk" && (
             <Badge variant="outline" className="text-sm">
-              {productInfo.servings_per_container}회분
+              {selectedSku.servings_per_container}회분
+            </Badge>
+          )}
+
+          {/* 제품 형태 칩 */}
+          {productLineInfo.form && (
+            <Badge variant="outline" className="text-sm">
+              {productLineInfo.form === "powder" ? "파우더" : "드링크"}
             </Badge>
           )}
         </div>

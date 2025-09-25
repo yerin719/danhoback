@@ -18,12 +18,12 @@ export function useToggleFavorite(userId: string) {
 
   return useMutation({
     mutationFn: ({
-      productVariantId,
+      productSkuId,
       currentStatus,
     }: {
-      productVariantId: string;
+      productSkuId: string;
       currentStatus: boolean;
-    }) => toggleFavorite(productVariantId, userId, currentStatus),
+    }) => toggleFavorite(productSkuId, userId, currentStatus),
     onSuccess: () => {
       // 관련 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["favorites"] });

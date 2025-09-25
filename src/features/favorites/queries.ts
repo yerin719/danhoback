@@ -7,12 +7,12 @@ import type { Database } from "database.types";
 
 // Database types
 type FavoriteRow = Database["public"]["Tables"]["favorites"]["Row"];
-type ProductVariantRow = Database["public"]["Tables"]["product_variants"]["Row"];
+type ProductSkuRow = Database["public"]["Tables"]["product_skus"]["Row"];
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 type BrandRow = Database["public"]["Tables"]["brands"]["Row"];
 
 export interface FavoriteWithDetails extends FavoriteRow {
-  variant?: ProductVariantRow;
+  sku?: ProductSkuRow;
   product?: ProductRow;
   brand?: BrandRow;
 }
@@ -38,16 +38,16 @@ export async function getUserFavorites() {
 
 /**
  * 특정 제품의 찜 여부 확인
- * @param productVariantId - 제품 variant ID
+ * @param productSkuId - 제품 SKU ID
  * @param userId - 사용자 ID
  * @returns 찜 여부
  */
-export async function checkIsFavorited(productVariantId: string, userId: string): Promise<boolean> {
+export async function checkIsFavorited(productSkuId: string, userId: string): Promise<boolean> {
   const { data, error } = await client
     .from("favorites")
     .select("user_id") // id 컬럼이 없으므로 user_id 선택
     .eq("user_id", userId)
-    .eq("product_variant_id", productVariantId)
+    .eq("product_sku_id", productSkuId)
     .maybeSingle(); // single() 대신 maybeSingle() 사용 - 데이터 없어도 에러 안남
 
   if (error) {
@@ -60,19 +60,19 @@ export async function checkIsFavorited(productVariantId: string, userId: string)
 
 /**
  * 찜 추가
- * @param productVariantId - 제품 variant ID
+ * @param productSkuId - 제품 SKU ID
  * @param userId - 사용자 ID
  * @returns 추가 결과
  */
 export async function addFavorite(
-  productVariantId: string,
+  productSkuId: string,
   userId: string,
 ): Promise<{ success: boolean; error?: string; data?: FavoriteRow }> {
   const { data, error } = await client
     .from("favorites")
     .insert({
       user_id: userId,
-      product_variant_id: productVariantId,
+      product_sku_id: productSkuId,
     })
     .select()
     .single();
@@ -91,19 +91,19 @@ export async function addFavorite(
 
 /**
  * 찜 삭제
- * @param productVariantId - 제품 variant ID
+ * @param productSkuId - 제품 SKU ID
  * @param userId - 사용자 ID
  * @returns 삭제 결과
  */
 export async function removeFavorite(
-  productVariantId: string,
+  productSkuId: string,
   userId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const { error } = await client
     .from("favorites")
     .delete()
     .eq("user_id", userId)
-    .eq("product_variant_id", productVariantId);
+    .eq("product_sku_id", productSkuId);
 
   if (error) {
     console.error("Error deleting favorite:", error);
@@ -115,35 +115,35 @@ export async function removeFavorite(
 
 /**
  * 찜 토글 (추가/삭제)
- * @param productVariantId - 제품 variant ID
+ * @param productSkuId - 제품 SKU ID
  * @param userId - 사용자 ID
  * @param currentStatus - 현재 찜 상태 (클라이언트에서 전달)
  * @returns 토글 결과
  */
 export async function toggleFavorite(
-  productVariantId: string,
+  productSkuId: string,
   userId: string,
   currentStatus: boolean,
 ): Promise<{ success: boolean; action?: "added" | "removed"; error?: string }> {
   if (currentStatus) {
-    const result = await removeFavorite(productVariantId, userId);
+    const result = await removeFavorite(productSkuId, userId);
     return { ...result, action: "removed" };
   } else {
-    const result = await addFavorite(productVariantId, userId);
+    const result = await addFavorite(productSkuId, userId);
     return { ...result, action: "added" };
   }
 }
 
 /**
  * 제품별 찜 카운트 조회
- * @param productVariantId - 제품 variant ID
+ * @param productSkuId - 제품 SKU ID
  * @returns 찜 개수
  */
-export async function getFavoriteCount(productVariantId: string): Promise<number> {
+export async function getFavoriteCount(productSkuId: string): Promise<number> {
   const { count, error } = await client
     .from("favorites")
     .select("*", { count: "exact", head: true })
-    .eq("product_variant_id", productVariantId);
+    .eq("product_sku_id", productSkuId);
 
   if (error) {
     console.error("Error getting favorite count:", error);
@@ -155,30 +155,30 @@ export async function getFavoriteCount(productVariantId: string): Promise<number
 
 /**
  * 여러 제품의 찜 여부 일괄 확인
- * @param productVariantIds - 제품 variant ID 배열
+ * @param productSkuIds - 제품 SKU ID 배열
  * @param userId - 사용자 ID
  * @returns 찜 여부 Map
  */
 export async function checkMultipleFavorites(
-  productVariantIds: string[],
+  productSkuIds: string[],
   userId: string,
 ): Promise<Map<string, boolean>> {
   const { data, error } = await client
     .from("favorites")
-    .select("product_variant_id")
+    .select("product_sku_id")
     .eq("user_id", userId)
-    .in("product_variant_id", productVariantIds);
+    .in("product_sku_id", productSkuIds);
 
   const favoriteMap = new Map<string, boolean>();
 
   if (error) {
     console.error("Error checking multiple favorites:", error);
-    productVariantIds.forEach((id) => favoriteMap.set(id, false));
+    productSkuIds.forEach((id) => favoriteMap.set(id, false));
     return favoriteMap;
   }
 
-  const favoritedIds = new Set((data || []).map((f) => f.product_variant_id));
-  productVariantIds.forEach((id) => {
+  const favoritedIds = new Set((data || []).map((f) => f.product_sku_id));
+  productSkuIds.forEach((id) => {
     favoriteMap.set(id, favoritedIds.has(id));
   });
 

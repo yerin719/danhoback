@@ -28,7 +28,7 @@ export const flavorCategoryEnum = pgEnum("flavor_category", [
   "black_sesame", // 흑임자
   "milktea",
   "greentea",
-  "anilla", // 바닐라
+  "vanilla", // 바닐라
   "corn", // 옥수수
   "other",
 ]);
@@ -64,10 +64,10 @@ export const packageTypeEnum = pgEnum("package_type", [
 ]);
 
 // ============================================
-// TABLES
+// CORE TABLES
 // ============================================
 
-// Brands table
+// Brands table (기존 유지)
 export const brands = pgTable("brands", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).unique().notNull(),
@@ -79,105 +79,72 @@ export const brands = pgTable("brands", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Protein Types table (단백질 타입 마스터)
+// Protein Types table (기존 유지)
 export const proteinTypes = pgTable("protein_types", {
   id: uuid("id").defaultRandom().primaryKey(),
-  type: proteinTypeEnum("type").unique().notNull(), // enum 사용
+  type: proteinTypeEnum("type").unique().notNull(),
   name: varchar("name", { length: 100 }).notNull(), // 한글명
-  description: text("description"), // 설명
+  description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Products table (제품 라인)
-export const products = pgTable(
-  "products",
+// ============================================
+// PRODUCT LINE LEVEL TABLES
+// ============================================
+
+// Product Lines table (제품 라인 - 예: 골드 스탠다드 웨이)
+export const productLines = pgTable(
+  "product_lines",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     brandId: uuid("brand_id")
       .references(() => brands.id)
       .notNull(),
-    name: varchar("name", { length: 200 }).notNull(),
-    description: text("description"), // SEO 메타 description용 제품 설명
+    name: varchar("name", { length: 200 }).notNull(), // "골드 스탠다드 웨이"
+    description: text("description"),
     form: productFormEnum("form").default("powder").notNull(),
-    packageType: packageTypeEnum("package_type"),
-    totalAmount: decimal("total_amount", { precision: 8, scale: 2 }),
-    servingsPerContainer: integer("servings_per_container"),
-    servingSize: decimal("serving_size", { precision: 6, scale: 2 }),
-    isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => {
     return {
-      brandIdx: index("idx_products_brand").on(table.brandId),
+      brandIdx: index("idx_product_lines_brand").on(table.brandId),
+      nameIdx: index("idx_product_lines_name").on(table.name),
     };
   },
 );
 
-// Variant Protein Types junction table (다대다 관계)
-export const variantProteinTypes = pgTable(
-  "variant_protein_types",
+// Line Flavors table (제품 라인의 맛 - 예: 골드 스탠다드 웨이 초콜릿)
+export const lineFlavors = pgTable(
+  "line_flavors",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    variantId: uuid("variant_id")
-      .references(() => productVariants.id, { onDelete: "cascade" })
+    lineId: uuid("line_id")
+      .references(() => productLines.id)
       .notNull(),
-    proteinTypeId: uuid("protein_type_id")
-      .references(() => proteinTypes.id, { onDelete: "cascade" })
-      .notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => {
-    return {
-      variantIdx: index("idx_variant_protein_types_variant").on(table.variantId),
-      proteinTypeIdx: index("idx_variant_protein_types_protein").on(table.proteinTypeId),
-      uniqueVariantProtein: index("unique_variant_protein").on(
-        table.variantId,
-        table.proteinTypeId,
-      ),
-    };
-  },
-);
-
-// Product variants table (실제 SKU)
-export const productVariants = pgTable(
-  "product_variants",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    productId: uuid("product_id")
-      .references(() => products.id)
-      .notNull(),
-    slug: varchar("slug", { length: 200 }).unique().notNull(),
-    name: varchar("name", { length: 200 }).notNull(),
     flavorCategory: flavorCategoryEnum("flavor_category"),
-    flavorName: varchar("flavor_name", { length: 100 }),
-    barcode: varchar("barcode", { length: 20 }).unique(),
-    primaryImage: text("primary_image"),
-    images: jsonb("images").$type<string[]>(),
-    purchaseUrl: text("purchase_url"),
-    favoritesCount: integer("favorites_count").default(0),
-    isAvailable: boolean("is_available").default(true),
-    displayOrder: integer("display_order").default(0),
+    flavorName: varchar("flavor_name", { length: 100 }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => {
     return {
-      productIdx: index("idx_variants_product").on(table.productId),
-      flavorIdx: index("idx_variants_flavor").on(table.flavorCategory),
-      slugIdx: index("idx_variants_slug").on(table.slug),
+      lineIdx: index("idx_line_flavors_line").on(table.lineId),
+      flavorIdx: index("idx_line_flavors_flavor").on(table.flavorCategory),
+      uniqueLineFlavor: index("unique_line_flavor").on(table.lineId, table.flavorName),
     };
   },
 );
 
-// Variant nutrition table
-export const variantNutrition = pgTable("variant_nutrition", {
+// Nutrition Info table (영양정보 - Line Flavor와 1:1)
+export const nutritionInfo = pgTable("nutrition_info", {
   id: uuid("id").defaultRandom().primaryKey(),
-  variantId: uuid("variant_id")
-    .references(() => productVariants.id)
+  lineFlavorId: uuid("line_flavor_id")
+    .references(() => lineFlavors.id)
     .unique()
     .notNull(),
+  servingSize: decimal("serving_size", { precision: 6, scale: 2 }),
   calories: decimal("calories", { precision: 6, scale: 2 }),
   protein: decimal("protein", { precision: 6, scale: 2 }).notNull(),
   carbs: decimal("carbs", { precision: 6, scale: 2 }),
@@ -196,52 +163,194 @@ export const variantNutrition = pgTable("variant_nutrition", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Line Flavor Protein Types junction table (맛별 단백질 타입 - N:M)
+export const lineFlavorProteinTypes = pgTable(
+  "line_flavor_protein_types",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    lineFlavorId: uuid("line_flavor_id")
+      .references(() => lineFlavors.id, { onDelete: "cascade" })
+      .notNull(),
+    proteinTypeId: uuid("protein_type_id")
+      .references(() => proteinTypes.id, { onDelete: "cascade" })
+      .notNull(),
+    percentage: decimal("percentage", { precision: 5, scale: 2 }), // 비율 (선택사항)
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      lineFlavorIdx: index("idx_line_flavor_protein_types_flavor").on(table.lineFlavorId),
+      proteinTypeIdx: index("idx_line_flavor_protein_types_protein").on(table.proteinTypeId),
+      uniqueFlavorProtein: index("unique_line_flavor_protein").on(
+        table.lineFlavorId,
+        table.proteinTypeId,
+      ),
+    };
+  },
+);
+
+// ============================================
+// PRODUCT LEVEL TABLES
+// ============================================
+
+// Products table (제품 - 라인 + 패키지타입, 예: 골드 스탠다드 웨이 벌크)
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    lineId: uuid("line_id")
+      .references(() => productLines.id)
+      .notNull(),
+    packageType: packageTypeEnum("package_type").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      lineIdx: index("idx_products_line").on(table.lineId),
+      packageTypeIdx: index("idx_products_package_type").on(table.packageType),
+      uniqueLinePackage: index("unique_line_package").on(table.lineId, table.packageType),
+    };
+  },
+);
+
+// Product Flavors table (제품별 맛 매핑)
+export const productFlavors = pgTable(
+  "product_flavors",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productId: uuid("product_id")
+      .references(() => products.id)
+      .notNull(),
+    lineFlavorId: uuid("line_flavor_id")
+      .references(() => lineFlavors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      productIdx: index("idx_product_flavors_product").on(table.productId),
+      lineFlavorIdx: index("idx_product_flavors_line_flavor").on(table.lineFlavorId),
+      uniqueProductFlavor: index("unique_product_flavor").on(table.productId, table.lineFlavorId),
+    };
+  },
+);
+
+// Product SKUs table (최종 판매 단위 - 용량별 SKU)
+export const productSkus = pgTable(
+  "product_skus",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productFlavorId: uuid("product_flavor_id")
+      .references(() => productFlavors.id)
+      .notNull(),
+    barcode: varchar("barcode", { length: 20 }).unique(),
+    slug: varchar("slug", { length: 255 }).unique().notNull(), // URL 친화적 고유 식별자
+    name: varchar("name", { length: 200 }).notNull(), // "골드 스탠다드 웨이 초콜릿 5LB"
+    size: varchar("size", { length: 50 }).notNull(), // "5LB", "2.27kg", "300g"
+    servingsPerContainer: integer("servings_per_container"),
+    primaryImage: text("primary_image"),
+    images: jsonb("images").$type<string[]>(),
+    purchaseUrl: text("purchase_url"),
+    favoritesCount: integer("favorites_count").default(0),
+    isAvailable: boolean("is_available").default(true),
+    displayOrder: integer("display_order").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      productFlavorIdx: index("idx_skus_product_flavor").on(table.productFlavorId),
+      barcodeIdx: index("idx_skus_barcode").on(table.barcode),
+    };
+  },
+);
+
 // ============================================
 // RELATIONS
 // ============================================
 
+// Brand relations
 export const brandsRelations = relations(brands, ({ many }) => ({
+  productLines: many(productLines),
+}));
+
+// Product Line relations
+export const productLinesRelations = relations(productLines, ({ one, many }) => ({
+  brand: one(brands, {
+    fields: [productLines.brandId],
+    references: [brands.id],
+  }),
+  lineFlavors: many(lineFlavors),
   products: many(products),
 }));
 
-export const proteinTypesRelations = relations(proteinTypes, ({ many }) => ({
-  variantProteinTypes: many(variantProteinTypes),
-}));
-
-export const productsRelations = relations(products, ({ one, many }) => ({
-  brand: one(brands, {
-    fields: [products.brandId],
-    references: [brands.id],
+// Line Flavor relations
+export const lineFlavorsRelations = relations(lineFlavors, ({ one, many }) => ({
+  line: one(productLines, {
+    fields: [lineFlavors.lineId],
+    references: [productLines.id],
   }),
-  variants: many(productVariants),
+  nutritionInfo: one(nutritionInfo, {
+    fields: [lineFlavors.id],
+    references: [nutritionInfo.lineFlavorId],
+  }),
+  proteinTypes: many(lineFlavorProteinTypes),
+  productFlavors: many(productFlavors),
 }));
 
-export const variantProteinTypesRelations = relations(variantProteinTypes, ({ one }) => ({
-  variant: one(productVariants, {
-    fields: [variantProteinTypes.variantId],
-    references: [productVariants.id],
+// Nutrition Info relations
+export const nutritionInfoRelations = relations(nutritionInfo, ({ one }) => ({
+  lineFlavor: one(lineFlavors, {
+    fields: [nutritionInfo.lineFlavorId],
+    references: [lineFlavors.id],
+  }),
+}));
+
+// Line Flavor Protein Types relations
+export const lineFlavorProteinTypesRelations = relations(lineFlavorProteinTypes, ({ one }) => ({
+  lineFlavor: one(lineFlavors, {
+    fields: [lineFlavorProteinTypes.lineFlavorId],
+    references: [lineFlavors.id],
   }),
   proteinType: one(proteinTypes, {
-    fields: [variantProteinTypes.proteinTypeId],
+    fields: [lineFlavorProteinTypes.proteinTypeId],
     references: [proteinTypes.id],
   }),
 }));
 
-export const productVariantsRelations = relations(productVariants, ({ one, many }) => ({
-  product: one(products, {
-    fields: [productVariants.productId],
-    references: [products.id],
-  }),
-  nutrition: one(variantNutrition, {
-    fields: [productVariants.id],
-    references: [variantNutrition.variantId],
-  }),
-  variantProteinTypes: many(variantProteinTypes),
+// Protein Types relations
+export const proteinTypesRelations = relations(proteinTypes, ({ many }) => ({
+  lineFlavorProteinTypes: many(lineFlavorProteinTypes),
 }));
 
-export const variantNutritionRelations = relations(variantNutrition, ({ one }) => ({
-  variant: one(productVariants, {
-    fields: [variantNutrition.variantId],
-    references: [productVariants.id],
+// Products relations
+export const productsRelations = relations(products, ({ one, many }) => ({
+  line: one(productLines, {
+    fields: [products.lineId],
+    references: [productLines.id],
+  }),
+  productFlavors: many(productFlavors),
+}));
+
+// Product Flavors relations
+export const productFlavorsRelations = relations(productFlavors, ({ one, many }) => ({
+  product: one(products, {
+    fields: [productFlavors.productId],
+    references: [products.id],
+  }),
+  lineFlavor: one(lineFlavors, {
+    fields: [productFlavors.lineFlavorId],
+    references: [lineFlavors.id],
+  }),
+  skus: many(productSkus),
+}));
+
+// Product SKUs relations
+export const productSkusRelations = relations(productSkus, ({ one }) => ({
+  productFlavor: one(productFlavors, {
+    fields: [productSkus.productFlavorId],
+    references: [productFlavors.id],
   }),
 }));

@@ -164,33 +164,33 @@ export type Database = {
       favorites: {
         Row: {
           created_at: string
-          product_variant_id: string
+          product_sku_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          product_variant_id: string
+          product_sku_id: string
           user_id: string
         }
         Update: {
           created_at?: string
-          product_variant_id?: string
+          product_sku_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "favorites_product_variant_id_product_variants_id_fk"
-            columns: ["product_variant_id"]
+            foreignKeyName: "favorites_product_sku_id_product_skus_id_fk"
+            columns: ["product_sku_id"]
             isOneToOne: false
-            referencedRelation: "product_variants"
+            referencedRelation: "product_skus"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "favorites_product_variant_id_product_variants_id_fk"
-            columns: ["product_variant_id"]
+            foreignKeyName: "favorites_product_sku_id_product_skus_id_fk"
+            columns: ["product_sku_id"]
             isOneToOne: false
             referencedRelation: "products_with_details"
-            referencedColumns: ["variant_id"]
+            referencedColumns: ["sku_id"]
           },
           {
             foreignKeyName: "favorites_user_id_profiles_id_fk"
@@ -201,72 +201,225 @@ export type Database = {
           },
         ]
       }
-      product_variants: {
+      line_flavor_protein_types: {
         Row: {
-          barcode: string | null
           created_at: string
-          display_order: number | null
-          favorites_count: number | null
-          flavor_category: Database["public"]["Enums"]["flavor_category"] | null
-          flavor_name: string | null
           id: string
-          images: Json | null
-          is_available: boolean | null
-          name: string
-          primary_image: string | null
-          product_id: string
-          purchase_url: string | null
-          slug: string
+          line_flavor_id: string
+          percentage: number | null
+          protein_type_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_flavor_id: string
+          percentage?: number | null
+          protein_type_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_flavor_id?: string
+          percentage?: number | null
+          protein_type_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "line_flavor_protein_types_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "line_flavors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "line_flavor_protein_types_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["line_flavor_id"]
+          },
+          {
+            foreignKeyName: "line_flavor_protein_types_protein_type_id_protein_types_id_fk"
+            columns: ["protein_type_id"]
+            isOneToOne: false
+            referencedRelation: "protein_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      line_flavors: {
+        Row: {
+          created_at: string
+          flavor_category: Database["public"]["Enums"]["flavor_category"] | null
+          flavor_name: string
+          id: string
+          line_id: string
           updated_at: string
         }
         Insert: {
-          barcode?: string | null
           created_at?: string
-          display_order?: number | null
-          favorites_count?: number | null
           flavor_category?:
             | Database["public"]["Enums"]["flavor_category"]
             | null
-          flavor_name?: string | null
+          flavor_name: string
           id?: string
-          images?: Json | null
-          is_available?: boolean | null
-          name: string
-          primary_image?: string | null
-          product_id: string
-          purchase_url?: string | null
-          slug: string
+          line_id: string
           updated_at?: string
         }
         Update: {
-          barcode?: string | null
           created_at?: string
-          display_order?: number | null
-          favorites_count?: number | null
           flavor_category?:
             | Database["public"]["Enums"]["flavor_category"]
             | null
-          flavor_name?: string | null
+          flavor_name?: string
           id?: string
-          images?: Json | null
-          is_available?: boolean | null
-          name?: string
-          primary_image?: string | null
-          product_id?: string
-          purchase_url?: string | null
-          slug?: string
+          line_id?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "product_variants_product_id_products_id_fk"
+            foreignKeyName: "line_flavors_line_id_product_lines_id_fk"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "product_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "line_flavors_line_id_product_lines_id_fk"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["product_line_id"]
+          },
+        ]
+      }
+      nutrition_info: {
+        Row: {
+          additional_nutrients: Json | null
+          allergen_info: string | null
+          calcium: number | null
+          calories: number | null
+          carbs: number | null
+          cholesterol: number | null
+          created_at: string
+          dietary_fiber: number | null
+          fat: number | null
+          id: string
+          line_flavor_id: string | null
+          protein: number
+          saturated_fat: number | null
+          serving_size: number | null
+          sodium: number | null
+          sugar: number | null
+          trans_fat: number | null
+          unsaturated_fat: number | null
+          updated_at: string
+        }
+        Insert: {
+          additional_nutrients?: Json | null
+          allergen_info?: string | null
+          calcium?: number | null
+          calories?: number | null
+          carbs?: number | null
+          cholesterol?: number | null
+          created_at?: string
+          dietary_fiber?: number | null
+          fat?: number | null
+          id?: string
+          line_flavor_id?: string | null
+          protein: number
+          saturated_fat?: number | null
+          serving_size?: number | null
+          sodium?: number | null
+          sugar?: number | null
+          trans_fat?: number | null
+          unsaturated_fat?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additional_nutrients?: Json | null
+          allergen_info?: string | null
+          calcium?: number | null
+          calories?: number | null
+          carbs?: number | null
+          cholesterol?: number | null
+          created_at?: string
+          dietary_fiber?: number | null
+          fat?: number | null
+          id?: string
+          line_flavor_id?: string | null
+          protein?: number
+          saturated_fat?: number | null
+          serving_size?: number | null
+          sodium?: number | null
+          sugar?: number | null
+          trans_fat?: number | null
+          unsaturated_fat?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_info_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: true
+            referencedRelation: "line_flavors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nutrition_info_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: true
+            referencedRelation: "products_with_details"
+            referencedColumns: ["line_flavor_id"]
+          },
+        ]
+      }
+      product_flavors: {
+        Row: {
+          created_at: string
+          id: string
+          line_flavor_id: string
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_flavor_id: string
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_flavor_id?: string
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_flavors_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "line_flavors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_flavors_line_flavor_id_line_flavors_id_fk"
+            columns: ["line_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["line_flavor_id"]
+          },
+          {
+            foreignKeyName: "product_flavors_product_id_products_id_fk"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "product_variants_product_id_products_id_fk"
+            foreignKeyName: "product_flavors_product_id_products_id_fk"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products_with_details"
@@ -274,19 +427,14 @@ export type Database = {
           },
         ]
       }
-      products: {
+      product_lines: {
         Row: {
           brand_id: string
           created_at: string
           description: string | null
           form: Database["public"]["Enums"]["product_form"]
           id: string
-          is_active: boolean
           name: string
-          package_type: Database["public"]["Enums"]["package_type"] | null
-          serving_size: number | null
-          servings_per_container: number | null
-          total_amount: number | null
           updated_at: string
         }
         Insert: {
@@ -295,12 +443,7 @@ export type Database = {
           description?: string | null
           form?: Database["public"]["Enums"]["product_form"]
           id?: string
-          is_active?: boolean
           name: string
-          package_type?: Database["public"]["Enums"]["package_type"] | null
-          serving_size?: number | null
-          servings_per_container?: number | null
-          total_amount?: number | null
           updated_at?: string
         }
         Update: {
@@ -309,21 +452,131 @@ export type Database = {
           description?: string | null
           form?: Database["public"]["Enums"]["product_form"]
           id?: string
-          is_active?: boolean
           name?: string
-          package_type?: Database["public"]["Enums"]["package_type"] | null
-          serving_size?: number | null
-          servings_per_container?: number | null
-          total_amount?: number | null
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "products_brand_id_brands_id_fk"
+            foreignKeyName: "product_lines_brand_id_brands_id_fk"
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_lines_brand_id_brands_id_fk"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["brand_id"]
+          },
+        ]
+      }
+      product_skus: {
+        Row: {
+          barcode: string | null
+          created_at: string
+          display_order: number | null
+          favorites_count: number | null
+          id: string
+          images: Json | null
+          is_available: boolean | null
+          name: string
+          primary_image: string | null
+          product_flavor_id: string
+          purchase_url: string | null
+          servings_per_container: number | null
+          size: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          created_at?: string
+          display_order?: number | null
+          favorites_count?: number | null
+          id?: string
+          images?: Json | null
+          is_available?: boolean | null
+          name: string
+          primary_image?: string | null
+          product_flavor_id: string
+          purchase_url?: string | null
+          servings_per_container?: number | null
+          size: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          created_at?: string
+          display_order?: number | null
+          favorites_count?: number | null
+          id?: string
+          images?: Json | null
+          is_available?: boolean | null
+          name?: string
+          primary_image?: string | null
+          product_flavor_id?: string
+          purchase_url?: string | null
+          servings_per_container?: number | null
+          size?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_skus_product_flavor_id_product_flavors_id_fk"
+            columns: ["product_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "product_flavors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_skus_product_flavor_id_product_flavors_id_fk"
+            columns: ["product_flavor_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["product_flavor_id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          id: string
+          line_id: string | null
+          package_type: Database["public"]["Enums"]["package_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_id?: string | null
+          package_type: Database["public"]["Enums"]["package_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_id?: string | null
+          package_type?: Database["public"]["Enums"]["package_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_line_id_product_lines_id_fk"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "product_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_line_id_product_lines_id_fk"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_details"
+            referencedColumns: ["product_line_id"]
           },
         ]
       }
@@ -381,132 +634,16 @@ export type Database = {
         }
         Relationships: []
       }
-      variant_nutrition: {
-        Row: {
-          additional_nutrients: Json | null
-          allergen_info: string | null
-          calcium: number | null
-          calories: number | null
-          carbs: number | null
-          cholesterol: number | null
-          created_at: string
-          dietary_fiber: number | null
-          fat: number | null
-          id: string
-          protein: number
-          saturated_fat: number | null
-          sodium: number | null
-          sugar: number | null
-          trans_fat: number | null
-          unsaturated_fat: number | null
-          updated_at: string
-          variant_id: string
-        }
-        Insert: {
-          additional_nutrients?: Json | null
-          allergen_info?: string | null
-          calcium?: number | null
-          calories?: number | null
-          carbs?: number | null
-          cholesterol?: number | null
-          created_at?: string
-          dietary_fiber?: number | null
-          fat?: number | null
-          id?: string
-          protein: number
-          saturated_fat?: number | null
-          sodium?: number | null
-          sugar?: number | null
-          trans_fat?: number | null
-          unsaturated_fat?: number | null
-          updated_at?: string
-          variant_id: string
-        }
-        Update: {
-          additional_nutrients?: Json | null
-          allergen_info?: string | null
-          calcium?: number | null
-          calories?: number | null
-          carbs?: number | null
-          cholesterol?: number | null
-          created_at?: string
-          dietary_fiber?: number | null
-          fat?: number | null
-          id?: string
-          protein?: number
-          saturated_fat?: number | null
-          sodium?: number | null
-          sugar?: number | null
-          trans_fat?: number | null
-          unsaturated_fat?: number | null
-          updated_at?: string
-          variant_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "variant_nutrition_variant_id_product_variants_id_fk"
-            columns: ["variant_id"]
-            isOneToOne: true
-            referencedRelation: "product_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "variant_nutrition_variant_id_product_variants_id_fk"
-            columns: ["variant_id"]
-            isOneToOne: true
-            referencedRelation: "products_with_details"
-            referencedColumns: ["variant_id"]
-          },
-        ]
-      }
-      variant_protein_types: {
-        Row: {
-          created_at: string
-          id: string
-          protein_type_id: string
-          variant_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          protein_type_id: string
-          variant_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          protein_type_id?: string
-          variant_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "variant_protein_types_protein_type_id_protein_types_id_fk"
-            columns: ["protein_type_id"]
-            isOneToOne: false
-            referencedRelation: "protein_types"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "variant_protein_types_variant_id_product_variants_id_fk"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "product_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "variant_protein_types_variant_id_product_variants_id_fk"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_details"
-            referencedColumns: ["variant_id"]
-          },
-        ]
-      }
     }
     Views: {
       product_filter_options: {
         Row: {
-          filter_option: Json | null
+          label: unknown | null
+          label_en: string | null
+          logo_url: string | null
+          option_type: string | null
+          product_count: number | null
+          value: string | null
         }
         Relationships: []
       }
@@ -516,6 +653,7 @@ export type Database = {
           allergen_info: string | null
           barcode: string | null
           brand_id: string | null
+          brand_is_active: boolean | null
           brand_logo_url: string | null
           brand_name: string | null
           brand_name_en: string | null
@@ -533,38 +671,32 @@ export type Database = {
           flavor_name: string | null
           form: string | null
           images: Json | null
-          is_active: boolean | null
           is_available: boolean | null
+          line_description: string | null
+          line_flavor_id: string | null
+          line_name: string | null
           package_type: string | null
           primary_image: string | null
-          product_description: string | null
+          product_flavor_id: string | null
           product_id: string | null
-          product_name: string | null
+          product_line_id: string | null
           protein: number | null
           protein_types: Json | null
           purchase_url: string | null
           saturated_fat: number | null
           serving_size: number | null
           servings_per_container: number | null
+          size: string | null
+          sku_id: string | null
+          sku_name: string | null
           slug: string | null
           sodium: number | null
           sugar: number | null
-          total_amount: number | null
           trans_fat: number | null
           unsaturated_fat: number | null
           updated_at: string | null
-          variant_id: string | null
-          variant_name: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "products_brand_id_brands_id_fk"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
@@ -595,13 +727,23 @@ export type Database = {
         }[]
       }
       get_product_detail: {
-        Args: { variant_slug_param: string }
+        Args: { sku_id_param: string }
         Returns: {
           brand_info: Json
           is_favorited: boolean
-          product_info: Json
-          related_variants: Json
-          selected_variant: Json
+          product_line_info: Json
+          related_skus: Json
+          selected_sku: Json
+        }[]
+      }
+      get_product_detail_by_slug: {
+        Args: { slug_param: string }
+        Returns: {
+          brand_info: Json
+          is_favorited: boolean
+          product_line_info: Json
+          related_skus: Json
+          selected_sku: Json
         }[]
       }
       get_related_articles_advanced: {
@@ -621,6 +763,7 @@ export type Database = {
       get_user_favorites: {
         Args: Record<PropertyKey, never>
         Returns: {
+          barcode: string
           brand_id: string
           brand_logo_url: string
           brand_name: string
@@ -632,17 +775,21 @@ export type Database = {
           flavor_name: string
           form: string
           is_favorited: boolean
+          line_description: string
+          line_id: string
+          line_name: string
           package_type: string
           primary_image: string
           product_id: string
           product_name: string
           protein: number
-          protein_type: string
+          protein_types: Json
           purchase_url: string
+          size: string
+          sku_id: string
+          sku_name: string
           slug: string
           sugar: number
-          variant_id: string
-          variant_name: string
         }[]
       }
       increment_article_view_count: {
@@ -701,6 +848,7 @@ export type Database = {
           sort_order?: string
         }
         Returns: {
+          barcode: string
           brand_id: string
           brand_logo_url: string
           brand_name: string
@@ -712,6 +860,9 @@ export type Database = {
           flavor_name: string
           form: string
           is_favorited: boolean
+          line_description: string
+          line_id: string
+          line_name: string
           package_type: string
           primary_image: string
           product_id: string
@@ -719,10 +870,11 @@ export type Database = {
           protein: number
           protein_types: Json
           purchase_url: string
+          size: string
+          sku_id: string
+          sku_name: string
           slug: string
           sugar: number
-          variant_id: string
-          variant_name: string
         }[]
       }
     }
@@ -740,7 +892,7 @@ export type Database = {
         | "black_sesame"
         | "milktea"
         | "greentea"
-        | "anilla"
+        | "vanilla"
         | "corn"
         | "other"
       package_type: "bulk" | "pouch" | "stick"
@@ -903,7 +1055,7 @@ export const Constants = {
         "black_sesame",
         "milktea",
         "greentea",
-        "anilla",
+        "vanilla",
         "corn",
         "other",
       ],

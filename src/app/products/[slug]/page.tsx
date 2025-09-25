@@ -21,9 +21,9 @@ export async function generateMetadata({
     };
   }
 
-  const productName = productData.selected_variant.name || productData.product_info.name;
-  const brandName = productData.brand_info.name;
-  const productDescription = productData.product_info.description;
+  const productName = productData.selected_sku?.name || productData.product_line_info?.name;
+  const brandName = productData.brand_info?.name;
+  const productDescription = productData.product_line_info?.description;
 
   // SEO 키워드 생성
   const baseKeywords = [

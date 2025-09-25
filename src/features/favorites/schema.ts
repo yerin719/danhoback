@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { index, pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
-import { productVariants } from "../products/schema";
+import { productSkus } from "../products/schema";
 import { profiles } from "../users/schema";
 
 // ============================================
@@ -14,16 +14,16 @@ export const favorites = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
-    productVariantId: uuid("product_variant_id")
+    productSkuId: uuid("product_sku_id")
       .notNull()
-      .references(() => productVariants.id, { onDelete: "cascade" }),
+      .references(() => productSkus.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => ({
     // 복합 primary key
-    pk: primaryKey({ columns: [table.userId, table.productVariantId] }),
+    pk: primaryKey({ columns: [table.userId, table.productSkuId] }),
     // 인덱스
-    productVariantIdx: index("idx_favorites_product_variant").on(table.productVariantId),
+    productSkuIdx: index("idx_favorites_product_sku").on(table.productSkuId),
     createdIdx: index("idx_favorites_created").on(table.createdAt.desc()),
   }),
 );
@@ -37,9 +37,9 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
     fields: [favorites.userId],
     references: [profiles.id],
   }),
-  productVariant: one(productVariants, {
-    fields: [favorites.productVariantId],
-    references: [productVariants.id],
+  productSku: one(productSkus, {
+    fields: [favorites.productSkuId],
+    references: [productSkus.id],
   }),
 }));
 

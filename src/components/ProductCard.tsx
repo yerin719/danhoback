@@ -10,10 +10,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface Product {
-  variant_id: string;
+  sku_id: string;
   product_id: string;
   product_name: string;
-  variant_name: string;
+  sku_name: string;
   slug: string;
   brand_name: string;
   brand_name_en?: string;
@@ -21,10 +21,10 @@ interface Product {
   brand_id: string;
   primary_image?: string;
   favorites_count: number;
-  is_favorited?: boolean; // SQL 함수에서 받아오는 찜 여부
+  is_favorited?: boolean;
   flavor_name?: string;
   flavor_category?: string;
-  protein_type: string;
+  protein_types?: string[];
   form: string;
   package_type?: string;
   size?: string;
@@ -33,8 +33,6 @@ interface Product {
   protein?: number;
   carbs?: number;
   sugar?: number;
-  fat?: number;
-  sodium?: number;
 }
 
 interface ProductCardProps {
@@ -61,9 +59,15 @@ export default function ProductCard({
       return;
     }
 
+    // sku_id가 없으면 에러 처리
+    if (!product.sku_id) {
+      console.error("Product sku_id is missing:", product);
+      return;
+    }
+
     // 찜 토글 mutation 실행 (현재 상태 전달)
     toggleFavorite.mutate({
-      productVariantId: product.variant_id,
+      productSkuId: product.sku_id,
       currentStatus: !!product.is_favorited,
     });
 
@@ -87,7 +91,7 @@ export default function ProductCard({
           <div className="aspect-square relative mb-4">
             <ProductImage
               src={product.primary_image || "/placeholder.png"}
-              alt={product.variant_name}
+              alt={product.sku_name || product.product_name}
               className="object-cover rounded-lg"
             />
             <Button
@@ -106,7 +110,9 @@ export default function ProductCard({
           </div>
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">{product.brand_name}</p>
-            <h3 className="font-semibold text-sm leading-tight">{product.variant_name}</h3>
+            <h3 className="font-semibold text-sm leading-tight">
+              {product.sku_name || product.product_name}
+            </h3>
           </div>
         </CardHeader>
 
