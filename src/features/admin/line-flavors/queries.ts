@@ -246,7 +246,39 @@ export async function deleteLineFlavor(
 ): Promise<void> {
   const client = supabaseClient || defaultClient;
 
-  // 먼저 nutrition_info 삭제
+  // 1. product_flavors에서 이 line_flavor를 참조하는 항목들 찾기
+  const { data: productFlavors } = await client
+    .from("product_flavors")
+    .select("id")
+    .eq("line_flavor_id", id);
+
+  // 2. 각 product_flavor에 연결된 product_skus 삭제
+  if (productFlavors && productFlavors.length > 0) {
+    for (const pf of productFlavors) {
+      const { error: skuDeleteError } = await client
+        .from("product_skus")
+        .delete()
+        .eq("product_flavor_id", pf.id);
+
+      if (skuDeleteError) {
+        console.error("Error deleting product skus:", skuDeleteError);
+        throw new Error("Failed to delete product skus");
+      }
+    }
+
+    // 3. product_flavors 삭제
+    const { error: productFlavorsError } = await client
+      .from("product_flavors")
+      .delete()
+      .eq("line_flavor_id", id);
+
+    if (productFlavorsError) {
+      console.error("Error deleting product flavors:", productFlavorsError);
+      throw new Error("Failed to delete product flavors");
+    }
+  }
+
+  // 4. nutrition_info 삭제
   const { error: nutritionError } = await client
     .from("nutrition_info")
     .delete()
@@ -257,7 +289,7 @@ export async function deleteLineFlavor(
     throw new Error("Failed to delete nutrition info");
   }
 
-  // line_flavor_protein_types 삭제
+  // 5. line_flavor_protein_types 삭제
   const { error: proteinTypesError } = await client
     .from("line_flavor_protein_types")
     .delete()
@@ -268,12 +300,17 @@ export async function deleteLineFlavor(
     throw new Error("Failed to delete protein types");
   }
 
-  // 마지막으로 line_flavor 삭제
+  // 6. 마지막으로 line_flavor 삭제
   const { error } = await client.from("line_flavors").delete().eq("id", id);
 
   if (error) {
-    console.error("Error deleting line flavor:", error);
-    throw new Error("Failed to delete line flavor");
+    console.error("Error deleting line flavor:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
+    throw new Error(`Failed to delete line flavor: ${error.message}`);
   }
 }
 

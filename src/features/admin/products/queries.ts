@@ -40,25 +40,69 @@ export async function createProduct(
 ): Promise<void> {
   const client = supabaseClient || defaultClient;
 
-  const { data: productData, error: productError } = await client
+  // 기존 product 찾기
+  const { data: existingProducts, error: findError } = await client
     .from("products")
-    .insert({
-      line_id: input.lineId,
-      package_type: input.packageType,
-      size: input.size,
-      servings_per_container: input.servingsPerContainer,
-    })
-    .select()
-    .single();
+    .select("*")
+    .eq("line_id", input.lineId)
+    .eq("package_type", input.packageType);
 
-  if (productError) {
-    console.error("Error creating product:", {
-      message: productError.message,
-      details: productError.details,
-      hint: productError.hint,
-      code: productError.code,
-    });
-    throw new Error(`Failed to create product: ${productError.message}`);
+  if (findError) {
+    console.error("Error finding product:", findError);
+    throw new Error(`Failed to find product: ${findError.message}`);
+  }
+
+  let productData;
+
+  if (existingProducts && existingProducts.length > 0) {
+    // 기존 product 사용 (size, servings_per_container 업데이트)
+    const existingProduct = existingProducts[0];
+    const { data: updatedProducts, error: updateError } = await client
+      .from("products")
+      .update({
+        size: input.size,
+        servings_per_container: input.servingsPerContainer,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existingProduct.id)
+      .select();
+
+    if (updateError) {
+      console.error("Error updating product:", {
+        message: updateError.message,
+        details: updateError.details,
+        hint: updateError.hint,
+        code: updateError.code,
+      });
+      throw new Error(`Failed to update product: ${updateError.message}`);
+    }
+
+    productData =
+      updatedProducts && updatedProducts.length > 0 ? updatedProducts[0] : existingProduct;
+  } else {
+    // 새 product 생성
+    const { data: newProduct, error: productError } = await client
+      .from("products")
+      .insert({
+        line_id: input.lineId,
+        package_type: input.packageType,
+        size: input.size,
+        servings_per_container: input.servingsPerContainer,
+      })
+      .select()
+      .single();
+
+    if (productError) {
+      console.error("Error creating product:", {
+        message: productError.message,
+        details: productError.details,
+        hint: productError.hint,
+        code: productError.code,
+      });
+      throw new Error(`Failed to create product: ${productError.message}`);
+    }
+
+    productData = newProduct;
   }
 
   for (const flavor of input.flavors) {
@@ -165,13 +209,13 @@ export async function getProductSkus(
     throw new Error(`Failed to fetch product SKUs: ${error.message}`);
   }
 
-  return (data || []).map((sku: any) => ({
+  return (data || []).map((sku) => ({
     id: sku.id,
     name: sku.name,
     size: sku.product_flavors?.products?.size || "",
     slug: sku.slug,
     primaryImage: sku.primary_image || undefined,
-    isAvailable: sku.is_available,
+    isAvailable: sku.is_available ?? true,
     brandName: sku.product_flavors?.line_flavors?.product_lines?.brands?.name || "",
     lineName: sku.product_flavors?.line_flavors?.product_lines?.name || "",
     flavorName: sku.product_flavors?.line_flavors?.flavor_name || "",
