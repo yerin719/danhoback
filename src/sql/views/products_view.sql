@@ -14,8 +14,6 @@ SELECT
   ps.barcode,
   ps.slug,
   ps.name AS sku_name,
-  ps.size,
-  ps.servings_per_container,
   ps.primary_image,
   ps.images,
   ps.purchase_url,
@@ -26,9 +24,11 @@ SELECT
   -- Product Flavor 정보
   pf.id AS product_flavor_id,
 
-  -- Product 정보 (패키지 타입)
+  -- Product 정보 (패키지 타입, size, servings)
   p.id AS product_id,
   p.package_type::text AS package_type,
+  p.size,
+  p.servings_per_container,
 
   -- Line Flavor 정보
   lf.id AS line_flavor_id,
@@ -97,11 +97,11 @@ WHERE
   b.is_active = true
   AND ps.is_available = true
 GROUP BY
-  ps.id, ps.barcode, ps.slug, ps.name, ps.size, ps.servings_per_container,
+  ps.id, ps.barcode, ps.slug, ps.name,
   ps.primary_image, ps.images, ps.purchase_url, ps.favorites_count,
   ps.is_available, ps.display_order, ps.created_at, ps.updated_at,
   pf.id,
-  p.id, p.package_type,
+  p.id, p.package_type, p.size, p.servings_per_container,
   lf.id, lf.flavor_category, lf.flavor_name,
   pl.id, pl.name, pl.description, pl.form,
   b.id, b.name, b.name_en, b.logo_url, b.website, b.is_active,

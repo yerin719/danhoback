@@ -202,6 +202,8 @@ export const products = pgTable(
       .references(() => productLines.id)
       .notNull(),
     packageType: packageTypeEnum("package_type").notNull(),
+    size: varchar("size", { length: 50 }),
+    servingsPerContainer: integer("servings_per_container"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -237,7 +239,7 @@ export const productFlavors = pgTable(
   },
 );
 
-// Product SKUs table (최종 판매 단위 - 용량별 SKU)
+// Product SKUs table (최종 판매 단위)
 export const productSkus = pgTable(
   "product_skus",
   {
@@ -246,10 +248,8 @@ export const productSkus = pgTable(
       .references(() => productFlavors.id)
       .notNull(),
     barcode: varchar("barcode", { length: 20 }).unique(),
-    slug: varchar("slug", { length: 255 }).unique().notNull(), // URL 친화적 고유 식별자
-    name: varchar("name", { length: 200 }).notNull(), // "골드 스탠다드 웨이 초콜릿 5LB"
-    size: varchar("size", { length: 50 }).notNull(), // "5LB", "2.27kg", "300g"
-    servingsPerContainer: integer("servings_per_container"),
+    slug: varchar("slug", { length: 255 }).unique().notNull(),
+    name: varchar("name", { length: 200 }).notNull(),
     primaryImage: text("primary_image"),
     images: jsonb("images").$type<string[]>(),
     purchaseUrl: text("purchase_url"),

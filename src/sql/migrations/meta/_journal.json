@@ -190,6 +190,13 @@
       "when": 1758798288824,
       "tag": "0027_dazzling_maelstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1758853718530,
+      "tag": "0028_handy_spot",
+      "breakpoints": true
     }
   ]
 }
