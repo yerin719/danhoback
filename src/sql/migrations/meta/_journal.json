@@ -197,6 +197,13 @@
       "when": 1758853718530,
       "tag": "0028_handy_spot",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1758855688882,
+      "tag": "0029_brave_romulus",
+      "breakpoints": true
     }
   ]
 }

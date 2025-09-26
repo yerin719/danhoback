@@ -366,8 +366,7 @@ BEGIN
                 'id', pt.id,
                 'type', pt.type::text,
                 'name', pt.name,
-                'description', pt.description,
-                'percentage', lfpt.percentage
+                'description', pt.description
               ) ORDER BY pt.type
             )
             FROM public.line_flavor_protein_types lfpt

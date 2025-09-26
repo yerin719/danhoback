@@ -35,7 +35,6 @@ export interface LineFlavor {
     id: string;
     type: string;
     name: string;
-    percentage?: number;
   }>;
 }
 
@@ -61,7 +60,6 @@ export interface CreateLineFlavorInput {
   };
   proteinTypes: Array<{
     proteinTypeId: string;
-    percentage?: number;
   }>;
 }
 
@@ -106,7 +104,6 @@ export async function getLineFlavors(
       ),
       line_flavor_protein_types (
         id,
-        percentage,
         protein_types (
           id,
           type,
@@ -175,7 +172,6 @@ export async function getLineFlavors(
       id: pt.id,
       type: pt.protein_types?.type || "",
       name: pt.protein_types?.name || "",
-      percentage: pt.percentage ? Number(pt.percentage) : undefined,
     })),
   }));
 }
@@ -234,7 +230,6 @@ export async function createLineFlavor(
       input.proteinTypes.map((pt) => ({
         line_flavor_id: flavorData.id,
         protein_type_id: pt.proteinTypeId,
-        percentage: pt.percentage?.toString(),
       })),
     );
 

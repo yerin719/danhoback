@@ -73,8 +73,7 @@ SELECT
         'id', pt.id,
         'type', pt.type::text,
         'name', pt.name,
-        'description', pt.description,
-        'percentage', lfpt.percentage
+        'description', pt.description
       ) ORDER BY pt.type
     ) FILTER (WHERE pt.id IS NOT NULL),
     '[]'::json

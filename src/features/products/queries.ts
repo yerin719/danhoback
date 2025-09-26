@@ -54,7 +54,6 @@ type ProductDetailRow = {
       type: string;
       name: string;
       description?: string;
-      percentage?: number;
     }>;
   };
   product_line_info: {

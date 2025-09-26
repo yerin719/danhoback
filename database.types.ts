@@ -206,21 +206,18 @@ export type Database = {
           created_at: string
           id: string
           line_flavor_id: string
-          percentage: number | null
           protein_type_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           line_flavor_id: string
-          percentage?: number | null
           protein_type_id: string
         }
         Update: {
           created_at?: string
           id?: string
           line_flavor_id?: string
-          percentage?: number | null
           protein_type_id?: string
         }
         Relationships: [
@@ -485,8 +482,6 @@ export type Database = {
           primary_image: string | null
           product_flavor_id: string
           purchase_url: string | null
-          servings_per_container: number | null
-          size: string
           slug: string
           updated_at: string
         }
@@ -502,8 +497,6 @@ export type Database = {
           primary_image?: string | null
           product_flavor_id: string
           purchase_url?: string | null
-          servings_per_container?: number | null
-          size: string
           slug: string
           updated_at?: string
         }
@@ -519,8 +512,6 @@ export type Database = {
           primary_image?: string | null
           product_flavor_id?: string
           purchase_url?: string | null
-          servings_per_container?: number | null
-          size?: string
           slug?: string
           updated_at?: string
         }
@@ -547,6 +538,8 @@ export type Database = {
           id: string
           line_id: string | null
           package_type: Database["public"]["Enums"]["package_type"]
+          servings_per_container: number | null
+          size: string | null
           updated_at: string
         }
         Insert: {
@@ -554,6 +547,8 @@ export type Database = {
           id?: string
           line_id?: string | null
           package_type: Database["public"]["Enums"]["package_type"]
+          servings_per_container?: number | null
+          size?: string | null
           updated_at?: string
         }
         Update: {
@@ -561,6 +556,8 @@ export type Database = {
           id?: string
           line_id?: string | null
           package_type?: Database["public"]["Enums"]["package_type"]
+          servings_per_container?: number | null
+          size?: string | null
           updated_at?: string
         }
         Relationships: [

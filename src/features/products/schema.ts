@@ -9,6 +9,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -174,7 +175,6 @@ export const lineFlavorProteinTypes = pgTable(
     proteinTypeId: uuid("protein_type_id")
       .references(() => proteinTypes.id, { onDelete: "cascade" })
       .notNull(),
-    percentage: decimal("percentage", { precision: 5, scale: 2 }), // 비율 (선택사항)
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => {
@@ -211,7 +211,7 @@ export const products = pgTable(
     return {
       lineIdx: index("idx_products_line").on(table.lineId),
       packageTypeIdx: index("idx_products_package_type").on(table.packageType),
-      uniqueLinePackage: index("unique_line_package").on(table.lineId, table.packageType),
+      uniqueLinePackage: uniqueIndex("unique_line_package").on(table.lineId, table.packageType),
     };
   },
 );

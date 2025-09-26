@@ -30,7 +30,6 @@ interface ProductInfoProps {
       type: string;
       name: string;
       description?: string;
-      percentage?: number;
     }>;
   };
 }
@@ -63,7 +62,6 @@ export default function ProductInfo({ productLineInfo, brandInfo, selectedSku }:
           {selectedSku.protein_types?.map((proteinType) => (
             <Badge key={proteinType.id} variant="outline" className="text-sm">
               {proteinType.name}
-              {proteinType.percentage && ` ${proteinType.percentage}%`}
             </Badge>
           ))}
 

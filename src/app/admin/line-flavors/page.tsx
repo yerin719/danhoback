@@ -128,7 +128,6 @@ export default function LineFlavorsPage() {
         },
         proteinTypes: formData.selectedProteinTypes.map((id) => ({
           proteinTypeId: id,
-          percentage: undefined,
         })),
       });
 
