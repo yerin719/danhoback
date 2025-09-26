@@ -18,12 +18,12 @@ export interface ProductSku {
 export interface CreateProductInput {
   lineId: string;
   packageType: "bulk" | "pouch" | "stick";
+  size: string;
+  servingsPerContainer?: number;
   flavors: Array<{
     lineFlavorId: string;
     skus: Array<{
       name: string;
-      size: string;
-      servingsPerContainer?: number;
       barcode?: string;
       slug: string;
       primaryImage?: string;
@@ -45,6 +45,8 @@ export async function createProduct(
     .insert({
       line_id: input.lineId,
       package_type: input.packageType,
+      size: input.size,
+      servings_per_container: input.servingsPerContainer,
     })
     .select()
     .single();
@@ -79,8 +81,6 @@ export async function createProduct(
         flavor.skus.map((sku) => ({
           product_flavor_id: productFlavorData.id,
           name: sku.name,
-          size: sku.size,
-          servings_per_container: sku.servingsPerContainer,
           barcode: sku.barcode,
           slug: sku.slug,
           primary_image: sku.primaryImage,
@@ -133,7 +133,6 @@ export async function getProductSkus(
       `
       id,
       name,
-      size,
       slug,
       primary_image,
       is_available,
@@ -148,7 +147,8 @@ export async function getProductSkus(
           )
         ),
         products (
-          package_type
+          package_type,
+          size
         )
       )
     `,
@@ -156,14 +156,19 @@ export async function getProductSkus(
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching product SKUs:", error);
-    throw new Error("Failed to fetch product SKUs");
+    console.error("Error fetching product SKUs:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
+    throw new Error(`Failed to fetch product SKUs: ${error.message}`);
   }
 
   return (data || []).map((sku: any) => ({
     id: sku.id,
     name: sku.name,
-    size: sku.size,
+    size: sku.product_flavors?.products?.size || "",
     slug: sku.slug,
     primaryImage: sku.primary_image || undefined,
     isAvailable: sku.is_available,

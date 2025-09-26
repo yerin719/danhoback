@@ -326,8 +326,8 @@ BEGIN
         'id', ps.id,
         'name', ps.name,
         'barcode', ps.barcode,
-        'size', ps.size,
-        'servings_per_container', ps.servings_per_container,
+        'size', p.size,
+        'servings_per_container', p.servings_per_container,
         'primary_image', ps.primary_image,
         'images', ps.images,
         'purchase_url', ps.purchase_url,
@@ -409,7 +409,7 @@ BEGIN
           jsonb_build_object(
             'id', other_ps.id,
             'name', other_ps.name,
-            'size', other_ps.size,
+            'size', other_p.size,
             'primary_image', other_ps.primary_image,
             'flavor', jsonb_build_object(
               'category', other_lf.flavor_category::text,
@@ -419,6 +419,7 @@ BEGIN
         )
         FROM public.product_skus other_ps
         INNER JOIN public.product_flavors other_pf ON other_pf.id = other_ps.product_flavor_id
+        INNER JOIN public.products other_p ON other_p.id = other_pf.product_id
         INNER JOIN public.line_flavors other_lf ON other_lf.id = other_pf.line_flavor_id
         WHERE other_pf.product_id = target_product_id
           AND other_ps.id != sku_id_param

@@ -66,7 +66,6 @@ export default function AdminProductsPage() {
               <TableHead>제품 라인</TableHead>
               <TableHead>맛</TableHead>
               <TableHead>패키지</TableHead>
-              <TableHead>용량</TableHead>
               <TableHead>상태</TableHead>
               <TableHead className="w-[150px]">작업</TableHead>
             </TableRow>
@@ -74,13 +73,13 @@ export default function AdminProductsPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   로딩 중...
                 </TableCell>
               </TableRow>
             ) : products?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   등록된 상품이 없습니다
                 </TableCell>
               </TableRow>
@@ -91,7 +90,6 @@ export default function AdminProductsPage() {
                   <TableCell>{product.lineName}</TableCell>
                   <TableCell className="font-medium">{product.flavorName}</TableCell>
                   <TableCell>{packageTypeLabels[product.packageType] || product.packageType}</TableCell>
-                  <TableCell>{product.size}</TableCell>
                   <TableCell>
                     <Badge variant={product.isAvailable ? "default" : "secondary"}>
                       {product.isAvailable ? "활성" : "비활성"}

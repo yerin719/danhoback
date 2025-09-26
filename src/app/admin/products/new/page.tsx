@@ -24,8 +24,6 @@ import { useState } from "react";
 
 interface SkuData {
   name: string;
-  size: string;
-  servingsPerContainer: string;
   barcode: string;
   slug: string;
   primaryImage: string;
@@ -45,13 +43,15 @@ export default function NewProductPage() {
   const [formData, setFormData] = useState({
     lineId: "",
     packageType: "bulk" as "bulk" | "pouch" | "stick",
+    size: "",
+    servingsPerContainer: "",
     selectedFlavorIds: [] as string[],
     skusByFlavor: {} as Record<string, SkuData[]>,
   });
 
   const handleLineChange = (lineId: string) => {
     setSelectedLineId(lineId);
-    setFormData({ ...formData, lineId, selectedFlavorIds: [], skusByFlavor: {} });
+    setFormData({ ...formData, lineId, size: "", servingsPerContainer: "", selectedFlavorIds: [], skusByFlavor: {} });
   };
 
   const toggleFlavor = (flavorId: string) => {
@@ -66,8 +66,6 @@ export default function NewProductPage() {
       newSkusByFlavor[flavorId] = [
         {
           name: "",
-          size: "",
-          servingsPerContainer: "",
           barcode: "",
           slug: "",
           primaryImage: "",
@@ -94,8 +92,6 @@ export default function NewProductPage() {
           ...(formData.skusByFlavor[flavorId] || []),
           {
             name: "",
-            size: "",
-            servingsPerContainer: "",
             barcode: "",
             slug: "",
             primaryImage: "",
@@ -138,12 +134,12 @@ export default function NewProductPage() {
       await createMutation.mutateAsync({
         lineId: formData.lineId,
         packageType: formData.packageType,
+        size: formData.size,
+        servingsPerContainer: formData.servingsPerContainer ? Number(formData.servingsPerContainer) : undefined,
         flavors: formData.selectedFlavorIds.map((flavorId) => ({
           lineFlavorId: flavorId,
           skus: (formData.skusByFlavor[flavorId] || []).map((sku) => ({
             name: sku.name,
-            size: sku.size,
-            servingsPerContainer: sku.servingsPerContainer ? Number(sku.servingsPerContainer) : undefined,
             barcode: sku.barcode || undefined,
             slug: sku.slug,
             primaryImage: sku.primaryImage || undefined,
@@ -214,6 +210,24 @@ export default function NewProductPage() {
                   <SelectItem value="stick">스틱</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label>용량/사이즈 *</Label>
+              <Input
+                value={formData.size}
+                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                placeholder="예: 5LB, 2.27kg"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>회분 수</Label>
+              <Input
+                type="number"
+                value={formData.servingsPerContainer}
+                onChange={(e) => setFormData({ ...formData, servingsPerContainer: e.target.value })}
+                onWheel={(e) => e.currentTarget.blur()}
+                placeholder="예: 73"
+              />
             </div>
             <Button onClick={() => setStep(2)} disabled={!canProceedToStep2}>
               다음 단계
@@ -291,30 +305,12 @@ export default function NewProductPage() {
                           )}
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="grid gap-2">
+                          <div className="grid gap-2 col-span-2">
                             <Label>SKU 이름 *</Label>
                             <Input
                               value={sku.name}
                               onChange={(e) => updateSku(flavorId, index, "name", e.target.value)}
                               placeholder="예: 골드 스탠다드 웨이 초콜릿 5LB"
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <Label>용량/사이즈 *</Label>
-                            <Input
-                              value={sku.size}
-                              onChange={(e) => updateSku(flavorId, index, "size", e.target.value)}
-                              placeholder="예: 5LB, 2.27kg"
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <Label>회분 수</Label>
-                            <Input
-                              type="number"
-                              value={sku.servingsPerContainer}
-                              onChange={(e) =>
-                                updateSku(flavorId, index, "servingsPerContainer", e.target.value)
-                              }
                             />
                           </div>
                           <div className="grid gap-2">
