@@ -26,11 +26,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithKakao } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -327,5 +327,44 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-semibold text-center">
+              <Link href="/" className="flex items-center justify-center mb-2">
+                <Image
+                  src="/images/logo.png"
+                  alt="단호박"
+                  width={80}
+                  height={40}
+                  className="object-cover w-20 h-10"
+                />
+              </Link>
+              <Link href="/" className="text-primary">
+                단호박에 오신것을 환영합니다
+              </Link>
+            </CardTitle>
+            <CardDescription className="text-center">단백질 정보 비교는 단호박으로</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Input type="email" placeholder="example@email.com" disabled />
+              <Input type="password" placeholder="••••••••" disabled />
+              <Button className="w-full" disabled>
+                로그인
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

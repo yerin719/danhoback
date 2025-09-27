@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Settings, Trash2, Upload, User } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -45,7 +45,7 @@ const profileFormSchema = z.object({
     .regex(/^[a-zA-Z0-9가-힣_-]+$/, "한글, 영문, 숫자, _, - 만 사용 가능합니다"),
 });
 
-export default function ProfilePageContent() {
+function ProfilePageContentInternal() {
   const { user, profile, avatarInitial, refreshProfile, deleteAccount, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -595,5 +595,44 @@ export default function ProfilePageContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePageContent() {
+  return (
+    <Suspense fallback={
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-semibold mb-8">프로필 설정</h1>
+        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <Card className="h-fit">
+            <CardContent className="px-6">
+              <nav className="space-y-2">
+                <div className="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg bg-primary text-primary-foreground">
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">프로필 정보</span>
+                </div>
+                <div className="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg hover:bg-muted">
+                  <Settings className="h-5 w-5" />
+                  <span className="font-medium">계정 관리</span>
+                </div>
+              </nav>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="space-y-6">
+              <div className="animate-pulse">
+                <div className="h-24 w-24 bg-muted rounded-full"></div>
+                <div className="mt-4 space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <ProfilePageContentInternal />
+    </Suspense>
   );
 }

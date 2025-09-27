@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 interface SearchInputProps {
   className?: string;
   placeholder?: string;
 }
 
-export default function SearchInput({
+function SearchInputContent({
   className,
   placeholder = "제품명, 브랜드명 검색",
 }: SearchInputProps) {
@@ -89,5 +89,31 @@ export default function SearchInput({
         <Search className="h-4 w-4" />
       </Button>
     </div>
+  );
+}
+
+export default function SearchInput(props: SearchInputProps) {
+  return (
+    <Suspense fallback={
+      <div className={cn("relative", props.className)}>
+        <Input
+          type="text"
+          placeholder={props.placeholder || "제품명, 브랜드명 검색"}
+          disabled
+          className="w-full pr-12"
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          disabled
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+        >
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+    }>
+      <SearchInputContent {...props} />
+    </Suspense>
   );
 }

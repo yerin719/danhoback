@@ -29,11 +29,11 @@ import { AlertCircle, ArrowLeft, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const { resetPasswordForEmail } = useAuth();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -199,5 +199,58 @@ export default function ResetPasswordPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-semibold text-center">
+              <Link href="/" className="flex items-center justify-center mb-2">
+                <Image
+                  src="/images/logo.png"
+                  alt="단호박"
+                  width={80}
+                  height={40}
+                  className="object-cover w-20 h-10"
+                />
+              </Link>
+              비밀번호 재설정
+            </CardTitle>
+            <CardDescription className="text-center">
+              가입하신 이메일 주소를 입력해주세요
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">이메일</label>
+                <Input
+                  type="email"
+                  placeholder="example@email.com"
+                  disabled
+                />
+              </div>
+              <Button className="w-full" disabled>
+                비밀번호 재설정 이메일 보내기
+              </Button>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Link href="/auth/login" className="w-full">
+              <Button variant="ghost" className="w-full">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                로그인 페이지로 돌아가기
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

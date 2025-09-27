@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { ARTICLE_CATEGORIES } from "@/features/articles/constants";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 
-export default function CategoryFilter() {
+function CategoryFilterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "all";
@@ -43,5 +43,24 @@ export default function CategoryFilter() {
         </Button>
       ))}
     </div>
+  );
+}
+
+export default function CategoryFilter() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-wrap gap-3">
+        <Button variant="default" size="sm">
+          전체
+        </Button>
+        {Object.entries(ARTICLE_CATEGORIES).map(([key, label]) => (
+          <Button key={key} variant="outline" size="sm">
+            {label}
+          </Button>
+        ))}
+      </div>
+    }>
+      <CategoryFilterContent />
+    </Suspense>
   );
 }
