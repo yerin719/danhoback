@@ -11,6 +11,7 @@ import {
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 import Autoplay from "embla-carousel-autoplay";
+import { type UseEmblaCarouselType } from "embla-carousel-react";
 import Image from "next/image";
 import { useCallback, useRef, useState, useEffect } from "react";
 import {
@@ -52,7 +53,7 @@ export default function CarouselAdBanner({
 
   const plugin = useRef(Autoplay({ delay: interval, stopOnInteraction: true }));
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [carouselApi, setCarouselApi] = useState<UseEmblaCarouselType[1] | null>(null);
 
   // Filter only active campaigns
   const activeCampaigns = campaigns.filter((campaign) => campaign.isActive);

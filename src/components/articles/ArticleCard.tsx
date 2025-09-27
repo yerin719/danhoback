@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { getCategoryDisplayName } from "@/features/articles/constants";
+import { getCategoryDisplayName, type ArticleCategory } from "@/features/articles/constants";
 import Link from "next/link";
 import ArticleImage from "./ArticleImage";
 
@@ -24,7 +24,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <ArticleImage
             src={article.featured_image || ""}
             alt={article.title}
-            category={getCategoryDisplayName(article.category as any)}
+            category={getCategoryDisplayName(article.category as ArticleCategory)}
             iconSize="lg"
             className="object-cover"
           />
@@ -44,7 +44,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 
             {/* 카테고리 */}
             <div className="text-xs text-muted-foreground">
-              {getCategoryDisplayName(article.category as any)}
+              {getCategoryDisplayName(article.category as ArticleCategory)}
             </div>
           </div>
         </CardContent>
