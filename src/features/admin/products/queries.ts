@@ -40,12 +40,14 @@ export async function createProduct(
 ): Promise<void> {
   const client = supabaseClient || defaultClient;
 
-  // 기존 product 찾기
+  // 기존 product 찾기 (4개 컬럼 조합으로 검색)
   const { data: existingProducts, error: findError } = await client
     .from("products")
     .select("*")
     .eq("line_id", input.lineId)
-    .eq("package_type", input.packageType);
+    .eq("package_type", input.packageType)
+    .eq("size", input.size)
+    .eq("servings_per_container", input.servingsPerContainer);
 
   if (findError) {
     console.error("Error finding product:", findError);
@@ -55,30 +57,8 @@ export async function createProduct(
   let productData;
 
   if (existingProducts && existingProducts.length > 0) {
-    // 기존 product 사용 (size, servings_per_container 업데이트)
-    const existingProduct = existingProducts[0];
-    const { data: updatedProducts, error: updateError } = await client
-      .from("products")
-      .update({
-        size: input.size,
-        servings_per_container: input.servingsPerContainer,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", existingProduct.id)
-      .select();
-
-    if (updateError) {
-      console.error("Error updating product:", {
-        message: updateError.message,
-        details: updateError.details,
-        hint: updateError.hint,
-        code: updateError.code,
-      });
-      throw new Error(`Failed to update product: ${updateError.message}`);
-    }
-
-    productData =
-      updatedProducts && updatedProducts.length > 0 ? updatedProducts[0] : existingProduct;
+    // 기존 product 사용 (이미 동일한 조합이 존재)
+    productData = existingProducts[0];
   } else {
     // 새 product 생성
     const { data: newProduct, error: productError } = await client

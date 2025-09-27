@@ -211,7 +211,12 @@ export const products = pgTable(
     return {
       lineIdx: index("idx_products_line").on(table.lineId),
       packageTypeIdx: index("idx_products_package_type").on(table.packageType),
-      uniqueLinePackage: uniqueIndex("unique_line_package").on(table.lineId, table.packageType),
+      uniqueLinePackageSizeServings: uniqueIndex("unique_line_package_size_servings").on(
+        table.lineId,
+        table.packageType,
+        table.size,
+        table.servingsPerContainer
+      ),
     };
   },
 );
