@@ -2,6 +2,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import Navigation from "@/components/Navigation";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "sonner";
 import "./(styles)/globals.css";
 import Providers from "./providers";
@@ -27,6 +28,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className={notoSansKr.variable}>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZFTS1H98RV"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-ZFTS1H98RV');
+          `}
+        </Script>
+
         <Providers>
           <Navigation />
           <main className="pt-16 pb-16 md:pb-0">{children}</main>
