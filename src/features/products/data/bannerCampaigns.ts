@@ -29,10 +29,9 @@ export const productPageBannerCampaigns = [
   },
   {
     id: "minimal-banner",
-    title: "단호박 출시 기넘 이벤트",
-    subtitle: "빠진 정보를 찾아라!",
-    description:
-      "혹시 내가 알고있는 제품이 없다!?\n정보 등록/수정요청을 하신 회원님들꼐 추첨을 통해 스타벅스 아이스아메리카노를 제공해드립니다!",
+    title: "빠진 정보를 찾아라!",
+    subtitle:
+      "정보 등록/수정요청을 하신 회원님들께\n추첨을 통해 스타벅스 아이스아메리카노를 제공해드립니다!",
     textColor: "#FFFFFF",
     gradientBackground: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
     startDate: new Date(),

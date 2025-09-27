@@ -53,12 +53,12 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
-          <div className="lg:col-span-2">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
+          <div className="md:col-span-2">
             <Skeleton className="aspect-square w-full" />
           </div>
-          <div className="lg:col-span-3 space-y-8">
+          <div className="md:col-span-3 space-y-8">
             <div className="space-y-4">
               <Skeleton className="h-12 w-32" />
               <Skeleton className="h-8 w-full" />
@@ -114,17 +114,25 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     return <div>제품 정보를 찾을 수 없습니다.</div>;
   }
 
-  // 이미지 배열 준비
+  // 이미지 배열 준비 - primary와 추가 이미지 머지
   const images: string[] = (() => {
-    // selectedVariant.images가 이미 string[] 타입
-    const variantImages = selectedVariant?.images;
+    const allImages: string[] = [];
 
-    if (Array.isArray(variantImages)) {
-      return variantImages.filter((img): img is string => typeof img === "string");
+    // primary_image 먼저 추가
+    if (selectedVariant?.primary_image) {
+      allImages.push(selectedVariant.primary_image);
     }
 
-    // images가 없으면 primary_image 사용
-    return selectedVariant?.primary_image ? [selectedVariant.primary_image] : [];
+    // 추가 이미지들 추가 (primary_image와 중복되지 않도록)
+    if (Array.isArray(selectedVariant?.images)) {
+      selectedVariant.images.forEach((img) => {
+        if (typeof img === "string" && !allImages.includes(img)) {
+          allImages.push(img);
+        }
+      });
+    }
+
+    return allImages;
   })();
 
   const handlePurchase = () => {
@@ -134,16 +142,16 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <ProductImageGallery
             images={images}
             alt={selectedVariant?.name || productInfo?.name || ""}
           />
         </div>
-        <div className="lg:col-span-3 space-y-8">
+        <div className="md:col-span-3 space-y-8">
           {/* 오른쪽: 제품 정보 */}
           {/* 제품 기본 정보 */}
           <ProductInfo

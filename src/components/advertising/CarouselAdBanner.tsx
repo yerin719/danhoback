@@ -121,7 +121,7 @@ export default function CarouselAdBanner({
             )}
 
             {campaign.subtitle && (
-              <h3 className={cn("mb-2", isMobile ? "text-base" : "text-lg lg:text-xl")}>
+              <h3 className={cn("mb-2 whitespace-pre-line", isMobile ? "text-base" : "text-lg lg:text-xl")}>
                 {campaign.subtitle}
               </h3>
             )}
