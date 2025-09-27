@@ -30,7 +30,7 @@ export default function RelatedArticles({ articles, latestArticles }: RelatedArt
       {/* 관련 글 섹션 */}
       {articles.length > 0 && (
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-8">관련 글</h2>
+          <h2 className="text-2xl font-semibold mb-8">관련 글</h2>
 
           {/* 모바일: 세로 레이아웃 (기존 ArticleCard 사용) */}
           <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -50,7 +50,7 @@ export default function RelatedArticles({ articles, latestArticles }: RelatedArt
 
       {/* 최신글 섹션 */}
       <div>
-        <h2 className="text-2xl font-bold mb-8">최신글</h2>
+        <h2 className="text-2xl font-semibold mb-8">최신글</h2>
 
         {/* 모바일: 세로 레이아웃 */}
         <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-6">

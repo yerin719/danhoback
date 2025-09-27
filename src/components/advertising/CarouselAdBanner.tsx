@@ -114,7 +114,7 @@ export default function CarouselAdBanner({
           >
             {/* Text content */}
             {campaign.title && (
-              <h2 className={cn("font-bold mb-2", isMobile ? "text-xl" : "text-2xl lg:text-3xl")}>
+              <h2 className={cn("font-semibold mb-2", isMobile ? "text-xl" : "text-2xl lg:text-3xl")}>
                 {campaign.title}
               </h2>
             )}
@@ -126,7 +126,7 @@ export default function CarouselAdBanner({
             )}
 
             {campaign.description && (
-              <p className={cn("mb-4 opacity-90", isMobile ? "text-sm" : "text-base")}>
+              <p className={cn("mb-4 opacity-90 whitespace-pre-line", isMobile ? "text-sm" : "text-base")}>
                 {campaign.description}
               </p>
             )}

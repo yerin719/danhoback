@@ -111,7 +111,7 @@ export default function ProductsClient({
             onClick={() => handleSortChange("favorites_count", "desc")}
             className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "favorites_count" && sortOrder === "desc"
-                ? "font-bold text-black"
+                ? "font-semibold text-black"
                 : "text-gray-500"
             }`}
           >
@@ -124,7 +124,7 @@ export default function ProductsClient({
             onClick={() => handleSortChange("protein", "desc")}
             className={`px-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "protein" && sortOrder === "desc"
-                ? "font-bold text-black"
+                ? "font-semibold text-black"
                 : "text-gray-500"
             }`}
           >
@@ -136,7 +136,7 @@ export default function ProductsClient({
             size="sm"
             onClick={() => handleSortChange("protein", "asc")}
             className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-              sortBy === "protein" && sortOrder === "asc" ? "font-bold text-black" : "text-gray-500"
+              sortBy === "protein" && sortOrder === "asc" ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             낮은 단백질순
@@ -148,7 +148,7 @@ export default function ProductsClient({
             onClick={() => handleSortChange("calories", "asc")}
             className={`px-2 hover:bg-transparent hover:cursor-pointer ${
               sortBy === "calories" && sortOrder === "asc"
-                ? "font-bold text-black"
+                ? "font-semibold text-black"
                 : "text-gray-500"
             }`}
           >

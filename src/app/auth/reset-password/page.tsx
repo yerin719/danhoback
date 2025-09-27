@@ -98,7 +98,7 @@ export default function ResetPasswordPage() {
                 <Mail className="w-8 h-8 text-primary" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">이메일을 확인해주세요</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-center">이메일을 확인해주세요</CardTitle>
             <CardDescription className="text-center">
               비밀번호 재설정 링크를 이메일로 보내드렸습니다
             </CardDescription>
@@ -136,7 +136,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
+          <CardTitle className="text-2xl font-semibold text-center">
             <Link href="/" className="flex items-center justify-center mb-2">
               <Image
                 src="/images/logo.png"

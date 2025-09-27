@@ -36,7 +36,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
           <div className="p-8 flex flex-col justify-center">
             <div className="space-y-4">
               {/* 제목 */}
-              <h2 className="text-2xl md:text-3xl font-bold leading-tight hover:text-primary transition-colors">
+              <h2 className="text-2xl md:text-3xl font-semibold leading-tight hover:text-primary transition-colors">
                 {article.title}
               </h2>
 

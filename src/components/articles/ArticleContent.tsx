@@ -10,7 +10,7 @@ function parseMarkdown(content: string): string {
     // 헤딩
     .replace(/^### (.*$)/gm, '<h3 class="text-xl font-semibold mt-6 mb-3">$1</h3>')
     .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mt-8 mb-4 first:mt-0">$1</h2>')
-    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mt-8 mb-4 first:mt-0">$1</h1>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-semibold mt-8 mb-4 first:mt-0">$1</h1>')
     
     // 볼드, 이탤릭
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900 dark:text-gray-100">$1</strong>')

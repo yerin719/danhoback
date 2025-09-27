@@ -47,13 +47,13 @@ export default function RangeFilterPopover({
         <div className={isMobile ? "space-y-4" : "space-y-3"}>
           {/* 설명 텍스트 */}
           <div className="text-center">
-            <span className={`text-black font-bold ${isMobile ? "text-lg" : "text-sm"}`}>
+            <span className={`text-black font-semibold ${isMobile ? "text-lg" : "text-sm"}`}>
               {label}을 설정해주세요.
             </span>
           </div>
 
           <div className="flex justify-center items-center">
-            <span className={`text-black font-bold ${isMobile ? "text-3xl" : "text-2xl"}`}>
+            <span className={`text-black font-semibold ${isMobile ? "text-3xl" : "text-2xl"}`}>
               <span className="text-yellow-500">{tempValue[0]}</span>
               {unit} ~ <span className="text-yellow-500">{tempValue[1]}</span>
               {unit}
@@ -80,14 +80,14 @@ export default function RangeFilterPopover({
             variant="outline"
             size={isMobile ? "default" : "sm"}
             onClick={handleReset}
-            className={isMobile ? "h-12 flex-1 font-bold" : "h-12 flex-1 font-bold"}
+            className={isMobile ? "h-12 flex-1 font-semibold" : "h-12 flex-1 font-semibold"}
           >
             초기화
           </Button>
           <Button
             size={isMobile ? "default" : "sm"}
             onClick={handleApply}
-            className={isMobile ? "h-12 flex-[2] font-bold" : "h-12 flex-[2] font-bold"}
+            className={isMobile ? "h-12 flex-[2] font-semibold" : "h-12 flex-[2] font-semibold"}
           >
             상품보기
           </Button>

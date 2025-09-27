@@ -78,7 +78,7 @@ export default function CommunityPage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold">커뮤니티</h1>
+          <h1 className="text-3xl font-semibold">커뮤니티</h1>
           <p className="text-muted-foreground mt-1">단백질 생활의 모든 이야기를 나누어보세요</p>
         </div>
         <Link href="/community/write">

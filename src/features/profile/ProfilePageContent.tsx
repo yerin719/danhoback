@@ -271,7 +271,7 @@ export default function ProfilePageContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-8">프로필 설정</h1>
+      <h1 className="text-3xl font-semibold mb-8">프로필 설정</h1>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         {/* 좌측 사이드바 - 메뉴 */}

@@ -102,7 +102,7 @@ export default function ResetPasswordConfirmPage() {
                 <CheckCircle className="w-8 h-8 text-green-500" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-2xl font-semibold text-center">
               비밀번호 변경 완료
             </CardTitle>
             <CardDescription className="text-center">
@@ -130,7 +130,7 @@ export default function ResetPasswordConfirmPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
+          <CardTitle className="text-2xl font-semibold text-center">
             <Link href="/" className="flex items-center justify-center mb-2">
               <Image
                 src="/images/logo.png"

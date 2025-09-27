@@ -85,7 +85,7 @@ export default function NewArticlePage() {
             value={formData.title}
             onChange={(e) => handleInputChange("title", e.target.value)}
             placeholder="글 제목을 입력하세요..."
-            className="!text-3xl md:!text-3xl font-bold border-0 border-b-2 border-border rounded-none px-0 py-8 focus-visible:ring-0 focus-visible:border-primary"
+            className="!text-3xl md:!text-3xl font-semibold border-0 border-b-2 border-border rounded-none px-0 py-8 focus-visible:ring-0 focus-visible:border-primary"
             style={{ fontSize: "1.875rem" }}
           />
 

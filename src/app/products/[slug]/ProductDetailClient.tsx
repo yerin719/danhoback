@@ -94,7 +94,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     hasSelectedSku: !!productData?.selected_sku,
     hasProductLineInfo: !!productData?.product_line_info,
     hasBrandInfo: !!productData?.brand_info,
-    productDataKeys: productData ? Object.keys(productData) : []
+    productDataKeys: productData ? Object.keys(productData) : [],
   });
 
   const selectedVariant = productData?.selected_sku;
@@ -106,7 +106,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     selectedVariant,
     productInfo,
     brandInfo,
-    relatedVariants
+    relatedVariants,
   });
 
   if (!selectedVariant) {
@@ -138,7 +138,10 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
         <div className="lg:col-span-2">
-          <ProductImageGallery images={images} alt={selectedVariant?.name || productInfo?.name || ""} />
+          <ProductImageGallery
+            images={images}
+            alt={selectedVariant?.name || productInfo?.name || ""}
+          />
         </div>
         <div className="lg:col-span-3 space-y-8">
           {/* 오른쪽: 제품 정보 */}
@@ -184,7 +187,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 size="lg"
               >
                 <ExternalLink className="h-6 w-6" />
-                <span>구매하기</span>
+                <span>최저가 확인하러 가기</span>
               </Button>
             )}
           </div>

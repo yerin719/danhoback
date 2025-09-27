@@ -106,7 +106,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
                 />
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-6">{article.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-6">{article.title}</h1>
 
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 {article.summary || ""}

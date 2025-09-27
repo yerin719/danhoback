@@ -49,7 +49,7 @@ export default function AdminProductsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">상품 목록</h1>
+        <h1 className="text-3xl font-semibold">상품 목록</h1>
         <Link href="/admin/products/new">
           <Button>
             <Plus className="w-4 h-4 mr-2" />

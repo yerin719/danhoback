@@ -65,7 +65,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
             <Badge variant="secondary" className="mb-2">
               {post.category}
             </Badge>
-            <h1 className="text-xl sm:text-2xl font-bold mb-4 leading-tight">{post.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold mb-4 leading-tight">{post.title}</h1>
             
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">

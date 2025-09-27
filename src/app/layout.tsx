@@ -1,9 +1,16 @@
 import MobileBottomNav from "@/components/MobileBottomNav";
 import Navigation from "@/components/Navigation";
 import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import { Toaster } from "sonner";
 import "./(styles)/globals.css";
 import Providers from "./providers";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-sans-kr",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +26,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>
+      <body className={notoSansKr.variable}>
         <Providers>
           <Navigation />
           <main className="pt-16 pb-16 md:pb-0">{children}</main>

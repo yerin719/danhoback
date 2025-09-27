@@ -165,7 +165,7 @@ export default function NewProductPage() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           뒤로가기
         </Button>
-        <h1 className="text-3xl font-bold">상품 등록</h1>
+        <h1 className="text-3xl font-semibold">상품 등록</h1>
         <p className="text-muted-foreground mt-2">
           제품 라인과 맛을 선택하여 상품을 등록합니다.
         </p>

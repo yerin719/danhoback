@@ -21,7 +21,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         <div className="flex-1">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
+              <h1 className="text-2xl font-semibold mb-1">{user.name}</h1>
               <p className="text-muted-foreground">{user.email}</p>
             </div>
           </div>

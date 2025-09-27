@@ -171,7 +171,7 @@ export default function LineFlavorsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">제품 라인 맛 관리</h1>
+        <h1 className="text-3xl font-semibold">제품 라인 맛 관리</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>

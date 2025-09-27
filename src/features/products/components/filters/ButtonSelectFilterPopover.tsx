@@ -86,7 +86,7 @@ export default function ButtonSelectFilterPopover({
               variant="ghost"
               onClick={() => handleToggle(option.code)}
               className={cn(
-                "h-[45px] w-full min-w-[140px] justify-center font-bold transition-all border-0 hover:bg-current",
+                "h-[45px] w-full min-w-[140px] justify-center font-semibold transition-all border-0 hover:bg-current",
                 option.label.length > 12 ? "text-sm" : "text-base",
                 tempValues.includes(option.code)
                   ? "bg-primary text-primary-foreground hover:bg-primary"
@@ -142,14 +142,14 @@ export default function ButtonSelectFilterPopover({
             variant="outline"
             size={isMobile ? "default" : "sm"}
             onClick={handleClearAll}
-            className={isMobile ? "h-12 flex-1 font-bold" : "h-12 flex-1 font-bold"}
+            className={isMobile ? "h-12 flex-1 font-semibold" : "h-12 flex-1 font-semibold"}
           >
             초기화
           </Button>
           <Button
             size={isMobile ? "default" : "sm"}
             onClick={handleApply}
-            className={isMobile ? "h-12 flex-[2] font-bold" : "h-12 flex-[2] font-bold"}
+            className={isMobile ? "h-12 flex-[2] font-semibold" : "h-12 flex-[2] font-semibold"}
           >
             상품보기
           </Button>

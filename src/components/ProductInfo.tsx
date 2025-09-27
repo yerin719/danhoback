@@ -53,7 +53,7 @@ export default function ProductInfo({ productLineInfo, brandInfo, selectedSku }:
 
       {/* 제품명 */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3">
+        <h1 className="text-2xl md:text-3xl font-semibold leading-tight mb-3">
           {selectedSku.name || productLineInfo.name}
         </h1>
         {/* 칩들 */}
