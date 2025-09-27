@@ -29,7 +29,7 @@ export type ArticleStatus = keyof typeof ARTICLE_STATUS;
 // HELPER FUNCTIONS
 // ============================================
 
-export function getCategoryDisplayName(category: ArticleCategory | null | undefined): string {
+export function getCategoryDisplayName(category: ArticleCategory | null | undefined) {
   if (!category) return "미분류";
   return ARTICLE_CATEGORIES[category] || category;
 }

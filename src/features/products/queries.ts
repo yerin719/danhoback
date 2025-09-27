@@ -12,9 +12,13 @@ export type ProductSearchResult =
     slug: string; // slug 필드 추가
   };
 
-// Database 기반으로 Json을 구체적인 타입으로 변환
-// 새로운 테이블 구조에 맞게 타입 정의
-type ProductDetailRow = {
+// RPC 함수의 반환 타입을 기반으로 Json 타입을 구체화
+type RpcProductDetail = Database["public"]["Functions"]["get_product_detail_by_slug"]["Returns"][0];
+
+export type ProductDetailRow = Omit<
+  RpcProductDetail,
+  "selected_sku" | "product_line_info" | "brand_info" | "related_skus"
+> & {
   selected_sku: {
     id: string;
     name: string;
@@ -28,10 +32,10 @@ type ProductDetailRow = {
     favorites_count: number;
     is_available: boolean;
     flavor?: {
-      category: string;
+      category: Database["public"]["Enums"]["flavor_category"];
       name: string;
     };
-    package_type?: string;
+    package_type?: Database["public"]["Enums"]["package_type"];
     nutrition?: {
       serving_size?: string;
       calories?: number;
@@ -78,12 +82,11 @@ type ProductDetailRow = {
     primary_image?: string;
     images?: string[];
     flavor?: {
-      category: string;
+      category: Database["public"]["Enums"]["flavor_category"];
       name: string;
     };
-    package_type?: string;
+    package_type?: Database["public"]["Enums"]["package_type"];
   }>;
-  is_favorited: boolean;
 };
 
 // 필터 옵션 인터페이스

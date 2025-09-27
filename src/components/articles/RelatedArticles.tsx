@@ -1,6 +1,7 @@
 "use client";
 
-import { getCategoryDisplayName } from "@/features/articles/constants";
+import { ArticleCategory, getCategoryDisplayName } from "@/features/articles/constants";
+
 import Link from "next/link";
 import ArticleCard from "./ArticleCard";
 import ArticleImage from "./ArticleImage";
@@ -11,7 +12,7 @@ interface RelatedArticlesProps {
     slug: string;
     title: string;
     summary: string | null;
-    category: string;
+    category: ArticleCategory;
     featured_image: string | null;
   }>;
   latestArticles: Array<{
@@ -19,7 +20,7 @@ interface RelatedArticlesProps {
     slug: string;
     title: string;
     summary: string | null;
-    category: string;
+    category: ArticleCategory;
     featured_image: string | null;
   }>;
 }
@@ -71,17 +72,17 @@ export default function RelatedArticles({ articles, latestArticles }: RelatedArt
 }
 
 // 데스크탑용 가로형 카드 컴포넌트
-function RelatedArticleHorizontalCard({ 
-  article 
-}: { 
+function RelatedArticleHorizontalCard({
+  article,
+}: {
   article: {
     id: string;
     slug: string;
     title: string;
     summary: string | null;
-    category: string;
+    category: ArticleCategory;
     featured_image: string | null;
-  }
+  };
 }) {
   return (
     <Link href={`/articles/${article.slug}`}>
@@ -91,7 +92,7 @@ function RelatedArticleHorizontalCard({
           <ArticleImage
             src={article.featured_image || ""}
             alt={article.title}
-            category={getCategoryDisplayName(article.category as any)}
+            category={getCategoryDisplayName(article.category)}
             iconSize="sm"
             className="object-cover"
           />
@@ -103,7 +104,7 @@ function RelatedArticleHorizontalCard({
             {article.title}
           </h3>
           <div className="text-xs text-muted-foreground">
-            {getCategoryDisplayName(article.category as any)}
+            {getCategoryDisplayName(article.category)}
           </div>
         </div>
       </div>

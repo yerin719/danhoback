@@ -47,7 +47,7 @@ export async function createProduct(
     .eq("line_id", input.lineId)
     .eq("package_type", input.packageType)
     .eq("size", input.size)
-    .eq("servings_per_container", input.servingsPerContainer);
+    .eq("servings_per_container", input.servingsPerContainer || 0);
 
   if (findError) {
     console.error("Error finding product:", findError);

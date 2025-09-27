@@ -40,7 +40,7 @@ export const FLAVOR_CATEGORIES = {
   black_sesame: "흑임자",
   milktea: "밀크티",
   greentea: "녹차",
-  anilla: "바닐라",
+  vanilla: "바닐라",
   corn: "옥수수",
   other: "기타",
 } as const;
@@ -136,7 +136,7 @@ export const FLAVOR_SLUG_MAP = {
   black_sesame: "black-sesame",
   milktea: "milktea",
   greentea: "greentea",
-  anilla: "vanilla",
+  vanilla: "vanilla",
   corn: "corn",
   other: "other",
 } as const;

@@ -8,6 +8,7 @@ import { useToggleFavorite } from "@/features/favorites/hooks";
 import { ExternalLink, Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { Json } from "../../database.types";
 
 interface Product {
   sku_id: string;
@@ -24,7 +25,7 @@ interface Product {
   is_favorited?: boolean;
   flavor_name?: string;
   flavor_category?: string;
-  protein_types?: string[];
+  protein_types?: Json;
   form: string;
   package_type?: string;
   size?: string;

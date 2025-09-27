@@ -54,7 +54,7 @@ export default function RelatedProductThumbnails({
 
                 {/* 맛 라벨 */}
                 <p className="text-[10px] text-center text-muted-foreground group-hover:text-foreground transition-colors truncate">
-                  {variant.flavor_category && getFlavorDisplayName(variant.flavor_category)}
+                  {variant.flavor?.category && getFlavorDisplayName(variant.flavor.category)}
                   {variant.package_type && ` ${getPackageTypeDisplayName(variant.package_type)}`}
                 </p>
               </div>

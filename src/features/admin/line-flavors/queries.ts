@@ -130,7 +130,7 @@ export async function getLineFlavors(
       ? {
           id: flavor.product_lines.id,
           name: flavor.product_lines.name,
-          brandName: (flavor.product_lines.brands as any)?.name || "",
+          brandName: flavor.product_lines.brands?.name || "",
         }
       : undefined,
     nutrition: flavor.nutrition_info
@@ -168,7 +168,7 @@ export async function getLineFlavors(
           allergenInfo: flavor.nutrition_info.allergen_info || undefined,
         }
       : undefined,
-    proteinTypes: (flavor.line_flavor_protein_types || []).map((pt: any) => ({
+    proteinTypes: (flavor.line_flavor_protein_types || []).map((pt) => ({
       id: pt.id,
       type: pt.protein_types?.type || "",
       name: pt.protein_types?.name || "",
@@ -186,7 +186,7 @@ export async function createLineFlavor(
     .from("line_flavors")
     .insert({
       line_id: input.lineId,
-      flavor_category: input.flavorCategory,
+      flavor_category: input.flavorCategory as Database["public"]["Enums"]["flavor_category"] | null | undefined,
       flavor_name: input.flavorName,
     })
     .select()
@@ -199,19 +199,19 @@ export async function createLineFlavor(
 
   const { error: nutritionError } = await client.from("nutrition_info").insert({
     line_flavor_id: flavorData.id,
-    serving_size: input.nutrition.servingSize?.toString(),
-    calories: input.nutrition.calories?.toString(),
-    protein: input.nutrition.protein.toString(),
-    carbs: input.nutrition.carbs?.toString(),
-    sugar: input.nutrition.sugar?.toString(),
-    fat: input.nutrition.fat?.toString(),
-    saturated_fat: input.nutrition.saturatedFat?.toString(),
-    unsaturated_fat: input.nutrition.unsaturatedFat?.toString(),
-    trans_fat: input.nutrition.transFat?.toString(),
-    dietary_fiber: input.nutrition.dietaryFiber?.toString(),
-    sodium: input.nutrition.sodium?.toString(),
-    cholesterol: input.nutrition.cholesterol?.toString(),
-    calcium: input.nutrition.calcium?.toString(),
+    serving_size: input.nutrition.servingSize,
+    calories: input.nutrition.calories,
+    protein: input.nutrition.protein,
+    carbs: input.nutrition.carbs,
+    sugar: input.nutrition.sugar,
+    fat: input.nutrition.fat,
+    saturated_fat: input.nutrition.saturatedFat,
+    unsaturated_fat: input.nutrition.unsaturatedFat,
+    trans_fat: input.nutrition.transFat,
+    dietary_fiber: input.nutrition.dietaryFiber,
+    sodium: input.nutrition.sodium,
+    cholesterol: input.nutrition.cholesterol,
+    calcium: input.nutrition.calcium,
     allergen_info: input.nutrition.allergenInfo,
   });
 
@@ -334,7 +334,24 @@ export async function getProteinTypes(
   }));
 
   // 원하는 순서로 정렬
-  const order = ["isp", "wpc", "wpi", "wph", "wpih", "casein", "goat_milk", "colostrum", "spc", "pea", "rice", "oat", "mpc", "mpi", "egg", "mixed"];
+  const order = [
+    "isp",
+    "wpc",
+    "wpi",
+    "wph",
+    "wpih",
+    "casein",
+    "goat_milk",
+    "colostrum",
+    "spc",
+    "pea",
+    "rice",
+    "oat",
+    "mpc",
+    "mpi",
+    "egg",
+    "mixed",
+  ];
 
   return proteinTypes.sort((a, b) => {
     const indexA = order.indexOf(a.type);

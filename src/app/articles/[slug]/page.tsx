@@ -11,9 +11,9 @@ import {
 } from "@/features/articles/queries";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ArrowLeft, Tag } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
   if (!article) {
     return {
       title: "아티클을 찾을 수 없습니다 - 단호박",
-      description: "요청하신 아티클 정보를 찾을 수 없습니다."
+      description: "요청하신 아티클 정보를 찾을 수 없습니다.",
     };
   }
 
@@ -41,13 +41,8 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
       locale: "ko_KR",
       siteName: "단호박",
       images: article.featured_image ? [article.featured_image] : [],
-      article: {
-        publishedTime: article.published_at || undefined,
-        authors: article.author_name ? [article.author_name] : [],
-        tags: article.tags?.map(tag => tag.name) || []
-      }
     },
-    keywords: article.tags?.map(tag => tag.name).join(", ") || undefined
+    keywords: article.tags?.map((tag) => tag.name).join(", ") || undefined,
   };
 }
 
@@ -106,7 +101,9 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
                 />
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-6">{article.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-6">
+                {article.title}
+              </h1>
 
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 {article.summary || ""}

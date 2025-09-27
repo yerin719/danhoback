@@ -1,14 +1,12 @@
 // Article categories and related types
 
 export const articleCategories = [
-  "단백질 가이드",
-  "운동 팁",
-  "다이어트",
-  "건강 정보",
-  "제품 리뷰",
-  "영양 정보",
-  "트레이닝",
-  "라이프스타일",
+  "가이드",
+  "제품 브랜드",
+  "운동",
+  "식단",
+  "트렌드",
+  "미분류",
 ] as const;
 
 export type ArticleCategory = (typeof articleCategories)[number];
