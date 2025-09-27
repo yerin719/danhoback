@@ -7,9 +7,9 @@ export const productPageBannerCampaigns = [
     title: "여름맞이 단백질 특가!",
     subtitle: "프리미엄 보충제 할인",
     description: "최대 40% 할인 + 무료배송 혜택",
-    imageUrl: "/images/banners/sale-30-off.png",
     ctaUrl: "/products?sale=spring",
-    textColor: "#90760B",
+    gradientBackground: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
+    textColor: "#fff",
     startDate: new Date(),
     endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7일 후
     isActive: true,
@@ -19,7 +19,6 @@ export const productPageBannerCampaigns = [
     id: "text-only-promo",
     title: "💪 새로운 단백질 라인업",
     description: "혁신적인 아이솔레이트 프로틴 출시",
-    ctaText: "신제품 보기",
     ctaUrl: "/products/new",
     gradientBackground: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     textColor: "#FFFFFF",
@@ -30,7 +29,12 @@ export const productPageBannerCampaigns = [
   },
   {
     id: "minimal-banner",
-    backgroundColor: "#F59E0B",
+    title: "단호박 출시 기넘 이벤트",
+    subtitle: "빠진 정보를 찾아라!",
+    description:
+      "혹시 내가 알고있는 제품이 없다!?\n정보 등록/수정요청을 하신 회원님들꼐 추첨을 통해 스타벅스 아이스아메리카노를 제공해드립니다!",
+    textColor: "#FFFFFF",
+    gradientBackground: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
     startDate: new Date(),
     endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3일 후
     isActive: true,
@@ -44,10 +48,7 @@ export const productPageBannerCampaigns = [
 export function getActiveBannerCampaigns() {
   const now = new Date();
   return productPageBannerCampaigns.filter(
-    (campaign) =>
-      campaign.isActive &&
-      campaign.startDate <= now &&
-      campaign.endDate >= now
+    (campaign) => campaign.isActive && campaign.startDate <= now && campaign.endDate >= now,
   );
 }
 
@@ -57,6 +58,6 @@ export function getActiveBannerCampaigns() {
 export function getSortedBannerCampaigns() {
   const priorityOrder = { high: 3, medium: 2, low: 1 };
   return getActiveBannerCampaigns().sort(
-    (a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]
+    (a, b) => priorityOrder[b.priority] - priorityOrder[a.priority],
   );
 }
