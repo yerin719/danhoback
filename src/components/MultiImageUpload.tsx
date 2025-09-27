@@ -74,7 +74,22 @@ export function MultiImageUpload({
     }
   };
 
-  const handleRemove = (index: number) => {
+  const handleRemove = async (index: number) => {
+    const urlToDelete = imageUrls[index];
+
+    // R2에서 이미지 삭제
+    try {
+      const formData = new FormData();
+      formData.append("imageUrl", urlToDelete);
+
+      await fetch("/api/products/delete", {
+        method: "POST",
+        body: formData,
+      });
+    } catch (error) {
+      console.error("이미지 삭제 실패:", error);
+    }
+
     const newUrls = imageUrls.filter((_, i) => i !== index);
     onChange(newUrls.join(", "));
   };

@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { uploadProductImage } from "@/lib/r2/products";
+import { uploadProductImage, deleteProductImage } from "@/lib/r2/products";
 
 function validateImageFile(file: File): { isValid: boolean; error?: string } {
   const maxSize = 2 * 1024 * 1024;
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
     const slug = formData.get("slug") as string;
     const imageType = (formData.get("imageType") as string) || 'primary';
+    const oldImageUrl = formData.get("oldImageUrl") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -59,7 +60,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 새 이미지 업로드
     const imageUrl = await uploadProductImage(slug, file, imageType);
+
+    // 이전 이미지 삭제
+    if (oldImageUrl) {
+      await deleteProductImage(oldImageUrl);
+    }
 
     return NextResponse.json({
       success: true,

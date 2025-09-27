@@ -49,6 +49,9 @@ export function ImageUpload({
       formData.append("file", file);
       formData.append("slug", slug);
       formData.append("imageType", imageType);
+      if (value) {
+        formData.append("oldImageUrl", value);
+      }
 
       const response = await fetch("/api/products/upload", {
         method: "POST",

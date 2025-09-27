@@ -7,8 +7,9 @@ export async function uploadProductImage(
   file: File,
   imageType: string = 'primary'
 ): Promise<string> {
+  const timestamp = Date.now();
   const fileExt = file.name.split('.').pop();
-  const fileName = `${imageType}.${fileExt}`;
+  const fileName = `${imageType}-${timestamp}.${fileExt}`;
   const filePath = `products/${slug}/${fileName}`;
 
   const arrayBuffer = await file.arrayBuffer();
