@@ -408,12 +408,15 @@ BEGIN
           jsonb_build_object(
             'id', other_ps.id,
             'name', other_ps.name,
+            'slug', other_ps.slug,
             'size', other_p.size,
             'primary_image', other_ps.primary_image,
+            'images', other_ps.images,
             'flavor', jsonb_build_object(
               'category', other_lf.flavor_category::text,
               'name', other_lf.flavor_name
-            )
+            ),
+            'package_type', other_p.package_type::text
           ) ORDER BY other_ps.display_order, other_ps.name
         )
         FROM public.product_skus other_ps

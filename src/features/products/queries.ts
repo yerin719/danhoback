@@ -73,13 +73,15 @@ type ProductDetailRow = {
   related_skus: Array<{
     id: string;
     name: string;
-    slug?: string;
+    slug: string;
     size: string;
     primary_image?: string;
+    images?: string[];
     flavor?: {
       category: string;
       name: string;
     };
+    package_type?: string;
   }>;
   is_favorited: boolean;
 };
