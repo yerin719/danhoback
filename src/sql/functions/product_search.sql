@@ -78,7 +78,7 @@ STABLE
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT DISTINCT ON (pwd.sku_id)
+  SELECT
     pwd.sku_id,
     pwd.sku_name::text,
     pwd.barcode::text,
@@ -163,7 +163,6 @@ BEGIN
     AND (pwd.sugar IS NULL OR (pwd.sugar >= min_sugar AND pwd.sugar <= max_sugar))
 
   ORDER BY
-    pwd.sku_id,
     CASE
       WHEN sort_by = 'favorites_count' AND sort_order = 'desc' THEN pwd.favorites_count
     END DESC NULLS LAST,
