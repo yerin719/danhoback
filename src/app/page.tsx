@@ -10,5 +10,7 @@ export default function Home() {
     router.replace("/products");
   }, [router]);
 
-  return null;
+  return (
+    <div className="fixed inset-0 bg-white z-50" />
+  );
 }
