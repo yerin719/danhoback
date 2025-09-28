@@ -187,8 +187,7 @@ BEGIN
     CASE
       WHEN sort_by = 'name' AND sort_order = 'asc' THEN pwd.sku_name
     END ASC,
-    pwd.display_order,
-    pwd.sku_name
+    pwd.display_order
 
   LIMIT limit_count
   OFFSET offset_count;
