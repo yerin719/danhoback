@@ -20,7 +20,7 @@ export const QUERY_GC_TIME = 10 * 60 * 1000; // 10분
 // 필터 범위 기본값 상수
 export const FILTER_RANGES = {
   PROTEIN: { MIN: 0, MAX: 100 },
-  CALORIES: { MIN: 0, MAX: 1000 },
+  CALORIES: { MIN: 0, MAX: 500 },
   CARBS: { MIN: 0, MAX: 50 },
   SUGAR: { MIN: 0, MAX: 30 },
 } as const;
