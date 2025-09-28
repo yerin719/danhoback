@@ -1,6 +1,7 @@
 import defaultClient from "@/lib/supabase/client";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../../../database.types";
+import { FILTER_RANGES } from "./constants";
 
 // ============================================
 // TYPE DEFINITIONS
@@ -141,13 +142,13 @@ export async function searchProducts(
     filter_forms: filters.forms.length > 0 ? filters.forms : undefined,
     filter_package_types: filters.packageTypes.length > 0 ? filters.packageTypes : undefined,
     min_protein: filters.proteinRange[0],
-    max_protein: filters.proteinRange[1],
+    max_protein: filters.proteinRange[1] === FILTER_RANGES.PROTEIN.MAX ? 999999 : filters.proteinRange[1],
     min_calories: filters.caloriesRange[0],
-    max_calories: filters.caloriesRange[1],
+    max_calories: filters.caloriesRange[1] === FILTER_RANGES.CALORIES.MAX ? 999999 : filters.caloriesRange[1],
     min_carbs: filters.carbsRange[0],
-    max_carbs: filters.carbsRange[1],
+    max_carbs: filters.carbsRange[1] === FILTER_RANGES.CARBS.MAX ? 999999 : filters.carbsRange[1],
     min_sugar: filters.sugarRange[0],
-    max_sugar: filters.sugarRange[1],
+    max_sugar: filters.sugarRange[1] === FILTER_RANGES.SUGAR.MAX ? 999999 : filters.sugarRange[1],
     search_query: filters.searchQuery || undefined,
     sort_by: sortBy,
     sort_order: sortOrder,

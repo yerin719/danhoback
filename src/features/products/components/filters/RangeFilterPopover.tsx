@@ -55,7 +55,11 @@ export default function RangeFilterPopover({
           <div className="flex justify-center items-center">
             <span className={`text-black font-semibold ${isMobile ? "text-3xl" : "text-2xl"}`}>
               <span className="text-yellow-500">{tempValue[0]}</span>
-              {unit} ~ <span className="text-yellow-500">{tempValue[1]}</span>
+              {unit} ~{" "}
+              <span className="text-yellow-500">
+                {tempValue[1]}
+                {tempValue[1] === max ? "+" : ""}
+              </span>
               {unit}
             </span>
           </div>
