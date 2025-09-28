@@ -192,29 +192,25 @@ export default function ProductsClient({
             ))}
           </div>
 
-          {/* 무한스크롤 트리거 */}
-          <div
-            className="h-10 mt-8 flex items-center justify-center"
-            ref={(el) => {
-              if (el && hasNextPage && !isFetchingNextPage) {
-                const observer = new IntersectionObserver(
-                  (entries) => {
-                    if (entries[0].isIntersecting) {
-                      fetchNextPage();
-                    }
-                  },
-                  { threshold: 0.1 },
-                );
-                observer.observe(el);
-                return () => observer.disconnect();
-              }
-            }}
-          >
-            {isFetchingNextPage && (
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                <span className="text-sm text-muted-foreground">더 많은 제품 불러오는 중...</span>
-              </div>
+          {/* 더보기 버튼 */}
+          <div className="mt-8 flex items-center justify-center">
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outline"
+                size="lg"
+                className="min-w-[200px]"
+              >
+                {isFetchingNextPage ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <span>불러오는 중...</span>
+                  </div>
+                ) : (
+                  "더보기"
+                )}
+              </Button>
             )}
             {!hasNextPage && products.length > 0 && (
               <span className="text-sm text-muted-foreground">모든 제품을 불러왔습니다</span>
