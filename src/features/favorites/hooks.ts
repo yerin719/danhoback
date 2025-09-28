@@ -2,6 +2,25 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUserFavorites, toggleFavorite } from "./queries";
+import { ProductSearchResult, ProductDetailRow } from "../products/queries";
+
+// 무한스크롤 데이터 타입
+type InfiniteQueryData = {
+  pages: ProductSearchResult[][];
+  pageParams: unknown[];
+};
+
+// oldData 유니온 타입
+type QueryData = InfiniteQueryData | ProductDetailRow | ProductSearchResult[] | undefined;
+
+// 타입 가드 함수들
+function isInfiniteQueryData(data: QueryData): data is InfiniteQueryData {
+  return data !== null && data !== undefined && typeof data === 'object' && 'pages' in data;
+}
+
+function isProductDetailRow(data: QueryData): data is ProductDetailRow {
+  return data !== null && data !== undefined && typeof data === 'object' && 'selected_sku' in data;
+}
 
 // 사용자 찜 목록 조회 훅
 export function useFavorites() {
@@ -31,7 +50,7 @@ export function useToggleFavorite(userId: string) {
         predicate: (query) => {
           const key = query.queryKey[0];
           return key === "products" || key === "product";
-        }
+        },
       });
 
       // 이전 데이터 백업
@@ -39,7 +58,7 @@ export function useToggleFavorite(userId: string) {
         predicate: (query) => {
           const key = query.queryKey[0];
           return key === "products" || key === "product";
-        }
+        },
       });
 
       // Optimistic update
@@ -48,52 +67,52 @@ export function useToggleFavorite(userId: string) {
           predicate: (query) => {
             const key = query.queryKey[0];
             return key === "products" || key === "product";
-          }
+          },
         },
-        (oldData: any) => {
+        (oldData: QueryData) => {
           if (!oldData) return oldData;
 
           // 무한스크롤 데이터 구조 처리
-          if (oldData.pages) {
+          if (isInfiniteQueryData(oldData)) {
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any[]) =>
-                page.map((product: any) =>
+              pages: oldData.pages.map((page) =>
+                page.map((product) =>
                   product.sku_id === productSkuId
                     ? {
                         ...product,
                         is_favorited: !currentStatus,
-                        favorites_count: product.favorites_count + (!currentStatus ? 1 : -1)
+                        favorites_count: product.favorites_count + (!currentStatus ? 1 : -1),
                       }
-                    : product
-                )
-              )
+                    : product,
+                ),
+              ),
             };
           }
 
           // 단일 제품 상세 데이터 구조 처리
-          if (oldData.selected_sku?.id === productSkuId) {
+          if (isProductDetailRow(oldData) && oldData.selected_sku?.id === productSkuId) {
             return {
               ...oldData,
-              is_favorited: !currentStatus
+              is_favorited: !currentStatus,
             };
           }
 
           // 일반 배열 구조 처리
           if (Array.isArray(oldData)) {
-            return oldData.map((product: any) =>
+            return oldData.map((product) =>
               product.sku_id === productSkuId
                 ? {
                     ...product,
                     is_favorited: !currentStatus,
-                    favorites_count: product.favorites_count + (!currentStatus ? 1 : -1)
+                    favorites_count: product.favorites_count + (!currentStatus ? 1 : -1),
                   }
-                : product
+                : product,
             );
           }
 
           return oldData;
-        }
+        },
       );
 
       return { previousData };
@@ -113,7 +132,7 @@ export function useToggleFavorite(userId: string) {
         predicate: (query) => {
           const key = query.queryKey[0];
           return key === "products" || key === "product";
-        }
+        },
       });
     },
   });

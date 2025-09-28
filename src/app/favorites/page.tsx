@@ -70,7 +70,6 @@ export default function FavoritesPage() {
             <ProductCard
               key={product.sku_id}
               product={product}
-              showPurchaseButton={true}
               onFavoriteChange={handleFavoriteChange}
             />
           ))}
