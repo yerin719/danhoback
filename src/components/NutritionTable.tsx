@@ -91,20 +91,20 @@ export default function NutritionTable({ nutrition }: NutritionTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[140px] px-6">영양성분</TableHead>
-                <TableHead className="text-center w-[120px] px-6">
+                <TableHead className="w-2/5 px-6 py-4 text-base bg-gray-50">영양성분</TableHead>
+                <TableHead className="text-center w-3/5 px-6 py-4 text-base">
                   1회 제공량 {nutrition.serving_size && `(${nutrition.serving_size}g)`}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {nutritionRows.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell className={`font-medium px-6 ${row.indent ? "pl-8" : ""}`}>
+                <TableRow key={row.name} className="hover:bg-transparent">
+                  <TableCell className={`font-medium px-6 py-4 text-base bg-gray-50 ${row.indent ? "pl-8" : ""}`}>
                     {row.indent && "- "}
                     {row.name}
                   </TableCell>
-                  <TableCell className="text-center font-semibold px-6">
+                  <TableCell className="text-center font-semibold px-6 py-4 text-base">
                     {row.value}
                     {row.unit}
                   </TableCell>
