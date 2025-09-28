@@ -4,7 +4,7 @@ export default function PrivacyPolicyPage() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-semibold mb-4">개인정보처리방침</h1>
-          <p className="text-sm text-muted-foreground">최종 업데이트: 2024년 12월 31일</p>
+          <p className="text-sm text-muted-foreground">최종 업데이트: 2025년 9월 28일</p>
         </div>
 
         <section className="space-y-4">
@@ -153,7 +153,7 @@ export default function PrivacyPolicyPage() {
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="space-y-2">
                 <p><span className="font-medium">개인정보보호책임자:</span> 관리자</p>
-                <p><span className="font-medium">연락처:</span> privacy@danhoback.com</p>
+                <p><span className="font-medium">연락처:</span> support@danhobak.kr</p>
               </div>
             </div>
           </div>
@@ -173,14 +173,14 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold">11. 개인정보 처리방침 버전</h2>
           <div className="space-y-3">
             <ul className="list-disc pl-6 space-y-1">
-              <li>버전 1.0: 2024년 12월 31일 최초 제정</li>
+              <li>버전 1.0: 2025년 9월 28일 최초 제정</li>
             </ul>
           </div>
         </section>
 
         <div className="border-t pt-8 mt-12">
           <p className="text-sm text-muted-foreground text-center">
-            본 방침에 대한 문의사항이 있으시면 privacy@danhoback.com으로 연락주시기 바랍니다.
+            본 방침에 대한 문의사항이 있으시면 support@danhobak.kr로 연락주시기 바랍니다.
           </p>
         </div>
       </div>
