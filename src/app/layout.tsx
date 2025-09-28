@@ -1,5 +1,6 @@
 import MobileBottomNav from "@/components/MobileBottomNav";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Navigation />
           <main className="pt-16 pb-16 md:pb-0">{children}</main>
+          <Footer />
           <MobileBottomNav />
           <Toaster />
         </Providers>
