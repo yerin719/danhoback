@@ -70,3 +70,32 @@ export function isPublicPage(pathname: string): boolean {
   // 패턴 매칭
   return PUBLIC_PATTERNS.some(pattern => pattern.test(pathname));
 }
+
+/**
+ * 관리자 전용 페이지 경로들
+ */
+const ADMIN_REQUIRED_ROUTES = [
+  '/admin',
+];
+
+/**
+ * 관리자 전용 경로 패턴들
+ */
+const ADMIN_REQUIRED_PATTERNS = [
+  /^\/admin(\/.*)?$/,  // /admin으로 시작하는 모든 경로
+];
+
+/**
+ * 주어진 경로가 관리자 권한이 필요한 페이지인지 확인합니다.
+ * @param pathname - 확인할 경로
+ * @returns 관리자 권한이 필요하면 true
+ */
+export function isAdminRequiredPage(pathname: string): boolean {
+  // 정확한 경로 매칭
+  if (ADMIN_REQUIRED_ROUTES.includes(pathname)) {
+    return true;
+  }
+
+  // 패턴 매칭
+  return ADMIN_REQUIRED_PATTERNS.some(pattern => pattern.test(pathname));
+}
