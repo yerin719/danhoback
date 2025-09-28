@@ -3,7 +3,7 @@
 // ============================================
 
 // 페이지네이션 관련 상수
-export const PRODUCTS_PER_PAGE = 20;
+export const PRODUCTS_PER_PAGE = 25;
 
 // 정렬 관련 상수
 export const DEFAULT_SORT_BY = "favorites_count";
