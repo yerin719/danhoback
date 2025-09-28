@@ -36,31 +36,27 @@ import {
   useProteinTypes,
 } from "@/features/admin/line-flavors/hooks";
 import { useProductLines } from "@/features/admin/product-lines/hooks";
+import { useAllFilterOptions } from "@/features/products/hooks/useFilterOptions";
+import { FLAVOR_CATEGORIES } from "@/features/products/constants";
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-
-const flavorCategories = [
-  { value: "grain", label: "곡물" },
-  { value: "chocolate", label: "초콜릿" },
-  { value: "strawberry", label: "딸기" },
-  { value: "banana", label: "바나나" },
-  { value: "milk", label: "우유" },
-  { value: "coffee", label: "커피" },
-  { value: "original", label: "오리지날" },
-  { value: "black_sesame", label: "흑임자" },
-  { value: "milktea", label: "밀크티" },
-  { value: "greentea", label: "녹차" },
-  { value: "vanilla", label: "바닐라" },
-  { value: "corn", label: "옥수수" },
-  { value: "other", label: "기타" },
-];
+import { useState, useMemo } from "react";
 
 export default function LineFlavorsPage() {
   const { data: lineFlavors, isLoading } = useLineFlavors();
   const { data: productLines } = useProductLines();
   const { data: proteinTypes } = useProteinTypes();
+  const { data: filterOptions } = useAllFilterOptions();
   const createMutation = useCreateLineFlavor();
   const deleteMutation = useDeleteLineFlavor();
+
+  // DB에서 받은 맛 카테고리 코드를 한글 레이블과 매핑
+  const flavorCategories = useMemo(() => {
+    if (!filterOptions?.flavors) return [];
+    return filterOptions.flavors.map((code) => ({
+      value: code,
+      label: FLAVOR_CATEGORIES[code as keyof typeof FLAVOR_CATEGORIES] || code,
+    }));
+  }, [filterOptions?.flavors]);
 
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({

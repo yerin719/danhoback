@@ -31,6 +31,7 @@ export const flavorCategoryEnum = pgEnum("flavor_category", [
   "greentea",
   "vanilla", // 바닐라
   "corn", // 옥수수
+  "sweet_potato", // 고구마
   "other",
 ]);
 

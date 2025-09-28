@@ -42,6 +42,7 @@ export const FLAVOR_CATEGORIES = {
   greentea: "녹차",
   vanilla: "바닐라",
   corn: "옥수수",
+  sweet_potato: "고구마",
   other: "기타",
 } as const;
 
@@ -138,6 +139,7 @@ export const FLAVOR_SLUG_MAP = {
   greentea: "greentea",
   vanilla: "vanilla",
   corn: "corn",
+  sweet_potato: "sweet-potato",
   other: "other",
 } as const;
 
