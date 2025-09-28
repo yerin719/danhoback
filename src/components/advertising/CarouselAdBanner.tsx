@@ -79,8 +79,12 @@ export default function CarouselAdBanner({
   const handleCampaignClick = useCallback(
     (campaign: CarouselCampaign) => {
       onCampaignClick?.(campaign);
-      if (hasCTA(campaign)) {
-        window.open(campaign.ctaUrl, "_blank");
+      if (campaign.ctaUrl) {
+        if (campaign.isExternal) {
+          window.open(campaign.ctaUrl, "_blank", "noopener,noreferrer");
+        } else {
+          window.location.href = campaign.ctaUrl;
+        }
       }
     },
     [onCampaignClick],
@@ -107,8 +111,8 @@ export default function CarouselAdBanner({
           />
         )}
 
-        {/* Content overlay */}
-        {(hasText(campaign) || hasCTA(campaign)) && (
+        {/* Content overlay - 이미지 전용 배너에서는 텍스트 오버레이 숨김 */}
+        {(hasText(campaign) || hasCTA(campaign)) && contentType !== 'image-only' && (
           <div
             className="relative z-10 text-center px-4 sm:px-8 max-w-4xl"
             style={{ color: textColor }}

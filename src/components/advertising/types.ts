@@ -39,6 +39,7 @@ export interface CarouselCampaign {
   // CTA (optional)
   ctaText?: string;
   ctaUrl?: string;
+  isExternal?: boolean; // 외부 링크 여부
   
   // Styling (important when no image)
   backgroundColor?: string;

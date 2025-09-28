@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import CompactProductFilters from "@/features/products/components/CompactProductFilters";
 import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
-import { productPageBannerCampaigns } from "@/features/products/data/bannerCampaigns";
+import { getActiveBannerCampaigns } from "@/features/products/data/bannerCampaigns";
 import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
@@ -92,7 +92,7 @@ export default function ProductsClient({
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 캐러셀 광고 배너 */}
       <CarouselAdBanner
-        campaigns={[...productPageBannerCampaigns]}
+        campaigns={[...getActiveBannerCampaigns()]}
         height={300}
         autoPlay={true}
         interval={5000}
