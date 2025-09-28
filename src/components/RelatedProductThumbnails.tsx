@@ -1,6 +1,5 @@
 "use client";
 
-import { getFlavorDisplayName, getPackageTypeDisplayName } from "@/features/products/constants";
 import { ProductVariant } from "@/features/products/hooks/useProductDetail";
 import Link from "next/link";
 import ProductImage from "./ProductImage";
@@ -54,8 +53,7 @@ export default function RelatedProductThumbnails({
 
                 {/* 맛 라벨 */}
                 <p className="text-[10px] text-center text-muted-foreground group-hover:text-foreground transition-colors truncate">
-                  {variant.flavor?.category && getFlavorDisplayName(variant.flavor.category)}
-                  {variant.package_type && ` ${getPackageTypeDisplayName(variant.package_type)}`}
+                  {variant.flavor?.name}
                 </p>
               </div>
             </Link>

@@ -66,9 +66,14 @@ export default function ProductInfo({ productLineInfo, brandInfo, selectedSku }:
           ))}
 
           {/* 사이즈 칩 */}
-          {selectedSku.size && (
+          {selectedSku.size && selectedSku.package_type === "bulk" && (
             <Badge variant="outline" className="text-sm">
-              {selectedSku.size}
+              {(() => {
+                const size = parseInt(selectedSku.size);
+                return size >= 1000
+                  ? `${(size / 1000).toFixed(size % 1000 === 0 ? 0 : 1)}kg`
+                  : `${selectedSku.size}g`;
+              })()}
             </Badge>
           )}
 
@@ -76,13 +81,6 @@ export default function ProductInfo({ productLineInfo, brandInfo, selectedSku }:
           {selectedSku.servings_per_container && selectedSku.package_type === "bulk" && (
             <Badge variant="outline" className="text-sm">
               {selectedSku.servings_per_container}회분
-            </Badge>
-          )}
-
-          {/* 제품 형태 칩 */}
-          {productLineInfo.form && (
-            <Badge variant="outline" className="text-sm">
-              {productLineInfo.form === "powder" ? "파우더" : "드링크"}
             </Badge>
           )}
         </div>

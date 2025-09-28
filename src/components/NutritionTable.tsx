@@ -93,7 +93,7 @@ export default function NutritionTable({ nutrition }: NutritionTableProps) {
               <TableRow>
                 <TableHead className="w-[140px] px-6">영양성분</TableHead>
                 <TableHead className="text-center w-[120px] px-6">
-                  1회 제공량 {nutrition.serving_size && `(${nutrition.serving_size})`}
+                  1회 제공량 {nutrition.serving_size && `(${nutrition.serving_size}g)`}
                 </TableHead>
               </TableRow>
             </TableHeader>
