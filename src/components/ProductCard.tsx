@@ -38,13 +38,11 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
-  showPurchaseButton?: boolean;
   onFavoriteChange?: () => void;
 }
 
 export default function ProductCard({
   product,
-  showPurchaseButton = false,
   onFavoriteChange,
 }: ProductCardProps) {
   const { user } = useAuth();
@@ -146,25 +144,27 @@ export default function ProductCard({
             )}
           </div>
 
-          {/* 찜 카운트 */}
-          <div
-            className={`flex items-center justify-start gap-1 ${showPurchaseButton ? "mb-4" : ""}`}
-          >
-            <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-            <span className="text-sm text-red-500">{product.favorites_count}</span>
-          </div>
+          {/* 찜 카운트와 구매 버튼 */}
+          <div className="flex items-center justify-between">
+            {/* 찜 카운트 */}
+            <div className="flex items-center gap-1">
+              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+              <span className="text-sm text-red-500">{product.favorites_count}</span>
+            </div>
 
-          {/* 구매하기 버튼 */}
-          {showPurchaseButton && product.purchase_url && (
-            <Button
-              onClick={handlePurchaseClick}
-              className="w-full flex items-center gap-2"
-              size="sm"
-            >
-              <ExternalLink className="h-4 w-4" />
-              최저가 확인하러 가기
-            </Button>
-          )}
+            {/* 구매하기 버튼 */}
+            {product.purchase_url && (
+              <Button
+                onClick={handlePurchaseClick}
+                variant="ghost"
+                className="flex items-center gap-1 text-xs p-2 h-auto"
+                size="sm"
+              >
+                <ExternalLink className="h-3 w-3" />
+                최저가 확인하러 가기
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </Link>
