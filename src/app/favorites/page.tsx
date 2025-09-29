@@ -33,7 +33,7 @@ export default function FavoritesPage() {
           <h1 className="text-3xl font-semibold">찜한 제품</h1>
           <p className="text-muted-foreground mt-2">불러오는 중...</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="space-y-3">
               <Skeleton className="aspect-square rounded-lg" />
@@ -65,7 +65,7 @@ export default function FavoritesPage() {
       {products.length === 0 ? (
         <EmptyFavorites />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {products.map((product) => (
             <ProductCard
               key={product.sku_id}

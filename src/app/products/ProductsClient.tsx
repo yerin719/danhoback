@@ -15,6 +15,7 @@ import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 interface ProductsClientProps {
   initialFilters: FilterState;
@@ -103,10 +104,13 @@ export default function ProductsClient({
   }, [sortBy, sortOrder]);
 
   // RadioGroup 값 변경 핸들러
-  const handleRadioChange = useCallback((value: string) => {
-    const [newSortBy, newSortOrder] = value.split("_");
-    handleSortChange(newSortBy, newSortOrder as "asc" | "desc");
-  }, [handleSortChange]);
+  const handleRadioChange = useCallback(
+    (value: string) => {
+      const [newSortBy, newSortOrder] = value.split("_");
+      handleSortChange(newSortBy, newSortOrder as "asc" | "desc");
+    },
+    [handleSortChange],
+  );
 
   // 필터 초기화
   const handleResetFilters = useCallback(() => {
@@ -128,13 +132,23 @@ export default function ProductsClient({
       <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       {/* 정렬 옵션 */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         {/* 모바일/태블릿: Drawer로 정렬 옵션 표시 */}
         <div className="lg:hidden flex items-center justify-between w-full">
           <Drawer open={sortDrawerOpen} onOpenChange={setSortDrawerOpen}>
             <DrawerTrigger asChild>
-              <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="pl-0 hover:bg-transparent flex items-center gap-1"
+                style={{ fontSize: "13px" }}
+              >
                 {getSortLabel()}
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform duration-200 ${
+                    sortDrawerOpen ? "rotate-180" : ""
+                  }`}
+                />
               </Button>
             </DrawerTrigger>
             <DrawerContent className="h-[40vh] p-0">
@@ -171,67 +185,71 @@ export default function ProductsClient({
 
         {/* 데스크톱: 기존 정렬 옵션 유지 */}
         <div className="hidden lg:flex items-center justify-between w-full">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSortChange("favorites_count", "desc")}
-                className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
-                  sortBy === "favorites_count" && sortOrder === "desc"
-                    ? "font-semibold text-black"
-                    : "text-gray-500"
-                }`}
-              >
-                인기순
-              </Button>
-              <span className="text-gray-300">·</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSortChange("protein", "desc")}
-                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-                  sortBy === "protein" && sortOrder === "desc"
-                    ? "font-semibold text-black"
-                    : "text-gray-500"
-                }`}
-              >
-                높은 단백질순
-              </Button>
-              <span className="text-gray-300">·</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSortChange("protein", "asc")}
-                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-                  sortBy === "protein" && sortOrder === "asc"
-                    ? "font-semibold text-black"
-                    : "text-gray-500"
-                }`}
-              >
-                낮은 단백질순
-              </Button>
-              <span className="text-gray-300">·</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSortChange("calories", "asc")}
-                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-                  sortBy === "calories" && sortOrder === "asc"
-                    ? "font-semibold text-black"
-                    : "text-gray-500"
-                }`}
-              >
-                낮은 칼로리순
-              </Button>
-            </div>
-            <RequestButton />
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSortChange("favorites_count", "desc")}
+              className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
+                sortBy === "favorites_count" && sortOrder === "desc"
+                  ? "font-semibold text-black"
+                  : "text-gray-500"
+              }`}
+              style={{ fontSize: "13px" }}
+            >
+              인기순
+            </Button>
+            <span className="text-gray-300">·</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSortChange("protein", "desc")}
+              className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                sortBy === "protein" && sortOrder === "desc"
+                  ? "font-semibold text-black"
+                  : "text-gray-500"
+              }`}
+              style={{ fontSize: "13px" }}
+            >
+              높은 단백질순
+            </Button>
+            <span className="text-gray-300">·</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSortChange("protein", "asc")}
+              className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                sortBy === "protein" && sortOrder === "asc"
+                  ? "font-semibold text-black"
+                  : "text-gray-500"
+              }`}
+              style={{ fontSize: "13px" }}
+            >
+              낮은 단백질순
+            </Button>
+            <span className="text-gray-300">·</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSortChange("calories", "asc")}
+              className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                sortBy === "calories" && sortOrder === "asc"
+                  ? "font-semibold text-black"
+                  : "text-gray-500"
+              }`}
+              style={{ fontSize: "13px" }}
+            >
+              낮은 칼로리순
+            </Button>
+          </div>
+          <RequestButton />
         </div>
       </div>
 
       {/* 초기 로딩 상태 */}
       {isLoading && (
         <div className="min-h-screen">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {[...Array(10)].map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-square rounded-lg" />
@@ -258,7 +276,7 @@ export default function ProductsClient({
       {/* 제품 목록 */}
       {!isLoading && !isError && products && products.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {products.map((product) => (
               <ProductCard key={product.sku_id} product={product} />
             ))}

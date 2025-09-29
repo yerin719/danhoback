@@ -56,6 +56,7 @@ export default function RequestButton({
       size={size}
       onClick={handleClick}
       className={`flex items-center gap-2 ${className}`}
+      style={{ fontSize: '13px' }}
     >
       정보 등록/수정 요청
     </Button>

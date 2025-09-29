@@ -35,9 +35,10 @@ export default function FilterButton({
   const triggerButton = (
     <Button
       variant={isActive ? "default" : "outline"}
-      className={`h-9 px-3 text-sm whitespace-nowrap flex items-center gap-1 ${
+      className={`h-8 px-3 py-1 whitespace-nowrap flex items-center gap-0 ${
         isOpen && !isActive ? "bg-accent" : ""
       }`}
+      style={{ fontSize: '13px' }}
     >
       {type === "range" && isActive && value ? (
         <span className="font-medium">{value}</span>

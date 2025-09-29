@@ -41,10 +41,7 @@ interface ProductCardProps {
   onFavoriteChange?: () => void;
 }
 
-export default function ProductCard({
-  product,
-  onFavoriteChange,
-}: ProductCardProps) {
+export default function ProductCard({ product, onFavoriteChange }: ProductCardProps) {
   const { user } = useAuth();
   const router = useRouter();
   const toggleFavorite = useToggleFavorite(user?.id || "");
@@ -88,7 +85,7 @@ export default function ProductCard({
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
         {/* 세로형 레이아웃 (2개 이상) */}
         <div className="hidden sm:block">
-          <CardHeader className="py-4 px-0 pb-2">
+          <CardHeader className="p-0 pb-4">
             <div className="aspect-square relative mb-4">
               <ProductImage
                 src={product.primary_image || "/placeholder.png"}
@@ -119,26 +116,26 @@ export default function ProductCard({
 
           <CardContent className="px-0 py-0">
             {/* 영양 성분 정보 */}
-            <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div className="grid grid-cols-11 gap-2 mb-4 text-xs">
               {product.protein !== null && product.protein !== undefined && (
-                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-6">
                   <span className="text-muted-foreground">단백질</span>
                   <p className="font-semibold">{product.protein}g</p>
                 </div>
               )}
               {product.calories !== null && product.calories !== undefined && (
-                <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
+                <div className="bg-muted/50 p-2 rounded flex justify-end items-center col-span-5">
                   <p className="font-semibold">{product.calories}kcal</p>
                 </div>
               )}
               {product.carbs !== null && product.carbs !== undefined && (
-                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                  <span className="text-muted-foreground">탄수</span>
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-6">
+                  <span className="text-muted-foreground">탄수화물</span>
                   <p className="font-semibold">{product.carbs}g</p>
                 </div>
               )}
               {product.sugar !== null && product.sugar !== undefined && (
-                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-5">
                   <span className="text-muted-foreground">당</span>
                   <p className="font-semibold">{product.sugar}g</p>
                 </div>
@@ -203,26 +200,26 @@ export default function ProductCard({
               </h3>
 
               {/* 영양 성분 정보 */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-11 gap-2 text-xs">
                 {product.protein !== null && product.protein !== undefined && (
-                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-6">
                     <span className="text-muted-foreground">단백질</span>
                     <p className="font-semibold">{product.protein}g</p>
                   </div>
                 )}
                 {product.calories !== null && product.calories !== undefined && (
-                  <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
+                  <div className="bg-muted/50 p-2 rounded flex justify-end items-center col-span-5">
                     <p className="font-semibold">{product.calories}kcal</p>
                   </div>
                 )}
                 {product.carbs !== null && product.carbs !== undefined && (
-                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                    <span className="text-muted-foreground">탄수</span>
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-6">
+                    <span className="text-muted-foreground">탄수화물</span>
                     <p className="font-semibold">{product.carbs}g</p>
                   </div>
                 )}
                 {product.sugar !== null && product.sugar !== undefined && (
-                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center col-span-5">
                     <span className="text-muted-foreground">당</span>
                     <p className="font-semibold">{product.sugar}g</p>
                   </div>
@@ -231,13 +228,7 @@ export default function ProductCard({
             </div>
 
             {/* 하단: 찜 카운트와 구매 버튼 */}
-            <div className="flex items-center justify-between mt-4">
-              {/* 찜 카운트 */}
-              <div className="flex items-center gap-1">
-                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-                <span className="text-sm text-red-500">{product.favorites_count}</span>
-              </div>
-
+            <div className="flex items-center justify-end mt-4">
               {/* 구매하기 버튼 */}
               {product.purchase_url && (
                 <Button
@@ -246,9 +237,21 @@ export default function ProductCard({
                   className="flex items-center gap-1 text-xs p-2 h-auto"
                   size="sm"
                 >
+                  {/* 찜 카운트 */}
+                  <div className="flex items-center gap-1 mr-2">
+                    <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                    <span className="text-sm text-red-500">{product.favorites_count}</span>
+                  </div>
                   <ExternalLink className="h-3 w-3" />
                   최저가 확인하러 가기
                 </Button>
+              )}
+              {/* 구매 URL이 없을 때는 찜 카운트만 표시 */}
+              {!product.purchase_url && (
+                <div className="flex items-center gap-1">
+                  <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                  <span className="text-sm text-red-500">{product.favorites_count}</span>
+                </div>
               )}
             </div>
           </div>

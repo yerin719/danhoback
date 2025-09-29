@@ -53,12 +53,12 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
-          <div className="md:col-span-2">
+      <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-12">
+          <div className="sm:col-span-2">
             <Skeleton className="aspect-square w-full" />
           </div>
-          <div className="md:col-span-3 space-y-8">
+          <div className="sm:col-span-3 space-y-8">
             <div className="space-y-4">
               <Skeleton className="h-12 w-32" />
               <Skeleton className="h-8 w-full" />
@@ -142,16 +142,16 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   };
 
   return (
-    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 md:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 sm:px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
-        <div className="md:col-span-2">
+        <div className="sm:col-span-2">
           <ProductImageGallery
             images={images}
             alt={selectedVariant?.name || productInfo?.name || ""}
           />
         </div>
-        <div className="md:col-span-3 space-y-8">
+        <div className="sm:col-span-3 space-y-8">
           {/* 오른쪽: 제품 정보 */}
           {/* 제품 기본 정보 */}
           <ProductInfo
@@ -177,7 +177,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
             <Button
               variant="outline"
               onClick={handleFavoriteClick}
-              className="flex-1 flex items-center justify-center gap-2 py-6 text-xl"
+              className="flex-1 flex items-center justify-center gap-2 py-6 text-base"
               size="lg"
               disabled={toggleFavorite.isPending}
             >
@@ -191,7 +191,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
             {selectedVariant.purchase_url && (
               <Button
                 onClick={handlePurchase}
-                className="flex-[2] flex items-center justify-center gap-3 py-6 text-xl"
+                className="flex-[2] flex items-center justify-center gap-3 py-6 text-base"
                 size="lg"
               >
                 <ExternalLink className="h-6 w-6" />
