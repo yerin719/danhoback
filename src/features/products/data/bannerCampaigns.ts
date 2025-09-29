@@ -4,7 +4,7 @@
 export const productPageBannerCampaigns = [
   {
     id: "coupang-diet-management",
-    imageUrl: "/coupang-diet-banner.png",
+    imageUrl: "/cupang-flesh-banner.png",
     ctaUrl: "https://link.coupang.com/a/cTAjlC",
     isExternal: true,
     startDate: new Date(),
