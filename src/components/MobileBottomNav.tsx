@@ -18,7 +18,7 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t">
       <div className="grid grid-cols-4 h-16">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;

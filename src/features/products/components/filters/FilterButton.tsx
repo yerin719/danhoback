@@ -25,7 +25,7 @@ export default function FilterButton({
   type = "multiselect",
 }: FilterButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);

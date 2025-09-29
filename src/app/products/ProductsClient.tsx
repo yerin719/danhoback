@@ -13,7 +13,6 @@ import { getActiveBannerCampaigns } from "@/features/products/data/bannerCampaig
 import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -29,7 +28,6 @@ export default function ProductsClient({
   initialSortOrder,
 }: ProductsClientProps) {
   const router = useRouter();
-  const isMobile = useMediaQuery("(max-width: 768px)");
   const [sortDrawerOpen, setSortDrawerOpen] = useState(false);
 
   // 현재 필터와 정렬 상태
@@ -84,12 +82,10 @@ export default function ProductsClient({
       setSortBy(newSortBy);
       setSortOrder(newSortOrder);
       updateUrl(filters, newSortBy, newSortOrder);
-      // 모바일에서 Drawer 닫기
-      if (isMobile) {
-        setSortDrawerOpen(false);
-      }
+      // Drawer 닫기
+      setSortDrawerOpen(false);
     },
-    [filters, updateUrl, isMobile],
+    [filters, updateUrl],
   );
 
   // 현재 정렬 옵션의 라벨 반환
@@ -132,50 +128,49 @@ export default function ProductsClient({
       <CompactProductFilters filters={filters} onFiltersChange={handleFilterChange} />
 
       {/* 정렬 옵션 */}
-      <div className="mb-6 flex items-center justify-between ">
-        {/* 모바일: Drawer로 정렬 옵션 표시 */}
-        {isMobile ? (
-          <>
-            <Drawer open={sortDrawerOpen} onOpenChange={setSortDrawerOpen}>
-              <DrawerTrigger asChild>
-                <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent">
-                  {getSortLabel()}
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="h-[40vh] p-0">
-                <div className="px-6 pt-4 pb-2">
-                  <h3 className="text-lg font-semibold">정렬</h3>
-                </div>
-                <div className="px-6 pb-4">
-                  <RadioGroup value={getCurrentSortValue()} onValueChange={handleRadioChange}>
-                    <label className="flex items-center gap-3 py-3 cursor-pointer">
-                      <RadioGroupItem value="favorites_count_desc" />
-                      <span className="text-base">인기순</span>
-                    </label>
-                    <div className="border-t border-gray-100" />
-                    <label className="flex items-center gap-3 py-3 cursor-pointer">
-                      <RadioGroupItem value="protein_desc" />
-                      <span className="text-base">높은 단백질순</span>
-                    </label>
-                    <div className="border-t border-gray-100" />
-                    <label className="flex items-center gap-3 py-3 cursor-pointer">
-                      <RadioGroupItem value="protein_asc" />
-                      <span className="text-base">낮은 단백질순</span>
-                    </label>
-                    <div className="border-t border-gray-100" />
-                    <label className="flex items-center gap-3 py-3 cursor-pointer">
-                      <RadioGroupItem value="calories_asc" />
-                      <span className="text-base">낮은 칼로리순</span>
-                    </label>
-                  </RadioGroup>
-                </div>
-              </DrawerContent>
-            </Drawer>
-            <RequestButton />
-          </>
-        ) : (
-          // 데스크톱: 기존 정렬 옵션 유지
-          <>
+      <div className="mb-6 flex items-center justify-between">
+        {/* 모바일/태블릿: Drawer로 정렬 옵션 표시 */}
+        <div className="lg:hidden flex items-center justify-between w-full">
+          <Drawer open={sortDrawerOpen} onOpenChange={setSortDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent">
+                {getSortLabel()}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[40vh] p-0">
+              <div className="px-6 pt-4 pb-2">
+                <h3 className="text-lg font-semibold">정렬</h3>
+              </div>
+              <div className="px-6 pb-4">
+                <RadioGroup value={getCurrentSortValue()} onValueChange={handleRadioChange}>
+                  <label className="flex items-center gap-3 py-3 cursor-pointer">
+                    <RadioGroupItem value="favorites_count_desc" />
+                    <span className="text-base">인기순</span>
+                  </label>
+                  <div className="border-t border-gray-100" />
+                  <label className="flex items-center gap-3 py-3 cursor-pointer">
+                    <RadioGroupItem value="protein_desc" />
+                    <span className="text-base">높은 단백질순</span>
+                  </label>
+                  <div className="border-t border-gray-100" />
+                  <label className="flex items-center gap-3 py-3 cursor-pointer">
+                    <RadioGroupItem value="protein_asc" />
+                    <span className="text-base">낮은 단백질순</span>
+                  </label>
+                  <div className="border-t border-gray-100" />
+                  <label className="flex items-center gap-3 py-3 cursor-pointer">
+                    <RadioGroupItem value="calories_asc" />
+                    <span className="text-base">낮은 칼로리순</span>
+                  </label>
+                </RadioGroup>
+              </div>
+            </DrawerContent>
+          </Drawer>
+          <RequestButton />
+        </div>
+
+        {/* 데스크톱: 기존 정렬 옵션 유지 */}
+        <div className="hidden lg:flex items-center justify-between w-full">
             <div className="flex items-center">
               <Button
                 variant="ghost"
@@ -230,8 +225,7 @@ export default function ProductsClient({
               </Button>
             </div>
             <RequestButton />
-          </>
-        )}
+        </div>
       </div>
 
       {/* 초기 로딩 상태 */}
