@@ -5,6 +5,7 @@ import CommunityPostItem from "@/components/community/CommunityPostItem";
 import CommunityPostListItem from "@/components/community/CommunityPostListItem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import {
   Sheet,
@@ -20,6 +21,7 @@ import { Filter, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export default function CommunityPage() {
+  const { isAdmin } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<CommunityCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState(""); // 실제 입력 필드 값
@@ -81,12 +83,14 @@ export default function CommunityPage() {
           <h1 className="text-3xl font-semibold">커뮤니티</h1>
           <p className="text-muted-foreground mt-1">단백질 생활의 모든 이야기를 나누어보세요</p>
         </div>
-        <Link href="/community/write">
-          <Button className="w-fit">
-            <Plus className="h-4 w-4 mr-2" />
-            글쓰기
-          </Button>
-        </Link>
+        {isAdmin && (
+          <Link href="/community/write">
+            <Button className="w-fit">
+              <Plus className="h-4 w-4 mr-2" />
+              글쓰기
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="flex gap-8">

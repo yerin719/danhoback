@@ -31,7 +31,12 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </div>
 
         <CardContent className="pt-0 p-0">
-          <div className="space-y-3">
+          <div className="space-y-2">
+            {/* 카테고리 */}
+            <div className="text-xs text-muted-foreground">
+              {getCategoryDisplayName(article.category as ArticleCategory)}
+            </div>
+
             {/* 제목 */}
             <h3 className="font-semibold text-lg leading-tight line-clamp-2 hover:text-primary transition-colors">
               {article.title}
@@ -41,11 +46,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             <p className="text-muted-foreground text-sm line-clamp-3 mb-2">
               {article.summary || ""}
             </p>
-
-            {/* 카테고리 */}
-            <div className="text-xs text-muted-foreground">
-              {getCategoryDisplayName(article.category as ArticleCategory)}
-            </div>
           </div>
         </CardContent>
       </Card>

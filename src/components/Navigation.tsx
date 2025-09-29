@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 const navigationItems: { href: string; label: string }[] = [
   // { href: "/products", label: "제품" },
-  // { href: "/articles", label: "아티클" },
+  { href: "/articles", label: "아티클" },
   // { href: "/community", label: "커뮤니티" },
 ];
 

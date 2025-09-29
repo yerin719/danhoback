@@ -1,12 +1,10 @@
-import ArticleBanner from "@/components/articles/ArticleBanner";
 import ArticleCard from "@/components/articles/ArticleCard";
+import ArticleWriteButton from "@/components/articles/ArticleWriteButton";
 import CategoryFilter from "@/components/articles/CategoryFilter";
 import FeaturedArticle from "@/components/articles/FeaturedArticle";
-import { Button } from "@/components/ui/button";
 import { getCategoryDisplayName } from "@/features/articles/constants";
 import { getArticles, getFeaturedArticle } from "@/features/articles/queries";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import Link from "next/link";
 import { Suspense } from "react";
 
 interface ArticlesPageProps {
@@ -35,14 +33,9 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
 
   return (
     <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* 배너 */}
-      <div className="mb-12">
-        <ArticleBanner />
-      </div>
-
       {/* 최신글 하이라이트 */}
       {featuredArticle && (
-        <section className="mb-12">
+        <section className="mb-10">
           <FeaturedArticle article={featuredArticle} />
         </section>
       )}
@@ -53,16 +46,14 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
           <Suspense fallback={<div className="flex gap-3">로딩 중...</div>}>
             <CategoryFilter />
           </Suspense>
-          <Button asChild variant="default" size="sm">
-            <Link href="/articles/new">글 작성</Link>
-          </Button>
+          <ArticleWriteButton />
         </div>
       </section>
 
       {/* 게시글 리스트 */}
       <section>
         {filteredArticles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredArticles.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}

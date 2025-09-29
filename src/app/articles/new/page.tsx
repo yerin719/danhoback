@@ -13,14 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/AuthContext";
 import { articleCategories, type ArticleCategory } from "@/lib/articles";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function NewArticlePage() {
   const router = useRouter();
+  const { isAdmin, loading: authLoading } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -34,6 +37,14 @@ export default function NewArticlePage() {
     category: "" as ArticleCategory | "",
     isPublic: true,
   });
+
+  // Admin 권한 체크
+  useEffect(() => {
+    if (!authLoading && !isAdmin) {
+      toast.error("관리자만 접근할 수 있습니다.");
+      router.push("/articles");
+    }
+  }, [isAdmin, authLoading, router]);
 
   const handlePublish = () => {
     // 출간 모달 오픈 시 제목 미리 채우기
@@ -65,6 +76,11 @@ export default function NewArticlePage() {
     // 성공 시 상세 페이지로 이동
     router.push("/articles");
   };
+
+  // 로딩 중이거나 권한이 없는 경우
+  if (authLoading || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="bg-background">

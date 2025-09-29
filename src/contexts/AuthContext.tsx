@@ -19,6 +19,7 @@ interface AuthContextType {
   displayName: string;
   avatarInitial: string;
   loading: boolean;
+  isAdmin: boolean;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 표시 이름과 아바타 이니셜 계산
   const displayName = getDisplayName(profile);
   const avatarInitial = getAvatarInitial(displayName);
+  const isAdmin = profile?.role === "admin";
 
   // 프로필 정보 로드
   const loadProfile = async (userId: string) => {
@@ -233,6 +235,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         displayName,
         avatarInitial,
         loading,
+        isAdmin,
         signInWithEmail,
         signUpWithEmail,
         signInWithGoogle,

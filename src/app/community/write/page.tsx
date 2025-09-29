@@ -6,20 +6,30 @@ import {
 } from "@/components/common/tiptap/tiptap-templates/simple/simple-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import { communityCategories, type CommunityCategory } from "@/lib/community";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function CommunityWritePage() {
   const router = useRouter();
+  const { isAdmin, loading: authLoading } = useAuth();
   const editorRef = useRef<SimpleEditorRef>(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<CommunityCategory | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDraft, setIsDraft] = useState(false);
+
+  // Admin 권한 체크
+  useEffect(() => {
+    if (!authLoading && !isAdmin) {
+      toast.error("관리자만 접근할 수 있습니다.");
+      router.push("/community");
+    }
+  }, [isAdmin, authLoading, router]);
 
   const handleSubmit = async (saveAsDraft = false) => {
     const contentHTML = editorRef.current?.getHTML() || "";
@@ -59,6 +69,11 @@ export default function CommunityWritePage() {
     }
   };
   console.log(editorRef.current?.getText());
+
+  // 로딩 중이거나 권한이 없는 경우
+  if (authLoading || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-4 sm:py-8 sm:px-6">
