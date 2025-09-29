@@ -177,7 +177,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
             <Button
               variant="outline"
               onClick={handleFavoriteClick}
-              className="flex-1 flex items-center justify-center gap-2 py-6 text-base"
+              className="flex-1 flex items-center justify-center gap-2 py-6 text-base cursor-pointer"
               size="lg"
               disabled={toggleFavorite.isPending}
             >
@@ -191,7 +191,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
             {selectedVariant.purchase_url && (
               <Button
                 onClick={handlePurchase}
-                className="flex-[2] flex items-center justify-center gap-3 py-6 text-base"
+                className="flex-[2] flex items-center justify-center gap-3 py-6 text-base cursor-pointer"
                 size="lg"
               >
                 <ExternalLink className="h-6 w-6" />

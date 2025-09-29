@@ -82,7 +82,7 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
 
   return (
     <Link href={`/products/${product.slug}`}>
-      <Card className="h-full cursor-pointer border-none shadow-none p-0">
+      <Card className="h-full  border-none shadow-none p-0">
         {/* 세로형 레이아웃 (2개 이상) */}
         <div className="hidden sm:block">
           <CardHeader className="p-0 pb-4">
@@ -96,12 +96,12 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
                 variant="ghost"
                 size="sm"
                 onClick={handleFavoriteClick}
-                className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                className="absolute bottom-2 right-2 h-6 w-6 p-0 bg-black/30 rounded-full hover:bg-black/30 border-none cursor-pointer"
                 disabled={toggleFavorite.isPending}
               >
                 <Heart
-                  className={`h-4 w-4 ${
-                    product.is_favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                  className={`h-5 w-5 drop-shadow-md font-bold ${
+                    product.is_favorited ? "fill-red-500 text-red-500" : "text-white"
                   }`}
                 />
               </Button>
@@ -145,7 +145,13 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
             {/* 찜 카운트와 구매 버튼 */}
             <div className="flex items-center justify-between">
               {/* 찜 카운트 */}
-              <div className="flex items-center gap-1">
+              <div
+                className="flex items-center gap-1 cursor-default"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
                 <Heart className="h-4 w-4 fill-red-500 text-red-500" />
                 <span className="text-sm text-red-500">{product.favorites_count}</span>
               </div>
@@ -155,7 +161,7 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
                 <Button
                   onClick={handlePurchaseClick}
                   variant="ghost"
-                  className="flex items-center gap-1 text-xs p-2 h-auto"
+                  className="flex items-center gap-1 text-xs p-2 h-auto hover:bg-transparent cursor-pointer"
                   size="sm"
                 >
                   <ExternalLink className="h-3 w-3" />
@@ -179,12 +185,12 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
               variant="ghost"
               size="sm"
               onClick={handleFavoriteClick}
-              className="absolute bottom-1 right-1 h-6 w-6 p-0"
+              className="absolute bottom-1 right-1 h-6 w-6 p-0 bg-black/30 rounded-full hover:bg-black/30 border-none cursor-pointer"
               disabled={toggleFavorite.isPending}
             >
               <Heart
-                className={`h-3 w-3 ${
-                  product.is_favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                className={`h-4 w-4 drop-shadow-md font-bold ${
+                  product.is_favorited ? "fill-red-500 text-red-500" : "text-white"
                 }`}
               />
             </Button>
@@ -228,30 +234,30 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
             </div>
 
             {/* 하단: 찜 카운트와 구매 버튼 */}
-            <div className="flex items-center justify-end mt-4">
+            <div className="flex items-center justify-end gap-2 mt-4">
+              {/* 찜 카운트 */}
+              <div
+                className="flex items-center gap-1 cursor-default"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
+                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                <span className="text-sm text-red-500">{product.favorites_count}</span>
+              </div>
+
               {/* 구매하기 버튼 */}
               {product.purchase_url && (
                 <Button
                   onClick={handlePurchaseClick}
                   variant="ghost"
-                  className="flex items-center gap-1 text-xs p-2 h-auto"
+                  className="flex items-center gap-1 text-xs p-2 h-auto hover:bg-transparent cursor-pointer"
                   size="sm"
                 >
-                  {/* 찜 카운트 */}
-                  <div className="flex items-center gap-1 mr-2">
-                    <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-                    <span className="text-sm text-red-500">{product.favorites_count}</span>
-                  </div>
                   <ExternalLink className="h-3 w-3" />
                   최저가 확인하러 가기
                 </Button>
-              )}
-              {/* 구매 URL이 없을 때는 찜 카운트만 표시 */}
-              {!product.purchase_url && (
-                <div className="flex items-center gap-1">
-                  <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-                  <span className="text-sm text-red-500">{product.favorites_count}</span>
-                </div>
               )}
             </div>
           </div>
