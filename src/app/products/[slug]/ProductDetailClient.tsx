@@ -53,7 +53,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+      <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
           <div className="md:col-span-2">
             <Skeleton className="aspect-square w-full" />
@@ -142,7 +142,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 md:px-8">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
         <div className="md:col-span-2">

@@ -28,7 +28,7 @@ export default function FavoritesPage() {
   // 로딩 상태
   if (authLoading || isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold">찜한 제품</h1>
           <p className="text-muted-foreground mt-2">불러오는 중...</p>
@@ -52,7 +52,7 @@ export default function FavoritesPage() {
   const products = favorites || [];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 헤더 */}
       <div className="mb-8">
         <h1 className="text-3xl font-semibold">찜한 제품</h1>

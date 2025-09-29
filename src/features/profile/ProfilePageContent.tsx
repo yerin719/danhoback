@@ -270,7 +270,7 @@ function ProfilePageContentInternal() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-semibold mb-8">프로필 설정</h1>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
@@ -601,7 +601,7 @@ function ProfilePageContentInternal() {
 export default function ProfilePageContent() {
   return (
     <Suspense fallback={
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-semibold mb-8">프로필 설정</h1>
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
           <Card className="h-fit">

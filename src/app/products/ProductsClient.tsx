@@ -114,7 +114,7 @@ export default function ProductsClient({
   }, [router]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 캐러셀 광고 배너 */}
       <CarouselAdBanner
         campaigns={[...getActiveBannerCampaigns()]}
@@ -231,7 +231,7 @@ export default function ProductsClient({
       {/* 초기 로딩 상태 */}
       {isLoading && (
         <div className="min-h-screen">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {[...Array(10)].map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-square rounded-lg" />
@@ -258,7 +258,7 @@ export default function ProductsClient({
       {/* 제품 목록 */}
       {!isLoading && !isError && products && products.length > 0 && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <ProductCard key={product.sku_id} product={product} />
             ))}

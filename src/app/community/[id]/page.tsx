@@ -43,7 +43,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-4 sm:py-8 sm:px-6">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-4 sm:py-8 sm:px-6">
       {/* 뒤로 가기 버튼 */}
       <div className="mb-4 sm:mb-6">
         <Link href="/community">
