@@ -142,7 +142,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   };
 
   return (
-    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6 sm:px-8">
+    <div className="mx-auto max-w-5xl xl:max-w-7xl px-4 py-8 sm:px-6">
       <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-12">
         {/* 왼쪽: 이미지 갤러리 */}
         <div className="sm:col-span-2">
