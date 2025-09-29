@@ -4,6 +4,8 @@ import ProductCard from "@/components/ProductCard";
 import RequestButton from "@/components/RequestButton";
 import { CarouselAdBanner } from "@/components/advertising";
 import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import CompactProductFilters from "@/features/products/components/CompactProductFilters";
 import { PRODUCTS_PER_PAGE } from "@/features/products/constants";
@@ -11,6 +13,7 @@ import { getActiveBannerCampaigns } from "@/features/products/data/bannerCampaig
 import { useInfiniteProductSearch } from "@/features/products/hooks/useInfiniteProductSearch";
 import { type FilterState } from "@/features/products/queries";
 import { filtersToSearchParams } from "@/features/products/utils/urlParams";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -26,6 +29,8 @@ export default function ProductsClient({
   initialSortOrder,
 }: ProductsClientProps) {
   const router = useRouter();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [sortDrawerOpen, setSortDrawerOpen] = useState(false);
 
   // 현재 필터와 정렬 상태
   const [filters, setFilters] = useState<FilterState>(initialFilters);
@@ -79,9 +84,33 @@ export default function ProductsClient({
       setSortBy(newSortBy);
       setSortOrder(newSortOrder);
       updateUrl(filters, newSortBy, newSortOrder);
+      // 모바일에서 Drawer 닫기
+      if (isMobile) {
+        setSortDrawerOpen(false);
+      }
     },
-    [filters, updateUrl],
+    [filters, updateUrl, isMobile],
   );
+
+  // 현재 정렬 옵션의 라벨 반환
+  const getSortLabel = useCallback(() => {
+    if (sortBy === "favorites_count" && sortOrder === "desc") return "인기순";
+    if (sortBy === "protein" && sortOrder === "desc") return "높은 단백질순";
+    if (sortBy === "protein" && sortOrder === "asc") return "낮은 단백질순";
+    if (sortBy === "calories" && sortOrder === "asc") return "낮은 칼로리순";
+    return "정렬";
+  }, [sortBy, sortOrder]);
+
+  // 현재 정렬 옵션의 값 반환 (RadioGroup용)
+  const getCurrentSortValue = useCallback(() => {
+    return `${sortBy}_${sortOrder}`;
+  }, [sortBy, sortOrder]);
+
+  // RadioGroup 값 변경 핸들러
+  const handleRadioChange = useCallback((value: string) => {
+    const [newSortBy, newSortOrder] = value.split("_");
+    handleSortChange(newSortBy, newSortOrder as "asc" | "desc");
+  }, [handleSortChange]);
 
   // 필터 초기화
   const handleResetFilters = useCallback(() => {
@@ -104,58 +133,105 @@ export default function ProductsClient({
 
       {/* 정렬 옵션 */}
       <div className="mb-6 flex items-center justify-between ">
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleSortChange("favorites_count", "desc")}
-            className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
-              sortBy === "favorites_count" && sortOrder === "desc"
-                ? "font-semibold text-black"
-                : "text-gray-500"
-            }`}
-          >
-            인기순
-          </Button>
-          <span className="text-gray-300">·</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleSortChange("protein", "desc")}
-            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-              sortBy === "protein" && sortOrder === "desc"
-                ? "font-semibold text-black"
-                : "text-gray-500"
-            }`}
-          >
-            높은 단백질순
-          </Button>
-          <span className="text-gray-300">·</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleSortChange("protein", "asc")}
-            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-              sortBy === "protein" && sortOrder === "asc" ? "font-semibold text-black" : "text-gray-500"
-            }`}
-          >
-            낮은 단백질순
-          </Button>
-          <span className="text-gray-300">·</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleSortChange("calories", "asc")}
-            className={`px-2 hover:bg-transparent hover:cursor-pointer ${
-              sortBy === "calories" && sortOrder === "asc"
-                ? "font-semibold text-black"
-                : "text-gray-500"
-            }`}
-          >
-            낮은 칼로리순
-          </Button>
-        </div>
-        <RequestButton />
+        {/* 모바일: Drawer로 정렬 옵션 표시 */}
+        {isMobile ? (
+          <>
+            <Drawer open={sortDrawerOpen} onOpenChange={setSortDrawerOpen}>
+              <DrawerTrigger asChild>
+                <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent">
+                  {getSortLabel()}
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent className="h-[40vh] p-0">
+                <div className="px-6 pt-4 pb-2">
+                  <h3 className="text-lg font-semibold">정렬</h3>
+                </div>
+                <div className="px-6 pb-4">
+                  <RadioGroup value={getCurrentSortValue()} onValueChange={handleRadioChange}>
+                    <label className="flex items-center gap-3 py-3 cursor-pointer">
+                      <RadioGroupItem value="favorites_count_desc" />
+                      <span className="text-base">인기순</span>
+                    </label>
+                    <div className="border-t border-gray-100" />
+                    <label className="flex items-center gap-3 py-3 cursor-pointer">
+                      <RadioGroupItem value="protein_desc" />
+                      <span className="text-base">높은 단백질순</span>
+                    </label>
+                    <div className="border-t border-gray-100" />
+                    <label className="flex items-center gap-3 py-3 cursor-pointer">
+                      <RadioGroupItem value="protein_asc" />
+                      <span className="text-base">낮은 단백질순</span>
+                    </label>
+                    <div className="border-t border-gray-100" />
+                    <label className="flex items-center gap-3 py-3 cursor-pointer">
+                      <RadioGroupItem value="calories_asc" />
+                      <span className="text-base">낮은 칼로리순</span>
+                    </label>
+                  </RadioGroup>
+                </div>
+              </DrawerContent>
+            </Drawer>
+            <RequestButton />
+          </>
+        ) : (
+          // 데스크톱: 기존 정렬 옵션 유지
+          <>
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortChange("favorites_count", "desc")}
+                className={`pl-0 pr-2 hover:bg-transparent hover:cursor-pointer ${
+                  sortBy === "favorites_count" && sortOrder === "desc"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+              >
+                인기순
+              </Button>
+              <span className="text-gray-300">·</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortChange("protein", "desc")}
+                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                  sortBy === "protein" && sortOrder === "desc"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+              >
+                높은 단백질순
+              </Button>
+              <span className="text-gray-300">·</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortChange("protein", "asc")}
+                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                  sortBy === "protein" && sortOrder === "asc"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+              >
+                낮은 단백질순
+              </Button>
+              <span className="text-gray-300">·</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortChange("calories", "asc")}
+                className={`px-2 hover:bg-transparent hover:cursor-pointer ${
+                  sortBy === "calories" && sortOrder === "asc"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+              >
+                낮은 칼로리순
+              </Button>
+            </div>
+            <RequestButton />
+          </>
+        )}
       </div>
 
       {/* 초기 로딩 상태 */}
