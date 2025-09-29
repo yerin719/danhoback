@@ -125,14 +125,13 @@ export default function ProductCard({
               </div>
             )}
             {product.calories !== null && product.calories !== undefined && (
-              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                <span className="text-muted-foreground">칼로리</span>
+              <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
                 <p className="font-semibold">{product.calories}kcal</p>
               </div>
             )}
             {product.carbs !== null && product.carbs !== undefined && (
               <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                <span className="text-muted-foreground">탄수화물</span>
+                <span className="text-muted-foreground">탄수</span>
                 <p className="font-semibold">{product.carbs}g</p>
               </div>
             )}
