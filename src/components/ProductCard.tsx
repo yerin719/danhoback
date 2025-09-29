@@ -86,85 +86,173 @@ export default function ProductCard({
   return (
     <Link href={`/products/${product.slug}`}>
       <Card className="h-full cursor-pointer border-none shadow-none p-0">
-        <CardHeader className="py-4 px-0 pb-2">
-          <div className="aspect-square relative mb-4">
+        {/* 세로형 레이아웃 (2개 이상) */}
+        <div className="hidden sm:block">
+          <CardHeader className="py-4 px-0 pb-2">
+            <div className="aspect-square relative mb-4">
+              <ProductImage
+                src={product.primary_image || "/placeholder.png"}
+                alt={product.sku_name || product.product_name}
+                className="object-cover rounded-lg"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleFavoriteClick}
+                className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                disabled={toggleFavorite.isPending}
+              >
+                <Heart
+                  className={`h-4 w-4 ${
+                    product.is_favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                  }`}
+                />
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">{product.brand_name}</p>
+              <h3 className="font-semibold text-sm leading-tight">
+                {product.sku_name || product.product_name}
+              </h3>
+            </div>
+          </CardHeader>
+
+          <CardContent className="px-0 py-0">
+            {/* 영양 성분 정보 */}
+            <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+              {product.protein !== null && product.protein !== undefined && (
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                  <span className="text-muted-foreground">단백질</span>
+                  <p className="font-semibold">{product.protein}g</p>
+                </div>
+              )}
+              {product.calories !== null && product.calories !== undefined && (
+                <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
+                  <p className="font-semibold">{product.calories}kcal</p>
+                </div>
+              )}
+              {product.carbs !== null && product.carbs !== undefined && (
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                  <span className="text-muted-foreground">탄수</span>
+                  <p className="font-semibold">{product.carbs}g</p>
+                </div>
+              )}
+              {product.sugar !== null && product.sugar !== undefined && (
+                <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                  <span className="text-muted-foreground">당</span>
+                  <p className="font-semibold">{product.sugar}g</p>
+                </div>
+              )}
+            </div>
+
+            {/* 찜 카운트와 구매 버튼 */}
+            <div className="flex items-center justify-between">
+              {/* 찜 카운트 */}
+              <div className="flex items-center gap-1">
+                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                <span className="text-sm text-red-500">{product.favorites_count}</span>
+              </div>
+
+              {/* 구매하기 버튼 */}
+              {product.purchase_url && (
+                <Button
+                  onClick={handlePurchaseClick}
+                  variant="ghost"
+                  className="flex items-center gap-1 text-xs p-2 h-auto"
+                  size="sm"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  최저가 확인하러 가기
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </div>
+
+        {/* 가로형 레이아웃 (모바일에서 1개일 때) */}
+        <div className="flex sm:hidden gap-4">
+          {/* 왼쪽: 이미지 */}
+          <div className="w-32 h-32 relative flex-shrink-0">
             <ProductImage
               src={product.primary_image || "/placeholder.png"}
               alt={product.sku_name || product.product_name}
-              className="object-cover rounded-lg"
+              className="object-cover rounded-lg w-full h-full"
             />
             <Button
               variant="ghost"
               size="sm"
               onClick={handleFavoriteClick}
-              className="absolute bottom-2 right-2 h-8 w-8 p-0"
+              className="absolute bottom-1 right-1 h-6 w-6 p-0"
               disabled={toggleFavorite.isPending}
             >
               <Heart
-                className={`h-4 w-4 ${
+                className={`h-3 w-3 ${
                   product.is_favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
                 }`}
               />
             </Button>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{product.brand_name}</p>
-            <h3 className="font-semibold text-sm leading-tight">
-              {product.sku_name || product.product_name}
-            </h3>
-          </div>
-        </CardHeader>
 
-        <CardContent className="px-0 py-0">
-          {/* 영양 성분 정보 */}
-          <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-            {product.protein !== null && product.protein !== undefined && (
-              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                <span className="text-muted-foreground">단백질</span>
-                <p className="font-semibold">{product.protein}g</p>
-              </div>
-            )}
-            {product.calories !== null && product.calories !== undefined && (
-              <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
-                <p className="font-semibold">{product.calories}kcal</p>
-              </div>
-            )}
-            {product.carbs !== null && product.carbs !== undefined && (
-              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                <span className="text-muted-foreground">탄수</span>
-                <p className="font-semibold">{product.carbs}g</p>
-              </div>
-            )}
-            {product.sugar !== null && product.sugar !== undefined && (
-              <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
-                <span className="text-muted-foreground">당</span>
-                <p className="font-semibold">{product.sugar}g</p>
-              </div>
-            )}
-          </div>
+          {/* 오른쪽: 데이터 */}
+          <div className="flex-1 flex flex-col justify-between">
+            {/* 상단: 제품 정보 */}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">{product.brand_name}</p>
+              <h3 className="font-semibold text-base leading-tight">
+                {product.sku_name || product.product_name}
+              </h3>
 
-          {/* 찜 카운트와 구매 버튼 */}
-          <div className="flex items-center justify-between">
-            {/* 찜 카운트 */}
-            <div className="flex items-center gap-1">
-              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-              <span className="text-sm text-red-500">{product.favorites_count}</span>
+              {/* 영양 성분 정보 */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {product.protein !== null && product.protein !== undefined && (
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                    <span className="text-muted-foreground">단백질</span>
+                    <p className="font-semibold">{product.protein}g</p>
+                  </div>
+                )}
+                {product.calories !== null && product.calories !== undefined && (
+                  <div className="bg-muted/50 p-2 rounded flex justify-end items-center">
+                    <p className="font-semibold">{product.calories}kcal</p>
+                  </div>
+                )}
+                {product.carbs !== null && product.carbs !== undefined && (
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                    <span className="text-muted-foreground">탄수</span>
+                    <p className="font-semibold">{product.carbs}g</p>
+                  </div>
+                )}
+                {product.sugar !== null && product.sugar !== undefined && (
+                  <div className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                    <span className="text-muted-foreground">당</span>
+                    <p className="font-semibold">{product.sugar}g</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* 구매하기 버튼 */}
-            {product.purchase_url && (
-              <Button
-                onClick={handlePurchaseClick}
-                variant="ghost"
-                className="flex items-center gap-1 text-xs p-2 h-auto"
-                size="sm"
-              >
-                <ExternalLink className="h-3 w-3" />
-                최저가 확인하러 가기
-              </Button>
-            )}
+            {/* 하단: 찜 카운트와 구매 버튼 */}
+            <div className="flex items-center justify-between mt-4">
+              {/* 찜 카운트 */}
+              <div className="flex items-center gap-1">
+                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                <span className="text-sm text-red-500">{product.favorites_count}</span>
+              </div>
+
+              {/* 구매하기 버튼 */}
+              {product.purchase_url && (
+                <Button
+                  onClick={handlePurchaseClick}
+                  variant="ghost"
+                  className="flex items-center gap-1 text-xs p-2 h-auto"
+                  size="sm"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  최저가 확인하러 가기
+                </Button>
+              )}
+            </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
     </Link>
   );
