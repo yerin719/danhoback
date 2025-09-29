@@ -53,6 +53,11 @@ export default function TermsOfServicePage() {
               <li>영양 정보 및 관련 콘텐츠 제공</li>
               <li>기타 회사가 추가 개발하거나 제휴계약 등을 통해 회원에게 제공하는 일체의 서비스</li>
             </ul>
+            <div className="bg-gray-50 p-4 rounded-lg mt-4">
+              <p className="text-sm">
+                <strong>쿠팡 파트너스 활동 안내:</strong> 본 서비스에서 제공하는 최저가 확인하기 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+              </p>
+            </div>
           </div>
         </section>
 
