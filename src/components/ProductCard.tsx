@@ -96,14 +96,12 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
                 variant="ghost"
                 size="sm"
                 onClick={handleFavoriteClick}
-                className="absolute bottom-2 right-2 h-6 w-6 p-0 bg-black/30 rounded-full hover:bg-black/30 border-none cursor-pointer"
+                className={`absolute bottom-2 right-2 h-6 w-6 p-0 rounded-full border-none cursor-pointer hover:bg-opacity-100 ${
+                  product.is_favorited ? "bg-red-500 hover:bg-red-500" : "bg-black/30 hover:bg-black/30"
+                }`}
                 disabled={toggleFavorite.isPending}
               >
-                <Heart
-                  className={`h-5 w-5 drop-shadow-md font-bold ${
-                    product.is_favorited ? "fill-red-500 text-red-500" : "text-white"
-                  }`}
-                />
+                <Heart className="h-5 w-5 drop-shadow-md font-bold text-white" />
               </Button>
             </div>
             <div className="space-y-1">
@@ -185,14 +183,12 @@ export default function ProductCard({ product, onFavoriteChange }: ProductCardPr
               variant="ghost"
               size="sm"
               onClick={handleFavoriteClick}
-              className="absolute bottom-1 right-1 h-6 w-6 p-0 bg-black/30 rounded-full hover:bg-black/30 border-none cursor-pointer"
+              className={`absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full border-none cursor-pointer hover:bg-opacity-100 ${
+                product.is_favorited ? "bg-red-500 hover:bg-red-500" : "bg-black/30 hover:bg-black/30"
+              }`}
               disabled={toggleFavorite.isPending}
             >
-              <Heart
-                className={`h-4 w-4 drop-shadow-md font-bold ${
-                  product.is_favorited ? "fill-red-500 text-red-500" : "text-white"
-                }`}
-              />
+              <Heart className="h-4 w-4 drop-shadow-md font-bold text-white" />
             </Button>
           </div>
 
