@@ -1,6 +1,6 @@
+import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
@@ -29,6 +29,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className={notoSansKr.variable}>
+        {/* Google AdSense */}
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3427802368854641"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ZFTS1H98RV"
