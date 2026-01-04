@@ -12,16 +12,6 @@ export const productPageBannerCampaigns = [
     isActive: true,
     priority: "high" as const,
   },
-  {
-    id: "coupang-partnership",
-    imageUrl: "/cupang-banner.png",
-    ctaUrl: "https://link.coupang.com/a/cTzjkg",
-    isExternal: true,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30일 후
-    isActive: true,
-    priority: "high" as const,
-  },
 ] as const;
 
 /**
