@@ -170,6 +170,7 @@ export default function CompactProductFilters({
 
   return (
     <div className="border-b pb-4 mb-4">
+      {/* 필터 버튼 줄 */}
       <div
         className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
         style={{
@@ -351,6 +352,16 @@ export default function CompactProductFilters({
             <RotateCcw className="h-3 w-3" />
           </Button>
         )}
+
+        {/* 데스크톱: 쿠팡 파트너스 문구 (같은 줄) */}
+        <div className="hidden md:block ml-4 flex-shrink-0 text-xs text-muted-foreground whitespace-nowrap">
+          쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+        </div>
+      </div>
+
+      {/* 모바일: 쿠팡 파트너스 문구 (별도 줄) */}
+      <div className="md:hidden mt-2 text-xs text-muted-foreground">
+        쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </div>
     </div>
   );

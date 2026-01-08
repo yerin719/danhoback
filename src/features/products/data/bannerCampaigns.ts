@@ -14,7 +14,7 @@ export const productPageBannerCampaigns = [
   },
   {
     id: "coupang-partnership",
-    imageUrl: "/cupang.jpg",
+    imageUrl: "/cupang0108.png",
     ctaUrl: "https://link.coupang.com/a/dk9eus",
     isExternal: true,
     startDate: new Date(),
